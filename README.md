@@ -1,145 +1,35 @@
-# The Devil's Deck
+# 🏙️ Synergy District
 
-Webová strategická karetní hra inspirovaná Robloxem (Hitman Card Game). Kombinuje prvky *ruské rulety*, taktického myšlení ve stylu *Exploding Kittens* a napětí, kdy jeden špatný tah může rozhodnout.
+**Synergy District** je strategická budovatelská webová hra založená na mřížce (grid-based), kde hlavním cílem je efektivní umisťování budov pro maximalizaci zisku a spokojenosti obyvatel. Hra klade důraz na **synergie** – vzájemné ovlivňování sousedících budov.
 
----
+## 🎮 O hře
 
-## 🛠️ Technologie
+Hráč staví město na omezené ploše. Každá budova má svou cenu, požadavky a především bonusy (nebo postihy), které závisí na tom, co stojí vedle ní.
 
-### Frontend
+### Klíčové mechaniky
+* **Grid systém:** Stavění probíhá na čtvercové síti.
+* **Synergie:** Umístění továrny vedle domu sníží spokojenost, ale park vedle domu přiláká více lidí.
+* **Management zdrojů:** Musíte balancovat 5 hlavních statistik.
+* **Časový tlak / Cíle:** Hra obsahuje herní módy s časovým limitem nebo cílem (např. "dosáhni 100 populace").
 
-* React.ts
-* CSS
-* Axios nebo Fetch API
+## 📊 Statistiky a Zdroje
 
-### Backend
+Hráč musí balancovat následující metriky:
 
-* ASP.NET Core Web API (C#)
+| Statistika | Význam |
+| :--- | :--- |
+| **👥 People** (Lidé) | Nutní pro fungování budov. Získávají se z Domů. |
+| **💰 Money** (Peníze) | Generují se v čase. Potřeba pro nákup nových budov. |
+| **😊 Happiness** (Štěstí) | Ovlivňuje produktivitu. Nízké štěstí = pomalejší práce. |
+| **⚡ Electricity** (Elektřina)| Vyžadována pro pokročilé budovy. |
+| **🏭 Industry** (Průmysl) | Zrychluje nabídku nových budov v obchodě. |
 
-### Databáze
+## 🏗️ Budovy a Synergie
 
-* Prozatím:
-  * Data v paměti pro lokální úložiště<br>
-  * MSSQL (hlavně GET) pro získávání dat pro webové prvky
-* Později:
-  * Přidání long-pollingu pro podporu multiplayeru
+Příklady interakcí ve hře:
 
----
-
-## 🎮 Pravidla hry (zjednodušeně)
-
-### Balíček karet obsahuje:
-- Bezpečné karty  
-- Uživatelské karty (Skip, Defuse, Shuffle atd.)  
-- Ďáblovy karty  
-
-### Průběh tahu
-Každý hráč (nebo AI) si v tahu vezme 1 kartu z balíčku.
-
-### Hrozba
-- Pokud hráč vytáhne Ďáblovu kartu → je vyřazen  
-- Zachránit se může obrannou kartou (např. Bodyguard, Disguise)  
-- Pokud obrannou kartu použije, Ďáblova karta se vrací do balíčku.  
-- Pokud ne → Ďáblova karta se odstraní a hráč končí.
-
-### Výhra
-Vyhrává poslední přeživší hráč (nebo AI).
-
----
-
-## 👥 Tým a rozdělení práce
-
-### **Mykhailo — Frontend**
-**Zaměření:** UI/UX, React komponenty, animace
-
-#### Úkoly:
-- Inicializace React (TypeScript) projektu a struktury složek.
-- Návrh a implementace vizuálního stylu karet a herní plochy.
-- Animace (tah karty, míchání, vyřazení, UI přechody).
-- Obrazovky: Menu, Nastavení, Hra, Game Over, Statistiky.
-- Práce s mock daty do doby, než backend poskytne API.
-
-**Výstup:** Responzivní, přehledné a vizuálně příjemné UI.
-
----
-
-### **Matěj — Backend**
-**Zaměření:** API, serverová logika, persistence
-
-#### Úkoly:
-- Vytvoření ASP.NET Core Web API projektu.
-- Implementace endpointů, např.:
-  - `POST /start-game` — vytvoření nové hry  
-  - `POST /draw-card` — táhnutí karty / provedení akce  
-  - `GET /game-state` — získání aktuálního stavu hry
-- Logika práce s balíčkem (vytvoření, míchání, odstranění karet).
-- Jednotkové testy základní logiky.
-- Návrh rozhraní pro přechod na multiplayer (long-polling / websockets).
-
-**Výstup:** Stabilní a testovatelný backend s dokumentovanými endpointy (Swagger).
-
----
-
-### **Daniel — Logika & Integrace**
-**Zaměření:** herní pravidla, state management, integrace FE ↔ BE
-
-#### Úkoly:
-- Implementace jádra hry v backendu: třídy `Card`, `Player`, `Deck`, event-handlery.
-- Definice a implementace pravidel (efekty karet, životy, pořadí tahů).
-- Implementace jednoduché AI pro singleplayer (různé úrovně agresivity).
-- Nastavení sdíleného state na frontendu (React Context / Redux) + napojení na API.
-- End-to-end testy chování „táhni kartu“ a odezvy UI.
-
-**Výstup:** Funkční herní logika a hladká integrace mezi UI a API.
-
----
-
-## 📅 Roadmapa
-
----
-
-### **Fáze 1 — Singleplayer (Prototype)**  
-**Cíl:** rychle fungující hratelný prototyp
-
-#### Úkoly:
-- Implementovat základní balíček karet a logiku v C#.
-- Zprovoznit REST API se základními endpointy.
-- Vytvořit React UI pro hraní proti jednoduchému botovi.
-- Testování a ladění stavu hry a koncových stavů (vyřazení, game over).
-
-#### Milníky:
-- Backend: CRUD pro hru + endpoint `draw-card`.
-- Frontend: herní obrazovka + vizualizace tahu.
-- AI: jednoduchý náhodný / heuristický bot.
-
----
-
-### **Fáze 2 — Vylepšení & rozšíření**  
-**Cíl:** obohatit hratelnost a vizuální stránku
-
-#### Úkoly:
-- Přidat efekty uživatelských karet (Skip, Attack, Shuffle, Defuse atd.).
-- Vylepšit AI (strategie, reakce na karty).
-- Přidat animace, zvuky, notifikace a zlepšit UX.
-- Přidat sledování skóre a statistiky hráče.
-
-#### Milníky:
-- Implementace všech hlavních typů karet a jejich efektů.
-- Vylepšený bot s různými obtížnostmi.
-- Ukládání statistik do MSSQL.
-
----
-
-### **Fáze 3 — Multiplayer**  
-**Cíl:** hrát s reálnými hráči v reálném čase
-
-#### Úkoly:
-- Implementovat real-time komunikaci (WebSockets / long-polling).
-- Vytvořit lobby systém (sezení, vytváření her, pozvánky).
-- Implementovat synchronizaci stavu hry mezi klienty.
-- Přidat in-game chat a základní reputační systém.
-
-#### Milníky:
-- Stabilní real-time synchronizace více klientů.
-- Lobby + matchmaking.
-- Bezpečnostní a škálovatelnostní úvahy (autentizace, ochrana proti cheatům).
+* **Domy (Domy):** Získávají bonus +2 lidi za každý sousední Park.
+* **Kanceláře:** +20 % peněz, bonus se násobí "Blue" synergií.
+* **Obchod:** Zdvojnásobuje výnos, pokud sousedí s jinou komerční budovou.
+* **Továrna:** Generuje průmysl, ale snižuje štěstí (-1) a peníze (-1).
+* **Park:** Zvyšuje štěstí (+2), ale více parků vedle sebe může mít klesající efekt.
