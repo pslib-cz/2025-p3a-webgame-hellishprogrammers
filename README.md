@@ -18,10 +18,11 @@ Webová strategická karetní hra inspirovaná Robloxem (Hitman Card Game). Komb
 
 ### Databáze
 
-* Prozatím:
+* Prozatím:<br>
   Data v paměti pro lokální úložiště<br>
   MSSQL (hlavně GET) pro získávání dat pro webové prvky
-* Později: Přidání long-pollingu pro podporu multiplayeru
+* Později:<br>
+  Přidání long-pollingu pro podporu multiplayeru
 
 ---
 
