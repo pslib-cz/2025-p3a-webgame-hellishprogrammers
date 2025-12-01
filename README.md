@@ -33,3 +33,33 @@ Příklady interakcí ve hře:
 * **Obchod:** Zdvojnásobuje výnos, pokud sousedí s jinou komerční budovou.
 * **Továrna:** Generuje průmysl, ale snižuje štěstí (-1) a peníze (-1).
 * **Park:** Zvyšuje štěstí (+2), ale více parků vedle sebe může mít klesající efekt.
+
+## Rozdělení práce
+
+### Mykhailo: Frontend & UI
+*Zodpovědnost: To, jak hra vypadá a jak se ovládá.*
+
+* Rozhodnutí Canvas vs. HTML Grid: Rozlousknout "Technologický problém" z tabulky.
+* UI Layout: Vytvořit postranní panel (Nabídka budov) a horní lištu (Statistiky: Money, People, Happiness...).
+* Interaktivita: Implementovat drag & drop nebo "click to build" systém pro umisťování budov do mřížky.
+* Vizuální feedback: Zobrazit šipky nebo barvy (zelená/červená) při umisťování budovy, aby hráč viděl synergie.
+
+### Matěj: Backend & Data Model
+*Zodpovědnost: Logika na pozadí, ukládání a validace.*
+
+* API Endpointy: Vytvořit Controller v ASP.NET pro:
+  * GET /gamestate (načtení hry)
+  * POST /build (pošle souřadnice a typ budovy, vrátí nový stav surovin).
+* Logika výpočtu (Engine): Zde se bude dít "magie". Potřeba vytvořit C# třídy pro budovy.
+ * Implementovat algoritmus, který po každém tahu přepočítá sousedy a aplikuje bonusy (Synergie).
+ * Udělat to robustně, aby se dalo snadno přidat nové pravidlo (např. Factory -1 Happiness).
+* Ukládání postupu: stačí jednoduchá JSON serializace do souboru nebo in-memory databáze pro začátek.
+
+### Daniel: Gameplay Loop & State Management
+*Zodpovědnost: Propojení frontendu a backendu, pravidla hry.*
+
+* React State (Zustand/Redux): Držet aktuální stav peněz a surovin na klientovi, aby se UI aktualizovalo okamžitě (optimistic updates), než přijde potvrzení ze serveru.
+* Game Loop (Timer): Implementovat "Časování" (viz tabulka).
+* Timer, který každých X sekund přidá peníze na základě statistiky "Money per second".
+* Podmínky prohry/výhry: Implementovat logiku "Cíl" (např. "Máš 5 minut na získání 1000 peněz").
+* Generace mapy: Implementovat "Překážky na mapě" – náhodně zablokovat některá políčka (voda/skály), kde nejde stavět.
