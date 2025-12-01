@@ -58,8 +58,8 @@ Příklady interakcí ve hře:
 ### Daniel: Gameplay Loop & State Management
 *Zodpovědnost: Propojení frontendu a backendu, pravidla hry.*
 
-* React State (Zustand/Redux): Držet aktuální stav peněz a surovin na klientovi, aby se UI aktualizovalo okamžitě (optimistic updates), než přijde potvrzení ze serveru.
-* Game Loop (Timer): Implementovat "Časování" (viz tabulka).
+* React State: Držet aktuální stav peněz a surovin na klientovi, aby se UI aktualizovalo okamžitě (optimistic updates), než přijde potvrzení ze serveru.
+* Game Loop (Timer): Implementovat "Časování".
 * Timer, který každých X sekund přidá peníze na základě statistiky "Money per second".
 * Podmínky prohry/výhry: Implementovat logiku "Cíl" (např. "Máš 5 minut na získání 1000 peněz").
 * Generace mapy: Implementovat "Překážky na mapě" – náhodně zablokovat některá políčka (voda/skály), kde nejde stavět.
