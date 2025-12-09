@@ -10,7 +10,6 @@
         public int SourceBuildingId { get; set; }
         public Building SourceBuilding { get; set; } = null!;
 
-        public ICollection<BuildingSynergy> IncomingSynergies { get; set; } = new List<BuildingSynergy>();
-        public ICollection<BuildingSynergy> OutgoingSynergies { get; set; } = new List<BuildingSynergy>();
+        public ICollection<BuildingProduction> SynergyProductions { get; set; } = new List<BuildingProduction>();
     }
 }
