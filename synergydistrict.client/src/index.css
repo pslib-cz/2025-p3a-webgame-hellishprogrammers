@@ -1,68 +1,41 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import "@fontsource/space-mono/700.css";
+@import "@fontsource/roboto-mono/700.css";
 
-  color-scheme: light dark;
+:root {
+  font-family: "Roboto Mono";
+  font-weight: 700;
+
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
 
+  --text: #FEFAE0;
+  --background: #191919;
+
+  --primary: #1982C4;
+  --secundary: #6A4C93;
+  --tercial: #FF595E;
+  --resident: #FFCA3A;
+  --leisure: #8AC926;
+
+  --water-light: #598392;
+  --water--dark: #124559;
+  --grass--light: #7C8B4A;
+  --grass--dark: #606C38;
+  --forrest--dark: #283618;
+  --mountain--light: #BE8F5B;
+  --mountain--dark: #8F531D;
+
+  --bg80: rgba(var(--background), 0.8);
+  --bg32: rgba(var(--background), 0.32);
+  
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+h1,
+h2,
+h3 {
+  font-family: "Space Mono";
 }

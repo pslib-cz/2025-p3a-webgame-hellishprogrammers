@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/roboto-mono": "^5.2.8",
+    "@fontsource/space-mono": "^5.2.9",
     "konva": "^10.0.12",
+    "normalize.css": "^8.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-konva": "^19.2.1",
