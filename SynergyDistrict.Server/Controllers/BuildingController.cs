@@ -5,6 +5,8 @@ using SynergyDistrict.Server.DTOs;
 
 namespace SynergyDistrict.Server.Controllers
 {
+    [ApiController]
+    [Route("api/[controller]")]
     public class BuildingController : ControllerBase
     {
         private readonly ILogger<BuildingController> _logger;
