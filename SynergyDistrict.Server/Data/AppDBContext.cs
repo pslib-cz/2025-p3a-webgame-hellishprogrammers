@@ -17,16 +17,15 @@ namespace SynergyDistrict.Server.Data
         {
             modelBuilder.Entity<BuildingSynergy>()
                 .HasOne(bs => bs.TargetBuilding)
-                .WithMany(b => b.Synergies)
+                .WithMany(b => b.IncomingSynergies)
                 .HasForeignKey(bs => bs.TargetBuildingId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BuildingSynergy>()
                 .HasOne(bs => bs.SourceBuilding)
-                .WithMany()
+                .WithMany(b => b.OutgoingSynergies)
                 .HasForeignKey(bs => bs.SourceBuildingId)
                 .OnDelete(DeleteBehavior.Restrict);
-
         }
     }
 }
