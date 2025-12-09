@@ -41,7 +41,7 @@ namespace SynergyDistrict.Server.Models
     public enum BuildingTileType
     {
         Empty,
-        Filled,
+        Solid,
         Icon
     }
 }

@@ -15,7 +15,7 @@
     {
         Money,
         People,
-        Electricity,
+        Energy,
         Industry,
         Happiness
     }
