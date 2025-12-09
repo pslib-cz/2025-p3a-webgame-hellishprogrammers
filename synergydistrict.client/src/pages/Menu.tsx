@@ -1,18 +1,23 @@
-import { NavLink, Outlet } from "react-router-dom";
+import TextButton from "../components/TextButton";
+import styles from "../styles/Menu.module.css";
 
 const Menu = () => {
   return (
-    <>
-      <nav style={{ marginBottom: "20px" }}>
-        <NavLink to="">Menu</NavLink> {" | "}
-        <NavLink to="play">Play</NavLink> {" | "}
-        <NavLink to="leaderboard">Leaderboard</NavLink> {" | "}
-        <NavLink to="statistics">Statistics</NavLink> {" | "}
-        <NavLink to="settings">Settings</NavLink> {" | "}
-        <NavLink to="/game">Game</NavLink>
+    <div className={styles.menuLeft}>
+      <h1>Synergy District_</h1>
+      <nav>
+        <menu>
+          <ul>
+            <TextButton text="button1" />
+          </ul>
+        </menu>
+
+        {/* <NavLink to="play">Play</NavLink>
+        <NavLink to="leaderboard">Leaderboard</NavLink>
+        <NavLink to="statistics">Statistics</NavLink>
+        <NavLink to="settings">Settings</NavLink> */}
       </nav>
-      <Outlet />
-    </>
+    </div>
   );
 };
 

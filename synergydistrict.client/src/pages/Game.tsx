@@ -1,7 +1,7 @@
 import React from "react";
 import { Stage, Layer } from "react-konva";
 import { useStore } from "../hooks/store";
-import { Tile } from "./Game/Gameplay/Tile";
+import { Tile } from "./Game/Tile";
 
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;

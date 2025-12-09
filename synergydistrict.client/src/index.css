@@ -5,29 +5,29 @@
   font-family: "Roboto Mono";
   font-weight: 700;
 
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--text);
+  background-color: var(--background);
 
-  --text: #FEFAE0;
+  --text: #fefae0;
   --background: #191919;
 
-  --primary: #1982C4;
-  --secundary: #6A4C93;
-  --tercial: #FF595E;
-  --resident: #FFCA3A;
-  --leisure: #8AC926;
+  --primary: #1982c4;
+  --secundary: #6a4c93;
+  --tercial: #ff595e;
+  --resident: #ffca3a;
+  --leisure: #8ac926;
 
   --water-light: #598392;
   --water--dark: #124559;
-  --grass--light: #7C8B4A;
-  --grass--dark: #606C38;
+  --grass--light: #7c8b4a;
+  --grass--dark: #606c38;
   --forrest--dark: #283618;
-  --mountain--light: #BE8F5B;
-  --mountain--dark: #8F531D;
+  --mountain--light: #be8f5b;
+  --mountain--dark: #8f531d;
 
   --bg80: rgba(var(--background), 0.8);
   --bg32: rgba(var(--background), 0.32);
-  
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -38,4 +38,17 @@ h1,
 h2,
 h3 {
   font-family: "Space Mono";
+}
+h1 {
+  font-size: 2.5rem;
+}
+h2 {
+  font-size: 1.5rem;
+}
+h3 {
+  font-size: 1.25rem;
+}
+a {
+  color: var(--text);
+  text-decoration: none;
 }
