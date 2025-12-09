@@ -1,11 +1,12 @@
 import { useState } from "react"
-
+import IconButtonStyle from"../styles/IconButton.css"
 export const BuildingButton = () => {
     const [value, setValue] = useState();
-    let IsSelected:boolean = false
+    const IsSelected:boolean = false
     return(
-        <>
-        <button onClick={}></button>
-        </>
+        <button onClick={}>
+            <span>obrazek</span>
+            <span>1</span>
+        </button>
     )
 }
