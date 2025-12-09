@@ -7,6 +7,9 @@ interface Forecast {
     temperatureF: number;
     summary: string;
 }
+type MyType = {
+    budovaId: string;
+}
 
 function App() {
     const [forecasts, setForecasts] = useState<Forecast[]>();
