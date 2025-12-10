@@ -7,13 +7,13 @@ export class MapApi {
         this.baseUrl = baseUrl;
     }
 
-    async getMapTiles(): Promise<MapTile[][]> {
+    async getMapTiles(width:number, height:number): Promise<MapTile[][]> {
         const res = await fetch(this.baseUrl + "/generate", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ width: 100, height: 100 })
+            body: JSON.stringify({ width: width, height: height })
         }
         );
 
