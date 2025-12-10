@@ -1,5 +1,7 @@
+import TextButton from "../../components/TextButton";
+
 const PlayMenu = () => {
-  return <>Play</>;
+  return <TextButton text="game" linkTo="/game" />;
 };
 
 export default PlayMenu;
