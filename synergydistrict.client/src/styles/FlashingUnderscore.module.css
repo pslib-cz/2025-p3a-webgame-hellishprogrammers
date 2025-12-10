@@ -1,0 +1,25 @@
+.parent::after{
+    content: "";
+    display: block;
+    width: .75em;
+    height: .25em;
+    background-color: var(--text);
+    position: absolute;
+    right: -.75em;
+    bottom: 0;
+    animation-name: blink;
+    animation-duration: 1.5s;
+    animation-iteration-count: infinite;
+    animation-timing-function: step-start;
+}
+
+@keyframes blink {
+    0% {opacity: 0%;}
+    50% {opacity: 100%;}
+    100% {opacity: 0%;}
+}
+
+.parent{
+    position: relative;
+    width: max-content;
+}
