@@ -10,7 +10,7 @@ type RendererProps = {
     size: { width: number; height: number; };
 }
 
-const Rendereder: React.FC<RendererProps> = ({size}) => {
+export const Rendereder: React.FC<RendererProps> = ({size}) => {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const stageRef = useRef<Konva.Stage>(null);
@@ -246,5 +246,3 @@ const Rendereder: React.FC<RendererProps> = ({size}) => {
 
     return getContent();
 };
-
-export default Rendereder;
