@@ -17,7 +17,7 @@ export const Rendereder: React.FC<RendererProps> = ({size}) => {
 
     const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 1 });
 
-    const SCALE_BY = 1.1;
+    const SCALE_BY = 1.15;
     const MIN_SCALE = 0.7;
     const MAX_SCALE = 5;
     const TILE_SIZE = 64;
@@ -124,10 +124,7 @@ export const Rendereder: React.FC<RendererProps> = ({size}) => {
         };
 
         let direction = e.evt.deltaY > 0 ? 1 : -1;
-
-        if (e.evt.ctrlKey) {
-            direction = -direction;
-        }
+        direction = -direction;
 
 
         let newScale = direction > 0 ? oldScale * SCALE_BY : oldScale / SCALE_BY;

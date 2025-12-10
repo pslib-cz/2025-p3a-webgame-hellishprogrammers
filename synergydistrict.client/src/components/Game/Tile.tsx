@@ -35,7 +35,7 @@ export const Tile = React.memo(({ x, y, type, }: { x: number; y: number; type: s
         listening={false}
       />
 
-      <Text text={`${x},${y}`} fontSize={10} fill="rgba(0,0,0,0.5)" padding={5} listening={false}/>
+      {/* <Text text={`${x},${y}`} fontSize={10} fill="rgba(0,0,0,0.5)" padding={5} listening={false}/> */}
     </Group>
   );
 });
