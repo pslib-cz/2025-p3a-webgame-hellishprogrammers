@@ -1,22 +1,24 @@
-import TextButton from "../components/TextButton";
 import styles from "../styles/Menu.module.css";
+import TextButton from "../components/TextButton";
+import { Outlet } from "react-router-dom";
 
 const Menu = () => {
   return (
-    <div className={styles.menuLeft}>
-      <h1>Synergy District_</h1>
-      <nav>
-        <menu>
-          <ul>
-            <TextButton text="button1" />
-          </ul>
-        </menu>
-
-        {/* <NavLink to="play">Play</NavLink>
-        <NavLink to="leaderboard">Leaderboard</NavLink>
-        <NavLink to="statistics">Statistics</NavLink>
-        <NavLink to="settings">Settings</NavLink> */}
-      </nav>
+    <div className={styles.menu}>
+      <div className={styles.menuLeft}>
+        <h1>Synergy District_</h1>
+        <nav>
+          <menu>
+            <ul>
+              <TextButton text="play" linkTo="play" />
+              <TextButton text="leaderboard" linkTo="leaderboard" />
+              <TextButton text="statistics" linkTo="statistics" />
+              <TextButton text="settings" linkTo="settings" />
+            </ul>
+          </menu>
+        </nav>
+      </div>
+      <Outlet />
     </div>
   );
 };

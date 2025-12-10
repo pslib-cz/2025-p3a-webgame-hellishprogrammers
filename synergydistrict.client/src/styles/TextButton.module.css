@@ -1,0 +1,15 @@
+.link {
+  text-transform: capitalize;
+}
+
+.link:hover {
+  background-color: var(--text);
+  color: var(--background);
+}
+
+.linkActive {
+}
+
+.linkUppercase {
+  text-transform: uppercase;
+}

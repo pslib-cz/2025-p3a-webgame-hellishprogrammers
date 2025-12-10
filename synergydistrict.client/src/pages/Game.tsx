@@ -1,7 +1,6 @@
 import React, { type ReactElement } from "react";
 import { Stage, Layer } from "react-konva";
 import { Tile } from "./Game/Tile";
-import type { MapTile } from "../types/Grid";
 import { useMap } from "../hooks/useMap";
 
 const WIDTH = window.innerWidth;
