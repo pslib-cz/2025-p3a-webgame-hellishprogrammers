@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { BuildingApi, type BuildingDetailResponse } from "../api/BuildingApi";
+import { BuildingApi } from "../api/BuildingApi";
+import type { BuildingDetail } from "../types/Buildings";
 
 const api = new BuildingApi();
 
 export function useBuildingDetail(id: number | null) {
-  const [data, setData] = useState<BuildingDetailResponse | null>(null);
+  const [data, setData] = useState<BuildingDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

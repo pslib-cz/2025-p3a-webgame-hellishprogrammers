@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { BuildingApi, type BuildingPreviewResponse } from "../api/BuildingApi";
+import { BuildingApi } from "../api/BuildingApi";
+import type { BuildingPreview } from "../types/Buildings";
 
 const api = new BuildingApi();
 
 export function useBuildings() {
-  const [data, setData] = useState<BuildingPreviewResponse[] | null>(null);
+  const [data, setData] = useState<BuildingPreview[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

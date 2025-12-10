@@ -1,47 +1,4 @@
-export type BuildingType = "Residential" | "Commercial" | "Industrial" | "Extractional" | "Recreational";
-export type BuildingTileType = "Solid" | "Empty" | "Icon";
-export type ResourceType = "Money" | "People" | "Energy" | "Happiness" | "Industry";
-
-export type BuildingPreviewResponse = {
-    buildingId: number;
-    name: string;
-    type: BuildingType;
-    colorHex: string;
-    iconKey: string;
-    shape: BuildingTileType[][];
-}
-
-export type SynergyBuilding ={
-    buildingId: number;
-    name: string;
-    type: BuildingType;
-    colorHex: string;
-}
-
-export type BuildingSynergyResponse = {
-    sourceBuildingId: SynergyBuilding;
-    targetBuildingId: SynergyBuilding;
-    productionBonuses: Production[];
-}
-
-export type Production = {
-    resourceType: ResourceType;
-    amount: number;
-}
-
-export type BuildingDetailResponse = {
-    buildingId: number;
-    name: string;
-    type: string;
-    description: string;
-    colorHex: string;
-    iconKey: string;
-    cost: number;
-    shape: BuildingTileType[][];
-    baseProduction: Production;
-    incomingSynergies: BuildingSynergyResponse[];
-    outgoingSynergies: BuildingSynergyResponse[];
-}
+import type { BuildingDetail, BuildingPreview } from "../types/Buildings";
 
 export class BuildingApi {
     private readonly baseUrl: string;
@@ -50,7 +7,7 @@ export class BuildingApi {
         this.baseUrl = baseUrl;
     }
 
-    async getAllBuildings(): Promise<BuildingPreviewResponse[]> {
+    async getAllBuildings(): Promise<BuildingPreview[]> {
         const res = await fetch(this.baseUrl, {
             method: "GET",
             headers: {
@@ -62,11 +19,11 @@ export class BuildingApi {
             throw new Error(`Failed to fetch buildings. Status: ${res.status}`);
         }
 
-        const data = (await res.json()) as BuildingPreviewResponse[];
+        const data = (await res.json()) as BuildingPreview[];
         return data;
     }
 
-    async getBuildingDetail(id: number): Promise<BuildingDetailResponse> {
+    async getBuildingDetail(id: number): Promise<BuildingDetail> {
         const res = await fetch(`${this.baseUrl}/${id}`, {
         method: "GET",
             headers: {
@@ -85,7 +42,7 @@ export class BuildingApi {
             );
         }
 
-        const data = (await res.json()) as BuildingDetailResponse;
+        const data = (await res.json()) as BuildingDetail;
         return data;
     }
 }

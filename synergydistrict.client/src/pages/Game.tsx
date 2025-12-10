@@ -1,13 +1,13 @@
 import React from "react";
 import { Stage, Layer } from "react-konva";
-import { useStore } from "../hooks/store";
 import { Tile } from "./Game/Tile";
+import type { MapTile } from "../types/Grid";
 
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight;
 
 export default function Game() {
-  const { grid, setBlock } = useStore();
+  const grid: MapTile[][] = []; // This would come from your game state/store
 
   // We use local state for immediate zoom feedback to ensure 60FPS smoothness
   const stageRef = React.useRef<any>(null);
@@ -60,16 +60,14 @@ export default function Game() {
           {Array.from({ length: 10 }).map((_, x) =>
             Array.from({ length: 10 }).map((_, y) => {
               const key = `${x},${y}`;
-              // Default to water if not set, or use what is in store
-              const type = grid[key] || ((x + y) % 2 === 0 ? "grass" : "water");
 
               return (
                 <Tile
                   key={key}
                   x={x}
                   y={y}
-                  type={type}
-                  onClick={() => setBlock(x, y, "building")} // Example interaction
+                  type={grid[x][y].type}
+                  onClick={() => {}} // Example interaction
                 />
               );
             })
