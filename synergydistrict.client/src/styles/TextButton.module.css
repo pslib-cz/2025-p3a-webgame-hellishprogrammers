@@ -1,13 +1,17 @@
 .link {
   text-transform: capitalize;
+  display: block;
+  padding: 0.5rem 1rem;
 }
 
 .link:hover {
-  background-color: var(--text);
+  background: var(--text);
   color: var(--background);
 }
 
 .linkActive {
+  background: var(--text);
+  color: var(--background);
 }
 
 .linkUppercase {

@@ -7,7 +7,7 @@ type ButtonTextProps = {
 
 export const ButtonText: FC<ButtonTextProps> = ({ text, isActive }) => {
   const displayedText = isActive ? `[ ${text} ]` : `< ${text} >`;
-  return <p>{displayedText}</p>;
+  return <span>{displayedText}</span>;
 };
 
 export default ButtonText;

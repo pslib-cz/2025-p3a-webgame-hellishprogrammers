@@ -5,20 +5,28 @@ import { Outlet } from "react-router-dom";
 const Menu = () => {
   return (
     <div className={styles.menu}>
-      <div className={styles.menuLeft}>
+      <div className={styles.menuSide}>
         <h1>Synergy District_</h1>
         <nav>
           <menu>
-            <ul>
+            <li>
               <TextButton text="play" linkTo="play" />
+            </li>
+            <li>
               <TextButton text="leaderboard" linkTo="leaderboard" />
+            </li>
+            <li>
               <TextButton text="statistics" linkTo="statistics" />
+            </li>
+            <li>
               <TextButton text="settings" linkTo="settings" />
-            </ul>
+            </li>
           </menu>
         </nav>
       </div>
-      <Outlet />
+      <div className={styles.menuSide}>
+        <Outlet />
+      </div>
     </div>
   );
 };

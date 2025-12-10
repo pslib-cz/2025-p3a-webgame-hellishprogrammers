@@ -11,19 +11,21 @@ import Game from "./pages/Game";
 function App() {
   return (
     <>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to={"/menu"} />} />
-          <Route path="/menu" element={<Menu />}>
-            <Route path="" element={<MainMenu />} />
-            <Route path="play" element={<PlayMenu />} />
-            <Route path="leaderboard" element={<LeaderboardMenu />} />
-            <Route path="statistics" element={<StatisticsMenu />} />
-            <Route path="settings" element={<SettingsMenu />} />
-          </Route>
-          <Route path="/game" element={<Game />} />
-        </Routes>
-      </BrowserRouter>
+      <div className="container">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Navigate to={"/menu"} />} />
+            <Route path="/menu" element={<Menu />}>
+              <Route path="" element={<MainMenu />} />
+              <Route path="play" element={<PlayMenu />} />
+              <Route path="leaderboard" element={<LeaderboardMenu />} />
+              <Route path="statistics" element={<StatisticsMenu />} />
+              <Route path="settings" element={<SettingsMenu />} />
+            </Route>
+            <Route path="/game" element={<Game />} />
+          </Routes>
+        </BrowserRouter>
+      </div>
     </>
   );
 }
