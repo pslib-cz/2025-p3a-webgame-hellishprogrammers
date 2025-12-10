@@ -36,17 +36,24 @@
 
 h1,
 h2,
-h3 {
+h3,
+.h1,
+.h2,
+.h3 {
   font-family: "Space Mono";
 }
-h1 {
+h1,
+.h1 {
   font-size: 2.5rem;
   text-transform: uppercase;
+  margin: 2rem 0;
 }
-h2 {
+h2,
+.h2 {
   font-size: 1.5rem;
 }
-h3 {
+h3,
+.h3 {
   font-size: 1.25rem;
 }
 a {
