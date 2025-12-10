@@ -9,7 +9,7 @@ const Menu = () => {
     <div className={styles.menu}>
       <div className={styles.menuSide}>
         <div className={styles.menuContainer}>
-          <h1 className={underscore.parent}>Synergy District_</h1>
+          <h1 className={underscore.parent}>Synergy District</h1>
           <nav>
             <menu className={`h2 ${buttonStyles.navContainer}`}>
               <li>
