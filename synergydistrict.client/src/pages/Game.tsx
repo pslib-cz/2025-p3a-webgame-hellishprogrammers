@@ -67,16 +67,16 @@ export default function Game() {
                 }}
             >
                 <Layer>
-                    {Array.from({ length: 10 }).map((_, x) =>
-                        Array.from({ length: 10 }).map((_, y) => {
+                    {grid.map((row, x) =>
+                        row.map((tile, y) => {
                             const key = `${x},${y}`;
-                            console.log('Rendering tile at ', key, "-> ", grid[x][y]);
+                            console.log('Rendering tile at ', key, "-> ", tile);
                             return (
                                 <Tile
                                     key={key}
                                     x={x}
                                     y={y}
-                                    type={grid[x][y].tileType}
+                                    type={tile.tileType}
                                     onClick={() => { }} // Example interaction
                                 />
                             );
