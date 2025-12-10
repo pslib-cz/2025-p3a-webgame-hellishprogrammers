@@ -6,6 +6,6 @@ export type Coordinates = {
 export type TileType = "water" | "grass" | "mountain" | "forest";
 
 export type MapTile = {
-    type: TileType;
-    icon: boolean;
+    tileType: TileType;
+    hasIcon: boolean;
 }

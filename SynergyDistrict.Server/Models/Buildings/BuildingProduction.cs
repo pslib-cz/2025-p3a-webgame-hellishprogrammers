@@ -1,4 +1,4 @@
-﻿namespace SynergyDistrict.Server.Models
+﻿namespace SynergyDistrict.Server.Models.Buildings
 {
     public class BuildingProduction
     {

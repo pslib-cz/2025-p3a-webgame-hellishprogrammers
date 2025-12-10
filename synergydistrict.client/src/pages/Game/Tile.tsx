@@ -5,7 +5,8 @@ const CELL_SIZE = 64;
 export const Tile = ({ x, y, type, onClick }: { x: number; y: number; type: string; onClick: () => void }) => {
   // Simple color mapping based on your images
   const getColor = (t: string) => {
-    switch (t) {
+    const normalized = t?.toLowerCase() ?? "";
+    switch (normalized) {
       case "water":
         return "#5d8a9e";
       case "grass":

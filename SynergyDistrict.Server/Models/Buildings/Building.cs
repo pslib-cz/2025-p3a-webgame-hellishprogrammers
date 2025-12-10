@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
 
-namespace SynergyDistrict.Server.Models
+namespace SynergyDistrict.Server.Models.Buildings
 {
     public class Building
     {

@@ -1,4 +1,4 @@
-﻿using SynergyDistrict.Server.Models;
+﻿using SynergyDistrict.Server.Models.Buildings;
 
 namespace SynergyDistrict.Server.DTOs
 {

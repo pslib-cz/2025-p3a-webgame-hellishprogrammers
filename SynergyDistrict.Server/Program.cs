@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using SynergyDistrict.Server.Data;
+using SynergyDistrict.Server.Services;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSingleton<MapService>();
 builder.Services.AddDbContext<AppDBContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
