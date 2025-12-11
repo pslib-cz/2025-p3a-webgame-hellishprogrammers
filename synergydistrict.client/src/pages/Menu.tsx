@@ -1,17 +1,16 @@
-import styles from "../styles/Menu.module.css";
-import underscore from "../styles/FlashingUnderscore.module.css";
+import styles from "/src/styles/Menu.module.css";
+import underscore from "/src/styles/FlashingUnderscore.module.css";
 import TextButton from "../components/TextButton";
 import { Outlet } from "react-router-dom";
-import buttonStyles from "../styles/TextButton.module.css";
 
 const Menu = () => {
   return (
     <div className={styles.menu}>
       <div className={styles.menuSide}>
-        <div className={styles.menuContainer}>
+        <div className={`${styles.menuContainer} ${styles.menuNarrow}`}>
           <h1 className={underscore.parent}>Synergy District</h1>
           <nav>
-            <menu className={`h2 ${buttonStyles.navContainer}`}>
+            <menu className={`h2`}>
               <li>
                 <TextButton text="play" linkTo="play" />
               </li>
@@ -29,7 +28,9 @@ const Menu = () => {
         </div>
       </div>
       <div className={styles.menuSide}>
-        <Outlet />
+        <div className={styles.menuContainer}>
+          <Outlet />
+        </div>
       </div>
     </div>
   );

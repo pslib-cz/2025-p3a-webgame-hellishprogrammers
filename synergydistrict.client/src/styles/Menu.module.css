@@ -1,15 +1,36 @@
 .menu {
-  display: flex;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-template-columns: repeat(2, 1fr);
   height: 100%;
 }
 
 .menuSide {
-  flex-basis: 50%;
   padding: 6rem 4rem;
+  position: relative;
+}
+.menuSide:nth-of-type(2):has(.menuSide_lineless) {
+  padding: 0;
+}
+.menuSide:nth-of-type(2):has(.menuSide_lineless)::before {
+  display: none;
+}
+
+.menuSide_lineless {
+  height: 100%;
+}
+
+.menuSide:nth-of-type(2)::before {
+  content: "";
+  position: absolute;
+  top: 20%;
+  bottom: 20%;
+  left: -1px;
+  width: 2px;
+  background: var(--text);
 }
 
 .menuContainer {
-  width: max-content;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -17,10 +38,15 @@
   align-items: stretch;
 }
 
+.menuNarrow {
+  width: max-content;
+}
+
 .menu menu {
   list-style-type: none;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
+  margin: 0;
 }

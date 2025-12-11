@@ -10,11 +10,6 @@
   color: var(--background);
 }
 
-/* .navContainer:has(.link:hover) .linkActive:not(.link:hover) {
-  background: var(--background);
-  color: var(--text);
-} */
-
 .linkUppercase {
   text-transform: uppercase;
 }
