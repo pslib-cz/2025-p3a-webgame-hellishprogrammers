@@ -1,14 +1,16 @@
 import styles from "/src/styles/Menu.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
 import TextButton from "../components/TextButton";
-import { Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 
 const Menu = () => {
   return (
     <div className={styles.menu}>
       <div className={styles.menuSide}>
         <div className={`${styles.menuContainer} ${styles.menuNarrow}`}>
-          <h1 className={underscore.parent}>Synergy District</h1>
+          <NavLink to="/menu">
+            <h1 className={underscore.parent}>Synergy District</h1>
+          </NavLink>
           <nav>
             <menu className={`h2`}>
               <li>
