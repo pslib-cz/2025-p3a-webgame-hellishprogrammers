@@ -7,11 +7,18 @@ type IconButtonProps = {
 };
 
 export const IconButton:FC<IconButtonProps> = ({isSelected,iconKey,OnClick}) => {
-    const handleOnClick = () =>{
+    const handleOnClick = () => {
         OnClick()
     }
+    const styleSelector = () => {
+        let trida: string = IconButtonStyle.default;
+        if(isSelected){
+            trida += " " + IconButtonStyle.selected
+        }
+        return trida;
+    } 
     return(
-        <button onClick={handleOnClick} className={isSelected? IconButtonStyle.selected:IconButtonStyle.default}>
+        <button onClick={handleOnClick} className={styleSelector()}>
             {iconKey}
         </button>
     )

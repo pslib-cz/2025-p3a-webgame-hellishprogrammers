@@ -32,8 +32,11 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  }
+@font-face {
+    font-family: 'icomoon';
+    src: url('/fonts/icomoon.ttf');
 }
-
 h1,
 h2,
 h3,
@@ -60,3 +63,4 @@ a {
   color: var(--text);
   text-decoration: none;
 }
+

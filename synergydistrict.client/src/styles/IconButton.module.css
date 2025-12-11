@@ -1,6 +1,18 @@
 .default{
-    background-color: blue;
+    display: flex;
+    width: 48px;
+    padding: 16px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    align-self: stretch;
+    background-color: var(--background);
+    color: var(--text);
+    font-family: 'icomoon';
+    font-size: 24px;
 }
 .selected{
-    background-color: brown;
+    background-color: var(--text, );
+    color: var(--background);
 }

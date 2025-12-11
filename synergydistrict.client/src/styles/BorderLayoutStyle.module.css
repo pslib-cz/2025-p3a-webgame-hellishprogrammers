@@ -1,0 +1,8 @@
+
+.layout{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    align-self: stretch;
+    border: 2px solid var(--text, #FEFAE0);
+}
