@@ -1,16 +1,17 @@
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { useRef, useState, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import type { ReactNode } from 'react';
 import { Stage, Layer } from 'react-konva';
 import type Konva from 'konva';
 import { useMap } from '../../hooks/useMap';
 import { Tile } from './Tile';
+import type { MapGeneratingOptions } from '../../types/Grid';
 
 type RendererProps = {
     size: { width: number; height: number; };
 }
 
-export const Rendereder: React.FC<RendererProps> = ({size}) => {
+export const Rendereder: React.FC<RendererProps> = ({ size }) => {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const stageRef = useRef<Konva.Stage>(null);
@@ -22,9 +23,17 @@ export const Rendereder: React.FC<RendererProps> = ({size}) => {
     const MAX_SCALE = 5;
     const TILE_SIZE = 64;
     const TILE_MARGIN = 2;
-    const EDGE_MARGIN_TILES = 2;
 
-    const { data: grid, loading, error } = useMap(size.width, size.height);
+    const mapOptions: MapGeneratingOptions = useMemo(() => ({
+        seed: 12345678,
+        renderDistanceX: 1,
+        renderDistanceY: 1,
+        chunkSize: 16,
+        positionX: 0,
+        positionY: 0,
+    }), [size.height, size.width]);
+
+    const { data: grid, loading, error } = useMap(mapOptions);
 
     const updateViewState = useCallback(() => {
         const stage = stageRef.current;
@@ -50,63 +59,6 @@ export const Rendereder: React.FC<RendererProps> = ({size}) => {
             return next;
         });
     }, []);
-
-    const clampStagePosition = useCallback((stage: Konva.Stage, attempted?: { x: number; y: number; }) => {
-        if (!grid) {
-            return attempted ?? { x: stage.x(), y: stage.y() };
-        }
-
-        const rowCount = grid.length;
-        const colCount = grid[0]?.length ?? 0;
-
-        if (rowCount === 0 || colCount === 0) {
-            return attempted ?? { x: stage.x(), y: stage.y() };
-        }
-
-        const marginPx = EDGE_MARGIN_TILES * TILE_SIZE;
-        const mapWidthPx = colCount * TILE_SIZE;
-        const mapHeightPx = rowCount * TILE_SIZE;
-        const scale = stage.scaleX();
-
-        const viewWidth = width / scale;
-        const viewHeight = height / scale;
-
-        const minVisibleX = -marginPx;
-        const maxVisibleX = mapWidthPx + marginPx - viewWidth;
-        const minVisibleY = -marginPx;
-        const maxVisibleY = mapHeightPx + marginPx - viewHeight;
-
-        let clampedX = attempted?.x ?? stage.x();
-        let clampedY = attempted?.y ?? stage.y();
-
-        if (minVisibleX > maxVisibleX) {
-            clampedX = width / 2 - (mapWidthPx * scale) / 2;
-        } else {
-            const viewLeft = (-clampedX) / scale;
-            if (viewLeft < minVisibleX) {
-                clampedX = -minVisibleX * scale;
-            } else if (viewLeft > maxVisibleX) {
-                clampedX = -maxVisibleX * scale;
-            }
-        }
-
-        if (minVisibleY > maxVisibleY) {
-            clampedY = height / 2 - (mapHeightPx * scale) / 2;
-        } else {
-            const viewTop = (-clampedY) / scale;
-            if (viewTop < minVisibleY) {
-                clampedY = -minVisibleY * scale;
-            } else if (viewTop > maxVisibleY) {
-                clampedY = -maxVisibleY * scale;
-            }
-        }
-
-        if (!attempted) {
-            stage.position({ x: clampedX, y: clampedY });
-        }
-
-        return { x: clampedX, y: clampedY };
-    }, [grid, height, width]);
 
     const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
         e.evt.preventDefault();
@@ -138,8 +90,6 @@ export const Rendereder: React.FC<RendererProps> = ({size}) => {
         };
         stage.position(newPos);
 
-        clampStagePosition(stage);
-
         updateViewState();
     };
 
@@ -154,55 +104,62 @@ export const Rendereder: React.FC<RendererProps> = ({size}) => {
     useEffect(() => {
         const stage = stageRef.current;
         if (stage) {
-            clampStagePosition(stage);
             updateViewState();
         }
-    }, [clampStagePosition, updateViewState, grid]);
+    }, [updateViewState, grid]);
 
     const getVisibleTiles = () => {
         if (!grid) {
             return null;
         }
 
-        const rowCount = grid.length;
-        const colCount = grid[0]?.length ?? 0;
-
-        if (rowCount === 0 || colCount === 0) {
-            return null;
-        }
-
         const { x: stageX, y: stageY, scale } = viewState;
         const inverseScale = 1 / scale;
 
-        const viewLeft = (-stageX) * inverseScale;
-        const viewTop = (-stageY) * inverseScale;
-        const viewRight = (width - stageX) * inverseScale;
-        const viewBottom = (height - stageY) * inverseScale;
+        const viewLeftPx = (-stageX) * inverseScale;
+        const viewTopPx = (-stageY) * inverseScale;
+        const viewRightPx = (width - stageX) * inverseScale;
+        const viewBottomPx = (height - stageY) * inverseScale;
 
-        const startX = Math.max(0, Math.floor(viewLeft / TILE_SIZE) - TILE_MARGIN);
-        const endX = Math.min(colCount - 1, Math.ceil(viewRight / TILE_SIZE) + TILE_MARGIN);
-        const startY = Math.max(0, Math.floor(viewTop / TILE_SIZE) - TILE_MARGIN);
-        const endY = Math.min(rowCount - 1, Math.ceil(viewBottom / TILE_SIZE) + TILE_MARGIN);
+        const marginPx = TILE_MARGIN * TILE_SIZE;
 
-        if (startX > endX || startY > endY) {
-            return null;
-        }
+        const cullLeft = viewLeftPx - marginPx;
+        const cullRight = viewRightPx + marginPx;
+        const cullTop = viewTopPx - marginPx;
+        const cullBottom = viewBottomPx + marginPx;
 
         const tiles: ReactNode[] = [];
 
-        for (let y = startY; y <= endY; y += 1) {
-            const row = grid[y];
-            for (let x = startX; x <= endX; x += 1) {
-                const tile = row[x];
+        for (const row of grid) {
+            for (const tile of row) {
+                const tileLeft = tile.position.x * TILE_SIZE;
+                const tileTop = tile.position.y * TILE_SIZE;
+                const tileRight = tileLeft + TILE_SIZE;
+                const tileBottom = tileTop + TILE_SIZE;
+
+                const isOutside =
+                    tileRight < cullLeft ||
+                    tileLeft > cullRight ||
+                    tileBottom < cullTop ||
+                    tileTop > cullBottom;
+
+                if (isOutside) {
+                    continue;
+                }
+
                 tiles.push(
                     <Tile
-                        key={`${x}-${y}`}
-                        x={x}
-                        y={y}
+                        key={`${tile.position.x}-${tile.position.y}`}
+                        x={tile.position.x}
+                        y={tile.position.y}
                         type={tile.tileType}
                     />
                 );
             }
+        }
+
+        if (tiles.length === 0) {
+            return null;
         }
 
         return <>{tiles}</>;
@@ -225,13 +182,6 @@ export const Rendereder: React.FC<RendererProps> = ({size}) => {
                     draggable={true}
                     onDragMove={handleDragMove}
                     onDragEnd={handleDragEnd}
-                    dragBoundFunc={(pos) => {
-                        const stage = stageRef.current;
-                        if (!stage) {
-                            return pos;
-                        }
-                        return clampStagePosition(stage, pos);
-                    }}
                 >
                     <Layer>
                         {getVisibleTiles()}

@@ -17,7 +17,7 @@ namespace SynergyDistrict.Server.Controllers
         [HttpPost("generate")]
         public ActionResult<MapTile[][]> GenerateMap([FromBody] MapGenerationOptions options)
         {
-            var map = _mapService.GenerateMap(options);
+            var map = _mapService.GetAdjecentChunks(options);
             return Ok(map);
         }
     }

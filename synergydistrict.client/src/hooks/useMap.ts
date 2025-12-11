@@ -1,20 +1,39 @@
 import { MapApi } from "../api/MapApi";
 import { useEffect, useState } from "react";
-import type { MapTile } from "../types/Grid";
+import type { MapGeneratingOptions, MapTile } from "../types/Grid";
 
 const api = new MapApi();
 
-export function useMap(width: number, height: number) {
+export function useMap(options: MapGeneratingOptions) {
     const [data, setData] = useState<MapTile[][] | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     useEffect(() => {
+        let cancelled = false;
         setLoading(true);
-        api.getMapTiles(width, height)
-            .then(setData)
-            .catch((err) => setError(err.message))
-            .finally(() => setLoading(false));
-    }, []);
+        setError(null);
+
+        api.getMapTiles(options)
+            .then((result) => {
+                if (!cancelled) {
+                    setData(result);
+                }
+            })
+            .catch((err: Error) => {
+                if (!cancelled) {
+                    setError(err.message);
+                }
+            })
+            .finally(() => {
+                if (!cancelled) {
+                    setLoading(false);
+                }
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [options]);
 
     return { data, loading, error };
 }

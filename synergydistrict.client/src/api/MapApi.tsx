@@ -1,4 +1,4 @@
-import { type MapTile } from "../types/Grid";
+import { type MapGeneratingOptions, type MapTile } from "../types/Grid";
 
 export class MapApi {
     private readonly baseUrl: string;
@@ -7,13 +7,13 @@ export class MapApi {
         this.baseUrl = baseUrl;
     }
 
-    async getMapTiles(width:number, height:number): Promise<MapTile[][]> {
+    async getMapTiles(options: MapGeneratingOptions): Promise<MapTile[][]> {
         const res = await fetch(this.baseUrl + "/generate", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ width: width, height: height })
+            body: JSON.stringify(options)
         }
         );
 
