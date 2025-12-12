@@ -9,10 +9,14 @@
   padding: 6rem 4rem;
   position: relative;
 }
-.menuSide:nth-of-type(2):has(.menuSide_lineless) {
+.menuSide:has(.menuSide_lineless) {
   padding: 0;
 }
-.menuSide:nth-of-type(2):has(.menuSide_lineless)::before {
+.menuSide:has(.menuSide_lineless)::before {
+  display: none;
+}
+
+.menuSide:has(.menuSide_lineless) .closeButton {
   display: none;
 }
 

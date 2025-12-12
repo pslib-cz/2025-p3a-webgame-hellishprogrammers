@@ -2,6 +2,7 @@ import styles from "/src/styles/Menu.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
 import TextButton from "../components/TextButton";
 import { NavLink, Outlet } from "react-router-dom";
+import { IconClose } from "../components/Icons";
 
 const Menu = () => {
   return (
@@ -30,6 +31,9 @@ const Menu = () => {
         </div>
       </div>
       <div className={styles.menuSide}>
+        <NavLink to="/menu" className={styles.closeButton}>
+          <IconClose />
+        </NavLink>
         <div className={styles.menuContainer}>
           <Outlet />
         </div>
