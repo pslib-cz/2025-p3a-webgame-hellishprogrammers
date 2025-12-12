@@ -1,6 +1,6 @@
 .menu {
   display: grid;
-  grid-template-rows: 1fr;
+  grid-template-rows: 100%;
   grid-template-columns: repeat(2, 1fr);
   height: 100%;
 }
@@ -39,11 +39,23 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  align-items: stretch;
 }
 
 .menuNarrow {
   width: max-content;
+}
+
+.closeButton {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 2rem;
+}
+.closeButton a {
+  line-height: 0;
+  position: relative;
+  z-index: 1;
+  padding: 1rem;
+  margin: -1rem;
 }
 
 .menu menu {
