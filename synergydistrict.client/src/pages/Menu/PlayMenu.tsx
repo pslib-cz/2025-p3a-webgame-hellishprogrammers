@@ -5,6 +5,7 @@ const PlayMenu = () => {
   return (
     <>
       <TextButton text="game" linkTo="/game" />
+      <p className="icon">forest</p>
     </>
   );
 };

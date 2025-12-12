@@ -6,7 +6,7 @@ export const IconVolumeOff = () => <span className="icon-volumeOff"></span>;
 export const IconForward = () => <span className="icon-forward"></span>;
 export const IconPause = () => <span className="icon-pause"></span>;
 export const IconWater = () => <span className="icon-water"></span>;
-export const IconTree = () => <span className="icon-tree"></span>;
+export const IconForest = () => <span className="icon-forest"></span>;
 export const IconPlay = () => <span className="icon-play"></span>;
 export const IconPeople = () => <span className="icon-people"></span>;
 export const IconMountain = () => <span className="icon-mountain"></span>;
