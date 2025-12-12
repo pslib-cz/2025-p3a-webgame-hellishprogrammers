@@ -5,14 +5,15 @@ namespace SynergyDistrict.Server.Services
 {
     public class MapService
     {
+        private readonly float thresholdLand = -0.2f;
+        private readonly float treshholdMountain = 0.6f;
+
         public MapTile[][] GetAdjecentChunks(MapGenerationOptions options)
         {
             Position startChunkPosition = new Position { X = options.positionX - options.renderDistanceX, Y = options.positionY - options.renderDistanceY };
             List<MapTile> tiles = new List<MapTile>();
             int widthChunks = options.renderDistanceX * 2 + 1;
             int heightChunks = options.renderDistanceY * 2 + 1;
-            Console.WriteLine($"Width in chunks: {widthChunks}");
-            Console.WriteLine($"Height in chunks: {heightChunks}");
 
             for (int i = 0; i < options.renderDistanceX * 2 + 1; i++)
             {
@@ -40,8 +41,8 @@ namespace SynergyDistrict.Server.Services
 
         MapTile[] GetChunkAt(MapGenerationOptions options, Position chunkPosition)
         {
-            int chunkSeed = HashCode.Combine(options.seed, chunkPosition.X, chunkPosition.Y);
-            var rand = new Random(chunkSeed);
+            var seedHash = HashCode.Combine(options.seed, chunkPosition.X, chunkPosition.Y);
+            var rand = new Random(seedHash);
 
             int offsetX = chunkPosition.X * options.chunkSize;
             int offsetY = chunkPosition.Y * options.chunkSize;
@@ -51,16 +52,17 @@ namespace SynergyDistrict.Server.Services
             {
                 for (int j = 0; j < options.chunkSize; j++)
                 {
+                    var type = getRandomTileType(GetHeight(options.seed, i + offsetX, j + offsetY), rand.NextDouble());
                     chunk.Add(new MapTile
                     {
-                        Position = new Position 
+                        Position = new Position
                         {
                             X = i + offsetX,
                             Y = j + offsetY,
                         },
-                        TileType = getRandomTileType(rand.Next(4)),
-                        hasIcon = false,
-                        
+                        TileType = type,
+                        hasIcon = type == MapTileType.Grass ? (rand.NextDouble() > .95 ? true : false) : true,
+
                     });
                 }
             }
@@ -68,21 +70,39 @@ namespace SynergyDistrict.Server.Services
             return chunk.ToArray();
         }
 
-        MapTileType getRandomTileType (int randomNum)
+        private FastNoiseLite Create(int seed)
         {
-            switch (randomNum)
+            var n = new FastNoiseLite(seed);
+            n.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
+            n.SetFrequency(0.05f);
+            n.SetFractalType(FastNoiseLite.FractalType.FBm);
+            n.SetFractalOctaves(3);
+            n.SetFractalLacunarity(1.5f);
+            n.SetFractalGain(0.4f);
+            return n;
+        }
+
+        public float GetHeight(int seed, int worldX, int worldY)
+        {
+            var n = Create(seed);
+            return n.GetNoise(worldX, worldY);
+        }
+
+        MapTileType getRandomTileType (float h, double f)
+        {
+            if(h > treshholdMountain)
             {
-                case 0:
-                    return MapTileType.Grass;
-                case 1:
-                    return MapTileType.Water;
-                case 2:
-                    return MapTileType.Mountain;
-                case 3:
-                    return MapTileType.Forest;
-                default: 
-                    return MapTileType.Grass;
+                return MapTileType.Mountain;
             }
+            if(h > thresholdLand)
+            {
+                if (f > .95)
+                {
+                    return MapTileType.Forest;
+                }
+                return MapTileType.Grass;
+            }
+            return MapTileType.Water;
         }
     }
 }

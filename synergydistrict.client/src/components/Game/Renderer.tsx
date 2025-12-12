@@ -1,5 +1,5 @@
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { Stage, Layer } from 'react-konva';
 import type Konva from 'konva';
@@ -8,30 +8,31 @@ import { Tile } from './Tile';
 import type { MapGeneratingOptions } from '../../types/Grid';
 
 type RendererProps = {
-    size: { width: number; height: number; };
+    //size: { width: number; height: number; };
 }
 
-export const Rendereder: React.FC<RendererProps> = ({ size }) => {
+export const Rendereder: React.FC<RendererProps> = () => {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const stageRef = useRef<Konva.Stage>(null);
 
     const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 1 });
+    const CHUNK_SIZE = 16;
 
     const SCALE_BY = 1.15;
-    const MIN_SCALE = 0.7;
+    const MIN_SCALE = 0.01;
     const MAX_SCALE = 5;
     const TILE_SIZE = 64;
     const TILE_MARGIN = 2;
 
-    const mapOptions: MapGeneratingOptions = useMemo(() => ({
+    const [mapOptions, setMapOptions] = useState<MapGeneratingOptions>(() => ({
         seed: 12345678,
-        renderDistanceX: 1,
-        renderDistanceY: 1,
-        chunkSize: 16,
+        renderDistanceX: 5,
+        renderDistanceY: 5,
+        chunkSize: CHUNK_SIZE,
         positionX: 0,
         positionY: 0,
-    }), [size.height, size.width]);
+    }));
 
     const { data: grid, loading, error } = useMap(mapOptions);
 
@@ -108,6 +109,29 @@ export const Rendereder: React.FC<RendererProps> = ({ size }) => {
         }
     }, [updateViewState, grid]);
 
+    useEffect(() => {
+        const centerWorldX = (width / 2 - viewState.x) / viewState.scale;
+        const centerWorldY = (height / 2 - viewState.y) / viewState.scale;
+
+        const centerTileX = centerWorldX / TILE_SIZE;
+        const centerTileY = centerWorldY / TILE_SIZE;
+
+        const nextPositionX = Math.floor(centerTileX / CHUNK_SIZE);
+        const nextPositionY = Math.floor(centerTileY / CHUNK_SIZE);
+
+        setMapOptions((prev) => {
+            if (prev.positionX === nextPositionX && prev.positionY === nextPositionY) {
+                return prev;
+            }
+
+            return {
+                ...prev,
+                positionX: nextPositionX,
+                positionY: nextPositionY,
+            };
+        });
+    }, [viewState, width, height, TILE_SIZE, CHUNK_SIZE]);
+
     const getVisibleTiles = () => {
         if (!grid) {
             return null;
@@ -146,13 +170,13 @@ export const Rendereder: React.FC<RendererProps> = ({ size }) => {
                 if (isOutside) {
                     continue;
                 }
-
                 tiles.push(
                     <Tile
                         key={`${tile.position.x}-${tile.position.y}`}
                         x={tile.position.x}
                         y={tile.position.y}
                         type={tile.tileType}
+                        hasIcon={tile.hasIcon}
                     />
                 );
             }
@@ -165,31 +189,23 @@ export const Rendereder: React.FC<RendererProps> = ({ size }) => {
         return <>{tiles}</>;
     }
 
-    const getContent = () => {
-        if (loading) {
-            return <div>Loading map...</div>;
-        }
-        else if (error != null) {
-            return <div>Error loading map: {error}</div>;
-        }
-        else {
-            return (
-                <Stage
-                    width={width}
-                    height={height}
-                    ref={stageRef}
-                    onWheel={handleWheel}
-                    draggable={true}
-                    onDragMove={handleDragMove}
-                    onDragEnd={handleDragEnd}
-                >
-                    <Layer>
-                        {getVisibleTiles()}
-                    </Layer>
-                </Stage>
-            );
-        }
-    }
-
-    return getContent();
+    return (
+        <>
+            <Stage
+                width={width}
+                height={height}
+                ref={stageRef}
+                onWheel={handleWheel}
+                draggable={true}
+                onDragMove={handleDragMove}
+                onDragEnd={handleDragEnd}
+            >
+                <Layer>
+                    {getVisibleTiles()}
+                </Layer>
+            </Stage>
+            {loading && !grid && <div>Loading map...</div>}
+            {error && !grid && <div>Error loading map: {error}</div>}
+        </>
+    );
 };
