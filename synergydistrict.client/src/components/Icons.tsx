@@ -1,0 +1,25 @@
+import "../styles/icons.css";
+
+export const IconClose = () => <span className="icon-close"></span>;
+export const IconVolumeOn = () => <span className="icon-volumeOn"></span>;
+export const IconVolumeOff = () => <span className="icon-volumeOff"></span>;
+export const IconForward = () => <span className="icon-forward"></span>;
+export const IconPause = () => <span className="icon-pause"></span>;
+export const IconWater = () => <span className="icon-water"></span>;
+export const IconTree = () => <span className="icon-tree"></span>;
+export const IconPlay = () => <span className="icon-play"></span>;
+export const IconPeople = () => <span className="icon-people"></span>;
+export const IconMountain = () => <span className="icon-mountain"></span>;
+export const IconIndustry = () => <span className="icon-industry"></span>;
+export const IconHappiness = () => <span className="icon-happiness"></span>;
+export const IconElectricity = () => <span className="icon-electricity"></span>;
+export const IconMoney = () => <span className="icon-money"></span>;
+export const IconGrass = () => <span className="icon-grass"></span>;
+export const IconTownHall = () => <span className="icon-townHall"></span>;
+export const IconShop = () => <span className="icon-shop"></span>;
+export const IconPark = () => <span className="icon-park"></span>;
+export const IconMine = () => <span className="icon-mine"></span>;
+export const IconLumberjack = () => <span className="icon-lumberjack"></span>;
+export const IconHouse = () => <span className="icon-house"></span>;
+export const IconFarm = () => <span className="icon-farm"></span>;
+export const IconFactory = () => <span className="icon-factory"></span>;
