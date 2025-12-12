@@ -46,7 +46,7 @@ export const Tile = React.memo(({ x, y, type, hasIcon }: { x: number; y: number;
         listening={false}
       />
 
-      <Text text={hasIcon ? type : ""} fontSize={40} fill={color} fontFamily="icons"/>
+      <Text text={hasIcon ? type.toLowerCase() : ""} fontSize={40} fill={color} fontFamily="icons"/>
 
       <Text text={`${x},${y}`} fontSize={10} fill="rgba(0,0,0,0.5)" padding={5} listening={false}/>
     </Group>
