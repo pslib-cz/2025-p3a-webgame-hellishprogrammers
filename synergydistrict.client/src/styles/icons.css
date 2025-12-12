@@ -1,16 +1,20 @@
 @font-face {
-  font-family: "Icons";
-  src: url("fonts/Icons.woff2") format("woff2"), url("fonts/Icons.ttf") format("truetype"),
-    url("fonts/Icons.woff") format("woff");
+  font-family: "icons";
+  src: url("/fonts/icons.eot?cughj8");
+  src: url("/fonts/icons.eot?cughj8#iefix") format("embedded-opentype"),
+    url("/fonts/icons.ttf?cughj8") format("truetype"), url("/fonts/icons.woff?cughj8") format("woff"),
+    url("/fonts/icons.svg?cughj8#icons") format("svg");
   font-weight: normal;
   font-style: normal;
   font-display: block;
 }
+
 .icon,
 [class^="icon-"],
 [class*=" icon-"] {
-  /* Use !important to prevent extensions from overriding this font. */
-  font-family: "Icons" !important;
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: "icons" !important;
+  speak: never;
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -31,97 +35,73 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-:root {
-  --icon-close: "\f014";
-  --icon-volumeOn: "\f015";
-  --icon-volumeOff: "\f016";
-  --icon-forward: "\f000";
-  --icon-pause: "\f001";
-  --icon-water: "\f002";
-  --icon-tree: "\f003";
-  --icon-play: "\f004";
-  --icon-people: "\f005";
-  --icon-mountain: "\f006";
-  --icon-industry: "\f007";
-  --icon-happiness: "\f008";
-  --icon-electricity: "\f009";
-  --icon-money: "\f00a";
-  --icon-grass: "\f00b";
-  --icon-townHall: "\f00c";
-  --icon-shop: "\f00d";
-  --icon-park: "\f00e";
-  --icon-mine: "\f00f";
-  --icon-lumberjack: "\f010";
-  --icon-house: "\f011";
-  --icon-farm: "\f012";
-  --icon-factory: "\f013";
-}
-.icon-close:before {
-  content: var(--icon-close);
-}
-.icon-volumeOn:before {
-  content: var(--icon-volumeOn);
-}
-.icon-volumeOff:before {
-  content: var(--icon-volumeOff);
-}
-.icon-forward:before {
-  content: var(--icon-forward);
-}
-.icon-pause:before {
-  content: var(--icon-pause);
-}
-.icon-water:before {
-  content: var(--icon-water);
-}
-.icon-tree:before {
-  content: var(--icon-tree);
-}
-.icon-play:before {
-  content: var(--icon-play);
-}
-.icon-people:before {
-  content: var(--icon-people);
-}
-.icon-mountain:before {
-  content: var(--icon-mountain);
-}
-.icon-industry:before {
-  content: var(--icon-industry);
-}
-.icon-happiness:before {
-  content: var(--icon-happiness);
-}
-.icon-electricity:before {
-  content: var(--icon-electricity);
-}
-.icon-money:before {
-  content: var(--icon-money);
-}
-.icon-grass:before {
-  content: var(--icon-grass);
-}
-.icon-townHall:before {
-  content: var(--icon-townHall);
-}
-.icon-shop:before {
-  content: var(--icon-shop);
-}
-.icon-park:before {
-  content: var(--icon-park);
-}
+
 .icon-mine:before {
-  content: var(--icon-mine);
-}
-.icon-lumberjack:before {
-  content: var(--icon-lumberjack);
-}
-.icon-house:before {
-  content: var(--icon-house);
+  content: "\e900";
 }
 .icon-farm:before {
-  content: var(--icon-farm);
+  content: "\e901";
 }
 .icon-factory:before {
-  content: var(--icon-factory);
+  content: "\e902";
+}
+.icon-house:before {
+  content: "\e903";
+}
+.icon-lumberjack:before {
+  content: "\e904";
+}
+.icon-park:before {
+  content: "\e905";
+}
+.icon-shop:before {
+  content: "\e906";
+}
+.icon-townHall:before {
+  content: "\e907";
+}
+.icon-grass:before {
+  content: "\e908";
+}
+.icon-money:before {
+  content: "\e909";
+}
+.icon-electricity:before {
+  content: "\e90a";
+}
+.icon-happiness:before {
+  content: "\e90b";
+}
+.icon-industry:before {
+  content: "\e90c";
+}
+.icon-mountain:before {
+  content: "\e90d";
+}
+.icon-people:before {
+  content: "\e90e";
+}
+.icon-play:before {
+  content: "\e90f";
+}
+.icon-tree:before {
+  content: "\e910";
+}
+.icon-water:before {
+  content: "\e911";
+}
+.icon-pause:before {
+  content: "\e912";
+}
+.icon-forward:before {
+  content: "\e913";
+}
+.icon-volumeOff:before {
+  content: "\e914";
+}
+.icon-volumeOn:before {
+  content: "\e915";
+}
+.icon-close:before {
+  content: "\e916";
 }
