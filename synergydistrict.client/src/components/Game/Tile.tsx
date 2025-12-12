@@ -41,14 +41,14 @@ export const Tile = React.memo(({ x, y, type, hasIcon }: { x: number; y: number;
         width={CELL_SIZE}
         height={CELL_SIZE}
         fill={backgoundColor}
-        stroke="#444"
-        strokeWidth={1}
+        stroke="#19191928"
+        strokeWidth={1.5}
         listening={false}
       />
 
-      <Text text={hasIcon ? type.toLowerCase() : ""} fontSize={40} fill={color} fontFamily="icons"/>
+      <Text text={hasIcon ? type.toLowerCase() : ""} fontSize={40} fill={color} fontFamily="icons" x={CELL_SIZE / 5.3333} y={CELL_SIZE / 5.3333}/>
 
-      <Text text={`${x},${y}`} fontSize={10} fill="rgba(0,0,0,0.5)" padding={5} listening={false}/>
+      {/* <Text text={`${x},${y}`} fontSize={10} fill="rgba(0,0,0,0.5)" padding={5} listening={false}/> */}
     </Group>
   );
 });

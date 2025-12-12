@@ -61,7 +61,7 @@ namespace SynergyDistrict.Server.Services
                             Y = j + offsetY,
                         },
                         TileType = type,
-                        hasIcon = type == MapTileType.Grass ? (rand.NextDouble() > .95 ? true : false) : true,
+                        hasIcon = type == MapTileType.Grass || type == MapTileType.Water ? (rand.NextDouble() > .85 ? true : false) : true,
 
                     });
                 }
@@ -96,7 +96,7 @@ namespace SynergyDistrict.Server.Services
             }
             if(h > thresholdLand)
             {
-                if (f > .95)
+                if (f > .90)
                 {
                     return MapTileType.Forest;
                 }

@@ -17,6 +17,8 @@ export const Rendereder: React.FC<RendererProps> = () => {
     const stageRef = useRef<Konva.Stage>(null);
 
     const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 1 });
+    const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
+
     const CHUNK_SIZE = 16;
 
     const SCALE_BY = 1.15;
@@ -27,8 +29,8 @@ export const Rendereder: React.FC<RendererProps> = () => {
 
     const [mapOptions, setMapOptions] = useState<MapGeneratingOptions>(() => ({
         seed: 12345678,
-        renderDistanceX: 5,
-        renderDistanceY: 5,
+        renderDistanceX: 2,
+        renderDistanceY: 2,
         chunkSize: CHUNK_SIZE,
         positionX: 0,
         positionY: 0,
@@ -59,6 +61,24 @@ export const Rendereder: React.FC<RendererProps> = () => {
 
             return next;
         });
+    }, []);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        const loadFonts = async () => {
+            try {
+                await document.fonts.load('16px "icons"');
+                await document.fonts.ready;
+            } finally {
+                if (!cancelled) setFontsLoaded(true);
+            }
+        };
+
+        loadFonts();
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
     const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
@@ -189,9 +209,15 @@ export const Rendereder: React.FC<RendererProps> = () => {
         return <>{tiles}</>;
     }
 
-    return (
-        <>
-            <Stage
+    const GetContent = () => {
+        if (!fontsLoaded || (loading && !grid)) {
+            return <div><div>Loading map...</div><div style={{ fontFamily: "icons" }}></div></div>
+        }
+        else if (error) {
+            return <div>Error while loading map: {error}</div>
+        }
+        else {
+            return <Stage
                 width={width}
                 height={height}
                 ref={stageRef}
@@ -204,8 +230,12 @@ export const Rendereder: React.FC<RendererProps> = () => {
                     {getVisibleTiles()}
                 </Layer>
             </Stage>
-            {loading && !grid && <div>Loading map...</div>}
-            {error && !grid && <div>Error loading map: {error}</div>}
+        }
+    }
+
+    return (
+        <>
+            {GetContent()}
         </>
     );
 };
