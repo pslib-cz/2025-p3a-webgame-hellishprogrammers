@@ -3,22 +3,33 @@ import { Group, Rect, Text } from "react-konva";
 
 const CELL_SIZE = 64;
 
-// Memoized color lookup for better performance
-const COLOR_MAP: Record<string, string> = {
+const BACKGROUND_COLOR_MAP: Record<string, string> = {
   "water": "#5d8a9e",
   "grass": "#8a9e5d",
   "mountain": "#9e7b5d",
-  "forest": "#4f6e45",
-  "building": "#d15c5c",
+  "forest": "#8a9e5d",
 };
 
-const getColor = (type: string): string => {
+const ICON_COLOR_MAP: Record<string, string> = {
+  "water": "#124559",
+  "grass": "#606C38",
+  "mountain": "#8F531D",
+  "forest": "#283618",
+};
+
+const getBackgroundColor = (type: string): string => {
   const normalized = type?.toLowerCase() ?? "";
-  return COLOR_MAP[normalized] ?? "#ccc";
+  return BACKGROUND_COLOR_MAP[normalized] ?? "#ccc";
 };
 
-export const Tile = React.memo(({ x, y, type, }: { x: number; y: number; type: string; }) => {
-  const color = getColor(type);
+const getIconColor = (type: string): string => {
+  const normalized = type?.toLowerCase() ?? "";
+  return ICON_COLOR_MAP[normalized] ?? "#ccc";
+}
+
+export const Tile = React.memo(({ x, y, type, hasIcon }: { x: number; y: number; type: string; hasIcon: boolean }) => {
+  const backgoundColor = getBackgroundColor(type);
+  const color = getIconColor(type);
   
   return (
     <Group
@@ -29,11 +40,13 @@ export const Tile = React.memo(({ x, y, type, }: { x: number; y: number; type: s
       <Rect
         width={CELL_SIZE}
         height={CELL_SIZE}
-        fill={color}
+        fill={backgoundColor}
         stroke="#444"
         strokeWidth={1}
         listening={false}
       />
+
+      <Text text={hasIcon ? type : ""} fontSize={40} fill={color} fontFamily="icons"/>
 
       <Text text={`${x},${y}`} fontSize={10} fill="rgba(0,0,0,0.5)" padding={5} listening={false}/>
     </Group>
