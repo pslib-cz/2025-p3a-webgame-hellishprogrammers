@@ -1,5 +1,5 @@
-import { Rendereder } from '../components/Game/Renderer';
+import { Rendereder } from '../components/Game/Canvas/GameCanvas';
 
 export default function Game() {
-    return <Rendereder size={{width: 200, height:150}}/>;
+    return <Rendereder />;
 }

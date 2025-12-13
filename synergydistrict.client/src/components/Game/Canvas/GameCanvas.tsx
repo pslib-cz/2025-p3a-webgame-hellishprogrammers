@@ -3,9 +3,10 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { Stage, Layer } from 'react-konva';
 import type Konva from 'konva';
-import { useMap } from '../../hooks/useMap';
+import { useMap } from '../../../hooks/useMap';
 import { Tile } from './Tile';
-import type { MapGeneratingOptions } from '../../types/Grid';
+import type { MapGeneratingOptions } from '../../../types/Grid';
+import MapLayer from './MapLayer';
 
 type RendererProps = {
     //size: { width: number; height: number; };
@@ -27,16 +28,16 @@ export const Rendereder: React.FC<RendererProps> = () => {
     const TILE_SIZE = 64;
     const TILE_MARGIN = 2;
 
-    const [mapOptions, setMapOptions] = useState<MapGeneratingOptions>(() => ({
-        seed: 12345678,
-        renderDistanceX: 2,
-        renderDistanceY: 2,
-        chunkSize: CHUNK_SIZE,
-        positionX: 0,
-        positionY: 0,
-    }));
-
-    const { data: grid, loading, error } = useMap(mapOptions);
+        const [mapOptions, setMapOptions] = useState<MapGeneratingOptions>(() => ({
+            seed: 12345678,
+            renderDistanceX: 2,
+            renderDistanceY: 2,
+            chunkSize: CHUNK_SIZE,
+            positionX: 0,
+            positionY: 0,
+        }));
+    
+        const { data: grid, loading, error } = useMap(mapOptions);
 
     const updateViewState = useCallback(() => {
         const stage = stageRef.current;
@@ -152,63 +153,6 @@ export const Rendereder: React.FC<RendererProps> = () => {
         });
     }, [viewState, width, height, TILE_SIZE, CHUNK_SIZE]);
 
-    const getVisibleTiles = () => {
-        if (!grid) {
-            return null;
-        }
-
-        const { x: stageX, y: stageY, scale } = viewState;
-        const inverseScale = 1 / scale;
-
-        const viewLeftPx = (-stageX) * inverseScale;
-        const viewTopPx = (-stageY) * inverseScale;
-        const viewRightPx = (width - stageX) * inverseScale;
-        const viewBottomPx = (height - stageY) * inverseScale;
-
-        const marginPx = TILE_MARGIN * TILE_SIZE;
-
-        const cullLeft = viewLeftPx - marginPx;
-        const cullRight = viewRightPx + marginPx;
-        const cullTop = viewTopPx - marginPx;
-        const cullBottom = viewBottomPx + marginPx;
-
-        const tiles: ReactNode[] = [];
-
-        for (const row of grid) {
-            for (const tile of row) {
-                const tileLeft = tile.position.x * TILE_SIZE;
-                const tileTop = tile.position.y * TILE_SIZE;
-                const tileRight = tileLeft + TILE_SIZE;
-                const tileBottom = tileTop + TILE_SIZE;
-
-                const isOutside =
-                    tileRight < cullLeft ||
-                    tileLeft > cullRight ||
-                    tileBottom < cullTop ||
-                    tileTop > cullBottom;
-
-                if (isOutside) {
-                    continue;
-                }
-                tiles.push(
-                    <Tile
-                        key={`${tile.position.x}-${tile.position.y}`}
-                        x={tile.position.x}
-                        y={tile.position.y}
-                        type={tile.tileType}
-                        hasIcon={tile.hasIcon}
-                    />
-                );
-            }
-        }
-
-        if (tiles.length === 0) {
-            return null;
-        }
-
-        return <>{tiles}</>;
-    }
-
     const GetContent = () => {
         if (!fontsLoaded || (loading && !grid)) {
             return <div><div>Loading map...</div><div style={{ fontFamily: "icons" }}></div></div>
@@ -226,9 +170,7 @@ export const Rendereder: React.FC<RendererProps> = () => {
                 onDragMove={handleDragMove}
                 onDragEnd={handleDragEnd}
             >
-                <Layer>
-                    {getVisibleTiles()}
-                </Layer>
+                <MapLayer width={width} height={height} TILE_MARGIN={TILE_MARGIN} TILE_SIZE={TILE_SIZE} viewState={viewState} grid={grid}/>
             </Stage>
         }
     }
