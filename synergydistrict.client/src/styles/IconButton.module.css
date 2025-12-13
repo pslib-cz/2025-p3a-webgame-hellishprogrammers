@@ -9,7 +9,7 @@
     align-self: stretch;
     background-color: var(--background);
     color: var(--text);
-    font-family: 'icomoon';
+    font-family: 'icons';
     font-size: 24px;
 }
 .selected{
