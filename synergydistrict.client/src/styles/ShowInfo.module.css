@@ -1,0 +1,14 @@
+.showInfo {
+    display: flex;
+    align-items: stretch;
+}
+
+.showInfo__left {
+    flex-basis: 12.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.showInfo__right {
+
+}

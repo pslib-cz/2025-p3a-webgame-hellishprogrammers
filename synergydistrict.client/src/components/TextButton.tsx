@@ -7,17 +7,18 @@ type TextButtonProps = {
   text: string;
   linkTo?: string;
   onClick?: () => void;
+  isActive?: boolean;
 };
 
-export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick }) => {
+export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActive = false }) => {
   const [isTextActive, setIsTextActive] = useState<boolean>(false);
 
   const renderContext = () => {
     if (!linkTo) {
       return (
-        <div className={styles.link} onClick={onClick}>
-          {text}
-        </div>
+        <button onClick={onClick}>
+          <ButtonText text={text} isActive={isActive} />
+        </button>
       );
     } else {
       return (
