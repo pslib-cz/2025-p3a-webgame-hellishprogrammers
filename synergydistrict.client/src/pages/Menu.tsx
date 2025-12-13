@@ -31,9 +31,11 @@ const Menu = () => {
         </div>
       </div>
       <div className={styles.menuSide}>
-        <NavLink to="/menu" className={styles.closeButton}>
-          <IconClose />
-        </NavLink>
+        <div className={styles.closeButton}>
+          <NavLink to="/menu">
+            <IconClose />
+          </NavLink>
+        </div>
         <div className={styles.menuContainer}>
           <Outlet />
         </div>
