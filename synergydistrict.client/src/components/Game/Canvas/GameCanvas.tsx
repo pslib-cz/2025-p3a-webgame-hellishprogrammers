@@ -1,18 +1,17 @@
 import type { KonvaEventObject } from 'konva/lib/Node';
 import { useRef, useState, useCallback, useEffect } from 'react';
-import type { ReactNode } from 'react';
 import { Stage, Layer } from 'react-konva';
 import type Konva from 'konva';
 import { useMap } from '../../../hooks/useMap';
-import { Tile } from './Tile';
-import type { MapGeneratingOptions } from '../../../types/Grid';
+import type { MapBuilding, MapGeneratingOptions } from '../../../types/Grid';
 import MapLayer from './MapLayer';
+import BuildingsLayer from './BuildingsLayer';
 
 type RendererProps = {
-    //size: { width: number; height: number; };
+    buildings: MapBuilding[]
 }
 
-export const Rendereder: React.FC<RendererProps> = () => {
+export const GameCanvas: React.FC<RendererProps> = ({buildings}) => {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const stageRef = useRef<Konva.Stage>(null);
@@ -171,6 +170,7 @@ export const Rendereder: React.FC<RendererProps> = () => {
                 onDragEnd={handleDragEnd}
             >
                 <MapLayer width={width} height={height} TILE_MARGIN={TILE_MARGIN} TILE_SIZE={TILE_SIZE} viewState={viewState} grid={grid}/>
+                <BuildingsLayer width={width} height={height} TILE_MARGIN={TILE_MARGIN} TILE_SIZE={TILE_SIZE} viewState={viewState} buildings={buildings}/>
             </Stage>
         }
     }

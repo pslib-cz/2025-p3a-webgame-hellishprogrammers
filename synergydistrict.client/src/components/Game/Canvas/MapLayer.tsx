@@ -59,7 +59,8 @@ const MapLayer: React.FC<MapLayerProps> = ({TILE_MARGIN, TILE_SIZE, viewState, w
                         x={tile.position.x}
                         y={tile.position.y}
                         type={tile.tileType}
-                        hasIcon={tile.hasIcon}
+                        iconKey={tile.hasIcon ? tile.tileType : ""}
+                        outline={["default", "default", "default" , "default"]}
                     />
                 );
             }

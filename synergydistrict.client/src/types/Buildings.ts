@@ -5,7 +5,7 @@ export type ResourceType = "Money" | "People" | "Energy" | "Happiness" | "Indust
 export type BuildingPreview = {
     buildingId: number;
     name: string;
-    type: BuildingType;
+    category: BuildingType;
     colorHex: string;
     iconKey: string;
     shape: BuildingTileType[][];
@@ -14,7 +14,7 @@ export type BuildingPreview = {
 export type SynergyBuilding ={
     buildingId: number;
     name: string;
-    type: BuildingType;
+    category: BuildingType;
     colorHex: string;
 }
 
@@ -32,7 +32,7 @@ export type Production = {
 export type BuildingDetail = {
     buildingId: number;
     name: string;
-    type: string;
+    category: string;
     description: string;
     colorHex: string;
     iconKey: string;
