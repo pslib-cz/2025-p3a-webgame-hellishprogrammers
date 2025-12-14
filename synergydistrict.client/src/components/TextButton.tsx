@@ -16,7 +16,7 @@ export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActiv
   const renderContext = () => {
     if (!linkTo) {
       return (
-        <button onClick={onClick}>
+        <button onClick={onClick} className={`${styles.link} ${isActive ? styles.linkActive : ""}`}>
           <ButtonText text={text} isActive={isActive} />
         </button>
       );

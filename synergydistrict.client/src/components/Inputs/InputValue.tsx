@@ -6,9 +6,11 @@ import BorderLayout from "../BorderLayout";
 type InputValueProps = {
   text: string;
   inputType: InputTypes;
+  value?: string | number;
+  onChange?: (value: string) => void;
 };
 
-const InputValue: FC<InputValueProps> = ({ text, inputType }) => {
+const InputValue: FC<InputValueProps> = ({ text, inputType, value, onChange }) => {
   const inputId = useId();
 
   const left = () => {
@@ -18,7 +20,13 @@ const InputValue: FC<InputValueProps> = ({ text, inputType }) => {
   const right = () => {
     return (
       <BorderLayout>
-        <input id={inputId} type={inputType} placeholder={placeholder()} />
+        <input
+          id={inputId}
+          type={inputType}
+          placeholder={placeholder()}
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+        />
       </BorderLayout>
     );
   };

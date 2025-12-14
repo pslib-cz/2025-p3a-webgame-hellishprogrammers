@@ -4,6 +4,11 @@
   padding: 0.5rem 1rem;
 }
 
+button {
+  background: transparent;
+  color: inherit;
+}
+
 .linkActive,
 .link:hover {
   background: var(--text);

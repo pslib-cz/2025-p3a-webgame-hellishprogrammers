@@ -11,7 +11,5 @@ export const GameOptionsContext = createContext<GameOptionsContextValue | null>(
 export const GameOptionsProvider: FC<PropsWithChildren> = ({ children }) => {
   const [options, setOptions] = useState<GameOptions>(defaultGameOptions);
 
-  // TODO: localstorage
-
   return <GameOptionsContext.Provider value={{ options, setOptions }}>{children}</GameOptionsContext.Provider>;
 };

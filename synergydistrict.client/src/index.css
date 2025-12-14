@@ -55,6 +55,7 @@ h2,
 h3,
 .h3 {
   font-size: 1.25rem;
+  margin: 0;
 }
 a {
   color: var(--text);
