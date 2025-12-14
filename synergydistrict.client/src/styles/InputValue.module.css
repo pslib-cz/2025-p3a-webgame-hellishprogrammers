@@ -1,0 +1,24 @@
+.inputValue input {
+  flex-grow: 1;
+  padding: 1rem;
+
+  background: transparent;
+  border: none;
+  outline: none;
+
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.inputValue input::placeholder {
+  color: inherit;
+  opacity: 0.5;
+}
+
+/* Remove spinners from number inputs */
+.inputValue input[type="number"]::-webkit-inner-spin-button,
+.inputValue input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

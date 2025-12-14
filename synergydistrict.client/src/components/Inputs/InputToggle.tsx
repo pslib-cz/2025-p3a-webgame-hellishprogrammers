@@ -1,6 +1,7 @@
 import { type FC } from "react";
 import ShowInfo from "../ShowInfo";
 import ToggleButton from "../ToggleButton";
+import styles from "../../styles/ToggleButton.module.css";
 
 type InputToggleProps = {
   text: string;
@@ -15,7 +16,11 @@ const InputToggle: FC<InputToggleProps> = ({ text, options, selectedIndex, onCha
   };
 
   const right = () => {
-    return <ToggleButton options={options} selectedIndex={selectedIndex} onChange={onChange} />;
+    return (
+      <div className={styles.toggleButtonsNarrow}>
+        <ToggleButton options={options} selectedIndex={selectedIndex} onChange={onChange} />
+      </div>
+    );
   };
 
   return <ShowInfo left={left()} right={right()} />;

@@ -37,7 +37,9 @@ const PlayMenu = () => {
           onChange={(val) => setOptions({ ...options, mapSize: Number(val) })}
         />
       </div>
-      <TextButton text="game" linkTo="/game" />
+      <div className={`h2 ${styles.right}`}>
+        <TextButton text="start" linkTo="/game" />
+      </div>
     </>
   );
 };

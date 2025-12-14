@@ -2,6 +2,7 @@ import { useId, type FC } from "react";
 import type { InputTypes } from "../../types/Input";
 import ShowInfo from "../ShowInfo";
 import BorderLayout from "../BorderLayout";
+import styles from "../../styles/InputValue.module.css";
 
 type InputValueProps = {
   text: string;
@@ -19,15 +20,17 @@ const InputValue: FC<InputValueProps> = ({ text, inputType, value, onChange }) =
 
   const right = () => {
     return (
-      <BorderLayout>
-        <input
-          id={inputId}
-          type={inputType}
-          placeholder={placeholder()}
-          value={value}
-          onChange={(e) => onChange?.(e.target.value)}
-        />
-      </BorderLayout>
+      <div className={styles.inputValue}>
+        <BorderLayout>
+          <input
+            id={inputId}
+            type={inputType}
+            placeholder={placeholder()}
+            value={value}
+            onChange={(e) => onChange?.(e.target.value)}
+          />
+        </BorderLayout>
+      </div>
     );
   };
 

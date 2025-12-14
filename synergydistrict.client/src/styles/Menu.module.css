@@ -67,10 +67,33 @@
   margin: 0;
 }
 
-
-
 .playMenu {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  margin-bottom: 2rem;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.playMenu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.playMenu::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.playMenu::-webkit-scrollbar-thumb {
+  background: var(--text);
+  border-radius: 4px;
+}
+
+.playMenu::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--text) 50%, transparent);
 }

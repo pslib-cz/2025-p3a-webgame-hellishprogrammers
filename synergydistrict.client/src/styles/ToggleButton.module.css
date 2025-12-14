@@ -5,4 +5,12 @@
 .toggleButtons button {
   flex-grow: 1;
   border: 0;
+  padding: 1rem;
+}
+
+.toggleButtonsNarrow {
+    justify-self: flex-end;
+}
+.toggleButtonsNarrow button {
+    flex-grow: 0;
 }
