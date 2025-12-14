@@ -4,7 +4,6 @@ import type { BuildingPreview, BuildingTileType } from '../types/Buildings';
 import type { MapBuilding, Position, Edge, EdgeSide } from '../types/Grid';
 
 export default function Game() {
-
     const [position, setPosition] = useState<Position>({x: 0, y: 0})
     const [buildings, setBuildings] = useState<MapBuilding[]>([])
 

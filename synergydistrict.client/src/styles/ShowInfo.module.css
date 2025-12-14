@@ -1,0 +1,17 @@
+.showInfo {
+    display: flex;
+    align-items: stretch;
+}
+
+.showInfo__left {
+    width: 12.5rem;
+    display: flex;
+    align-items: center;
+    background: var(--text);
+    color: var(--background);
+    padding: 1rem;
+}
+
+.showInfo__right {
+    flex-grow: 1;
+}

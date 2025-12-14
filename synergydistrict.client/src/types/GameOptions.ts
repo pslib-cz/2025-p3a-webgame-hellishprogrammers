@@ -1,11 +1,14 @@
+type GameMode = "timePresure" | "survival";
+
 export type GameOptions = {
-  duration: number;
-  mapSize: number;
-  soundEnabled: boolean;
+  gameMode: GameMode;
+  gameDuration: number;
+  infiniteMap: boolean;
+  mapSize?: number;
 };
 
 export const defaultGameOptions: GameOptions = {
-  duration: 10,
-  mapSize: 100,
-  soundEnabled: true,
+  gameMode: "timePresure",
+  gameDuration: 10,
+  infiniteMap: true,
 };
