@@ -5,35 +5,39 @@ import type { MapGeneratingOptions, MapTile } from "../types/Grid";
 const api = new MapApi();
 
 export function useMap(options: MapGeneratingOptions) {
-    const [data, setData] = useState<MapTile[][] | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    useEffect(() => {
-        let cancelled = false;
-        setLoading(true);
-        setError(null);
+  const [data, setData] = useState<MapTile[][] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-        api.getMapTiles(options)
-            .then((result) => {
-                if (!cancelled) {
-                    setData(result);
-                }
-            })
-            .catch((err: Error) => {
-                if (!cancelled) {
-                    setError(err.message);
-                }
-            })
-            .finally(() => {
-                if (!cancelled) {
-                    setLoading(false);
-                }
-            });
+  const optionsKey = JSON.stringify(options);
 
-        return () => {
-            cancelled = true;
-        };
-    }, [options]);
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
 
-    return { data, loading, error };
+    api
+      .getMapTiles(options)
+      .then((result) => {
+        if (!cancelled) {
+          setData(result);
+        }
+      })
+      .catch((err: Error) => {
+        if (!cancelled) {
+          setError(err.message);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [optionsKey]);
+
+  return { data, loading, error };
 }
