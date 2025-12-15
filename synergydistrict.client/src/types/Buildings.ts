@@ -9,25 +9,25 @@ export type BuildingPreview = {
     colorHex: string;
     iconKey: string;
     shape: BuildingTileType[][];
-}
+};
 
-export type SynergyBuilding ={
+export type SynergyBuilding = {
     buildingId: number;
     name: string;
     category: BuildingType;
     colorHex: string;
-}
+};
 
 export type BuildingSynergy = {
     sourceBuildingId: SynergyBuilding;
     targetBuildingId: SynergyBuilding;
     productionBonuses: Production[];
-}
+};
 
 export type Production = {
     resourceType: ResourceType;
     amount: number;
-}
+};
 
 export type BuildingDetail = {
     buildingId: number;
@@ -41,4 +41,4 @@ export type BuildingDetail = {
     baseProduction: Production;
     incomingSynergies: BuildingSynergy[];
     outgoingSynergies: BuildingSynergy[];
-}
+};

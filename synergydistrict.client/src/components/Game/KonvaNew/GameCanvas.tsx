@@ -1,5 +1,5 @@
 import { useMap } from "../../../hooks/useMap";
-import type { MapGeneratingOptions, MapTile } from "../../../types/Grid";
+import type { MapGeneratingOptions, MapTile, Position } from "../../../types/Grid";
 import { useState, useEffect, useRef } from "react";
 import MapLayer from "./MapLayer";
 import { Stage } from "react-konva";
@@ -7,20 +7,18 @@ import type Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import GridLayer from "./GridLayer";
 import styles from "../../../styles/Game.module.css";
+import useGameProperties from "../../../hooks/useGameProperties";
 
 const GameCanvas = () => {
-
-      const containerRef = useRef<HTMLDivElement>(null);
-      const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
     const stageRef = useRef<Konva.Stage | null>(null);
-    const CHUNK_SIZE = 16;
-    const SCALE_BY = 1.15;
-    const MIN_SCALE = 0.01;
-    const MAX_SCALE = 5;
-    const TILE_SIZE = 64;
+
+    const { CHUNK_SIZE, SCALE_BY, MIN_SCALE, MAX_SCALE, TILE_SIZE } = useGameProperties();
+
     const [stageScale, setStageScale] = useState(1);
-    const [stagePosition, setStagePosition] = useState({ x: 0, y: 0 });
+    const [stagePosition, setStagePosition] = useState<Position>({ x: 0, y: 0 });
 
     const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(value, min));
 
@@ -41,12 +39,12 @@ const GameCanvas = () => {
         // Keep the zoom centered around the current cursor position.
         const mousePointTo = {
             x: (pointer.x - stage.x()) / oldScale,
-            y: (pointer.y - stage.y()) / oldScale
+            y: (pointer.y - stage.y()) / oldScale,
         };
 
         const newPosition = {
             x: pointer.x - mousePointTo.x * nextScale,
-            y: pointer.y - mousePointTo.y * nextScale
+            y: pointer.y - mousePointTo.y * nextScale,
         };
 
         setStageScale(nextScale);
@@ -58,27 +56,27 @@ const GameCanvas = () => {
     };
 
     useEffect(() => {
-    if (!containerRef.current) return;
+        if (!containerRef.current) return;
 
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        setDimensions({ width, height });
-      }
-    });
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const { width, height } = entry.contentRect;
+                setDimensions({ width, height });
+            }
+        });
 
-    resizeObserver.observe(containerRef.current);
+        resizeObserver.observe(containerRef.current);
 
-    return () => resizeObserver.disconnect();
-  }, []);
+        return () => resizeObserver.disconnect();
+    }, []);
 
     const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
 
     const [mapOptions, setMapOptions] = useState<MapGeneratingOptions>({
         seed: 12345678,
         chunkSize: CHUNK_SIZE,
-        startChunkPos: { x: -10, y: -10 },
-        endChunkPos: { x: 10, y: 10 }
+        startChunkPos: { x: -1, y: -1 },
+        endChunkPos: { x: 1, y: 1 },
     });
 
     const [loadedChunks, setLoadedChunks] = useState<Record<string, MapTile[]>>();
@@ -102,7 +100,6 @@ const GameCanvas = () => {
             cancelled = true;
         };
     }, []);
-    
 
     const GetContent = () => {
         if (!fontsLoaded || (loading && !newChunks)) {
@@ -113,10 +110,8 @@ const GameCanvas = () => {
             );
         } else if (error) {
             return <div>Error while loading map: {error}</div>;
-        }
-        else {
+        } else {
             return (
-
                 <Stage
                     ref={stageRef}
                     width={dimensions.width}
@@ -129,8 +124,13 @@ const GameCanvas = () => {
                     y={stagePosition.y}
                     onDragMove={handleDragMove}
                 >
-                    <MapLayer chunks={newChunks!} TILE_SIZE={TILE_SIZE} />
-                    <GridLayer mapHeightTiles={dimensions.height / TILE_SIZE} mapWidthTiles={dimensions.width / TILE_SIZE} TILE_SIZE={TILE_SIZE} opacity={.35}/>
+                    <MapLayer chunks={newChunks!} />
+                    <GridLayer
+                        mapHeightTiles={dimensions.height / TILE_SIZE}
+                        mapWidthTiles={dimensions.width / TILE_SIZE}
+                        TILE_SIZE={TILE_SIZE}
+                        opacity={0.35}
+                    />
                 </Stage>
             );
         }
@@ -138,9 +138,9 @@ const GameCanvas = () => {
 
     return (
         <div ref={containerRef} className={styles.canvas}>
-            { GetContent() }
+            {GetContent()}
         </div>
     );
-}
+};
 
 export default GameCanvas;
