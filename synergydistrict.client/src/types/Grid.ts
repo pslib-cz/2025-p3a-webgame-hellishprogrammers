@@ -20,11 +20,9 @@ export type Position = {
 
 export type MapGeneratingOptions = {
   seed: number;
-  renderDistanceX: number;
-  renderDistanceY: number;
   chunkSize: number;
-  positionX: number;
-  positionY: number;
+  startChunkPos: Position,
+  endChunkPos: Position
 };
 
 export type TileType = "water" | "grass" | "mountain" | "forest";

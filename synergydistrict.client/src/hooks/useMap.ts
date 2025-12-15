@@ -5,7 +5,7 @@ import type { MapGeneratingOptions, MapTile } from "../types/Grid";
 const api = new MapApi();
 
 export function useMap(options: MapGeneratingOptions) {
-  const [data, setData] = useState<MapTile[][] | null>(null);
+  const [data, setData] = useState<Record<string, MapTile[]> | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
