@@ -26,14 +26,12 @@ const GridLayer: React.FC<GridLayerProp> = ({ TILE_SIZE, mapHeightTiles, mapWidt
 
             con.beginPath();
 
-            // Vertical lines
             for (let x = 0; x <= mapWidthTiles; x++) {
                 const px = x * TILE_SIZE;
                 con.moveTo(px, 0);
                 con.lineTo(px, heightPx);
             }
 
-            // Horizontal lines
             for (let y = 0; y <= mapHeightTiles; y++) {
                 const py = y * TILE_SIZE;
                 con.moveTo(0, py);
