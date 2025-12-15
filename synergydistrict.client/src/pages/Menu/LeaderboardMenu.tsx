@@ -1,8 +1,7 @@
-import { TimeControl } from "../../components/TimeControl";
+import Construction from "../../components/Construction";
 
 const LeaderboardMenu = () => {
-  
-  return <TimeControl selectedTimer={() => {}} />;
+  return <Construction />;
 };
 
 export default LeaderboardMenu;

@@ -1,5 +1,7 @@
+import Construction from "../../components/Construction";
+
 const StatisticsMenu = () => {
-  return <></>;
+  return <Construction />;
 };
 
 export default StatisticsMenu;
