@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { GameCanvas } from "../components/Game/Canvas/GameCanvas";
 import type { BuildingPreview, BuildingTileType } from "../types/Buildings";
 import type { MapBuilding, Position, Edge, EdgeSide } from "../types/Grid";
 import styles from "../styles/Game.module.css";
+import GameCanvas from "../components/Game/KonvaNew/GameCanvas";
 
 export default function Game() {
   const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
@@ -89,7 +89,7 @@ export default function Game() {
 
   return (
     <div className={styles.game}>
-      <GameCanvas buildings={buildings} />
+      <GameCanvas />
       <div>
         <button onClick={handleOnClick}>Build</button>
         <input type="number" onChange={(e) => setPosition((p) => ({ ...p, x: parseInt(e.target.value) }))}></input>

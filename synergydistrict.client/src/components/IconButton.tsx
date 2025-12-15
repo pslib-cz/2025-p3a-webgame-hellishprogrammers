@@ -4,9 +4,10 @@ type IconButtonProps = {
     isSelected: boolean,
     iconKey:string,
     OnClick:() => void,
+    amount?:React.ReactNode
 };
 
-export const IconButton:FC<IconButtonProps> = ({isSelected,iconKey,OnClick}) => {
+export const IconButton:FC<IconButtonProps> = ({isSelected,iconKey,OnClick,amount}) => {
     const handleOnClick = () => {
         OnClick()
     }
@@ -19,7 +20,7 @@ export const IconButton:FC<IconButtonProps> = ({isSelected,iconKey,OnClick}) => 
     } 
     return(
         <button onClick={handleOnClick} className={styleSelector()}>
-            {iconKey}
+            {iconKey}{amount !== undefined && <span>{amount}</span>}
         </button>
     )
 }

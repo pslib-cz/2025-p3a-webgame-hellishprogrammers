@@ -7,7 +7,7 @@ export class MapApi {
         this.baseUrl = baseUrl;
     }
 
-    async getMapTiles(options: MapGeneratingOptions): Promise<MapTile[][]> {
+    async getMapTiles(options: MapGeneratingOptions): Promise<Record<string, MapTile[]>> {
         const res = await fetch(this.baseUrl + "/generate", {
             method: "POST",
             headers: {
@@ -20,7 +20,9 @@ export class MapApi {
         if (!res.ok) {
             throw new Error(`Failed to fetch map tiles. Status: ${res.status}`);
         }
-        const data = (await res.json()) as MapTile[][];
+        const data = (await res.json()) as Record<string, MapTile[]>;
         return data;
     }
+
+
 }

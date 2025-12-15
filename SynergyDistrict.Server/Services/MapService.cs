@@ -8,35 +8,22 @@ namespace SynergyDistrict.Server.Services
         private readonly float thresholdLand = -0.2f;
         private readonly float treshholdMountain = 0.6f;
 
-        public MapTile[][] GetAdjecentChunks(MapGenerationOptions options)
+        public Dictionary<string, MapTile[]> GetAdjecentChunks(MapGenerationOptions options)
         {
-            Position startChunkPosition = new Position { X = options.positionX - options.renderDistanceX, Y = options.positionY - options.renderDistanceY };
-            List<MapTile> tiles = new List<MapTile>();
-            int widthChunks = options.renderDistanceX * 2 + 1;
-            int heightChunks = options.renderDistanceY * 2 + 1;
+            Dictionary<string, MapTile[]> chunks = new Dictionary<string, MapTile[]>();
+            int widthChunks = Math.Abs(options.startChunkPos.X - options.endChunkPos.X) + 1;
+            int heightChunks = Math.Abs(options.startChunkPos.Y - options.endChunkPos.Y) + 1;
 
-            for (int i = 0; i < options.renderDistanceX * 2 + 1; i++)
+            for (int i = 0; i < widthChunks; i++)
             {
-                for (int j = 0; j < options.renderDistanceY * 2 + 1; j++)
+                for (int j = 0; j < heightChunks; j++)
                 {
-                    tiles.AddRange(GetChunkAt(options,new Position { X = i + startChunkPosition.X, Y = j + startChunkPosition.Y }));
+                    var current = new Position { X = i + options.startChunkPos.X, Y = j + options.startChunkPos.Y };
+                    chunks.Add( current.ToString() ,GetChunkAt(options, current));
                 }
             }
 
-            MapTile[][] map = new MapTile[widthChunks * options.chunkSize][];
-            for (int i = 0; i < map.Length; i++)
-            {
-                map[i] = new MapTile[heightChunks * options.chunkSize];
-            }
-            var tileFirst = tiles[0];
-            Position tileOffsetPosition = new Position { X = tileFirst.Position.X, Y = tileFirst.Position.Y };
-
-            foreach (var tile in tiles)
-            {
-                map[tile.Position.X - tileOffsetPosition.X][tile.Position.Y - tileOffsetPosition.Y] = tile;
-            }
-
-            return map;
+            return chunks;
         }
 
         MapTile[] GetChunkAt(MapGenerationOptions options, Position chunkPosition)

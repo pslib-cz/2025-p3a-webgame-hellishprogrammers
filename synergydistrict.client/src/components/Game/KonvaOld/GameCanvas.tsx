@@ -12,7 +12,7 @@ type RendererProps = {
   buildings: MapBuilding[];
 };
 
-export const GameCanvas: React.FC<RendererProps> = ({ buildings }) => {
+export const GameCanvas_Old: React.FC<RendererProps> = ({ buildings }) => {
   // 1. Ref for the wrapper div
   const containerRef = useRef<HTMLDivElement>(null);
   // 2. State to store the measured size
