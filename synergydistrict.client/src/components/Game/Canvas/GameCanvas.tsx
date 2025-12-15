@@ -22,7 +22,7 @@ export const GameCanvas: React.FC<RendererProps> = ({buildings}) => {
     const CHUNK_SIZE = 16;
 
     const SCALE_BY = 1.15;
-    const MIN_SCALE = 0.01;
+    const MIN_SCALE = 0.9;
     const MAX_SCALE = 5;
     const TILE_SIZE = 64;
     const TILE_MARGIN = 2;

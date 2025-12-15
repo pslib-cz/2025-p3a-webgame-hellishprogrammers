@@ -15,7 +15,8 @@ export default function Game() {
         iconKey: "",
         shape: [
             ["Icon", "Solid", "Empty"],
-            ["Empty", "Solid", "Solid"]
+            ["Empty", "Solid", "Solid"],
+            ["Solid", "Solid", "Solid"]
         ]
     }
 

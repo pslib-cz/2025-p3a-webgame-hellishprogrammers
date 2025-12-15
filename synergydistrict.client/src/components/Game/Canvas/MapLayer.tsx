@@ -1,5 +1,5 @@
 import { useMap } from "../../../hooks/useMap";
-import { useState, type ReactNode } from "react";
+import { useState, type ReactNode, useMemo } from "react";
 import type { MapGeneratingOptions, MapTile } from "../../../types/Grid";
 import { Tile } from "./Tile";
 import { Layer } from "react-konva";
@@ -73,9 +73,11 @@ const MapLayer: React.FC<MapLayerProps> = ({TILE_MARGIN, TILE_SIZE, viewState, w
         return <>{tiles}</>;
     }
 
+    const visibleTiles = useMemo(() => getVisibleTiles(), [viewState, grid]);
+
     return(
-        <Layer>
-            {getVisibleTiles()}
+        <Layer cache={true}>
+            {visibleTiles}
         </Layer>
     );
 }
