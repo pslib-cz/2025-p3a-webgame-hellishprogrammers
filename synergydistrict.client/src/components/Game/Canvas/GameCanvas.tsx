@@ -1,183 +1,225 @@
-import type { KonvaEventObject } from 'konva/lib/Node';
-import { useRef, useState, useCallback, useEffect } from 'react';
-import { Stage, Layer } from 'react-konva';
-import type Konva from 'konva';
-import { useMap } from '../../../hooks/useMap';
-import type { MapBuilding, MapGeneratingOptions } from '../../../types/Grid';
-import MapLayer from './MapLayer';
-import BuildingsLayer from './BuildingsLayer';
+import type { KonvaEventObject } from "konva/lib/Node";
+import { useRef, useState, useCallback, useEffect } from "react";
+import { Stage } from "react-konva";
+import type Konva from "konva";
+import { useMap } from "../../../hooks/useMap";
+import type { MapBuilding, MapGeneratingOptions } from "../../../types/Grid";
+import MapLayer from "./MapLayer";
+import BuildingsLayer from "./BuildingsLayer";
+import styles from "../../../styles/Game.module.css";
 
 type RendererProps = {
-    buildings: MapBuilding[]
-}
+  buildings: MapBuilding[];
+};
 
-export const GameCanvas: React.FC<RendererProps> = ({buildings}) => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const stageRef = useRef<Konva.Stage>(null);
+export const GameCanvas: React.FC<RendererProps> = ({ buildings }) => {
+  // 1. Ref for the wrapper div
+  const containerRef = useRef<HTMLDivElement>(null);
+  // 2. State to store the measured size
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  //   const width = window.innerWidth;
+  //   const height = window.innerHeight;
+  const stageRef = useRef<Konva.Stage>(null);
 
-    const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 1 });
-    const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
+  const [viewState, setViewState] = useState({ x: 0, y: 0, scale: 1 });
+  const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
 
-    const CHUNK_SIZE = 16;
+  const CHUNK_SIZE = 16;
 
-    const SCALE_BY = 1.15;
-    const MIN_SCALE = 0.01;
-    const MAX_SCALE = 5;
-    const TILE_SIZE = 64;
-    const TILE_MARGIN = 2;
+  const SCALE_BY = 1.15;
+  const MIN_SCALE = 0.9;
+  const MAX_SCALE = 5;
+  const TILE_SIZE = 64;
+  const TILE_MARGIN = 2;
 
-        const [mapOptions, setMapOptions] = useState<MapGeneratingOptions>(() => ({
-            seed: 12345678,
-            renderDistanceX: 2,
-            renderDistanceY: 2,
-            chunkSize: CHUNK_SIZE,
-            positionX: 0,
-            positionY: 0,
-        }));
-    
-        const { data: grid, loading, error } = useMap(mapOptions);
+  const [mapOptions, setMapOptions] = useState<MapGeneratingOptions>(() => ({
+    seed: 12345678,
+    renderDistanceX: 2,
+    renderDistanceY: 2,
+    chunkSize: CHUNK_SIZE,
+    positionX: 0,
+    positionY: 0,
+  }));
 
-    const updateViewState = useCallback(() => {
-        const stage = stageRef.current;
-        if (!stage) {
-            return;
-        }
+  const { data: grid, loading, error } = useMap(mapOptions);
 
-        const next = {
-            x: stage.x(),
-            y: stage.y(),
-            scale: stage.scaleX(),
-        };
+  useEffect(() => {
+    if (!containerRef.current) return;
 
-        setViewState((prev) => {
-            const deltaX = Math.abs(prev.x - next.x);
-            const deltaY = Math.abs(prev.y - next.y);
-            const deltaScale = Math.abs(prev.scale - next.scale);
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        setDimensions({ width, height });
+      }
+    });
 
-            if (deltaX < 0.5 && deltaY < 0.5 && deltaScale < 0.001) {
-                return prev;
-            }
+    resizeObserver.observe(containerRef.current);
 
-            return next;
-        });
-    }, []);
+    return () => resizeObserver.disconnect();
+  }, []);
 
-    useEffect(() => {
-        let cancelled = false;
-
-        const loadFonts = async () => {
-            try {
-                await document.fonts.load('16px "icons"');
-                await document.fonts.ready;
-            } finally {
-                if (!cancelled) setFontsLoaded(true);
-            }
-        };
-
-        loadFonts();
-        return () => {
-            cancelled = true;
-        };
-    }, []);
-
-    const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
-        e.evt.preventDefault();
-
-        const stage = stageRef.current;
-        if (!stage) return;
-
-        const oldScale = stage.scaleX();
-        const pointer = stage.getPointerPosition();
-        if (!pointer) return;
-
-        const mousePointTo = {
-            x: (pointer.x - stage.x()) / oldScale,
-            y: (pointer.y - stage.y()) / oldScale,
-        };
-
-        let direction = e.evt.deltaY > 0 ? 1 : -1;
-        direction = -direction;
-
-
-        let newScale = direction > 0 ? oldScale * SCALE_BY : oldScale / SCALE_BY;
-        newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
-
-        stage.scale({ x: newScale, y: newScale });
-
-        const newPos = {
-            x: pointer.x - mousePointTo.x * newScale,
-            y: pointer.y - mousePointTo.y * newScale,
-        };
-        stage.position(newPos);
-
-        updateViewState();
-    };
-
-    const handleDragMove = () => {
-        updateViewState();
-    };
-
-    const handleDragEnd = () => {
-        updateViewState();
-    };
-
-    useEffect(() => {
-        const stage = stageRef.current;
-        if (stage) {
-            updateViewState();
-        }
-    }, [updateViewState, grid]);
-
-    useEffect(() => {
-        const centerWorldX = (width / 2 - viewState.x) / viewState.scale;
-        const centerWorldY = (height / 2 - viewState.y) / viewState.scale;
-
-        const centerTileX = centerWorldX / TILE_SIZE;
-        const centerTileY = centerWorldY / TILE_SIZE;
-
-        const nextPositionX = Math.floor(centerTileX / CHUNK_SIZE);
-        const nextPositionY = Math.floor(centerTileY / CHUNK_SIZE);
-
-        setMapOptions((prev) => {
-            if (prev.positionX === nextPositionX && prev.positionY === nextPositionY) {
-                return prev;
-            }
-
-            return {
-                ...prev,
-                positionX: nextPositionX,
-                positionY: nextPositionY,
-            };
-        });
-    }, [viewState, width, height, TILE_SIZE, CHUNK_SIZE]);
-
-    const GetContent = () => {
-        if (!fontsLoaded || (loading && !grid)) {
-            return <div><div>Loading map...</div><div style={{ fontFamily: "icons" }}></div></div>
-        }
-        else if (error) {
-            return <div>Error while loading map: {error}</div>
-        }
-        else {
-            return <Stage
-                width={width}
-                height={height}
-                ref={stageRef}
-                onWheel={handleWheel}
-                draggable={true}
-                onDragMove={handleDragMove}
-                onDragEnd={handleDragEnd}
-            >
-                <MapLayer width={width} height={height} TILE_MARGIN={TILE_MARGIN} TILE_SIZE={TILE_SIZE} viewState={viewState} grid={grid}/>
-                <BuildingsLayer width={width} height={height} TILE_MARGIN={TILE_MARGIN} TILE_SIZE={TILE_SIZE} viewState={viewState} buildings={buildings}/>
-            </Stage>
-        }
+  const updateViewState = useCallback(() => {
+    const stage = stageRef.current;
+    if (!stage) {
+      return;
     }
 
-    return (
-        <>
-            {GetContent()}
-        </>
-    );
+    const next = {
+      x: stage.x(),
+      y: stage.y(),
+      scale: stage.scaleX(),
+    };
+
+    setViewState((prev) => {
+      const deltaX = Math.abs(prev.x - next.x);
+      const deltaY = Math.abs(prev.y - next.y);
+      const deltaScale = Math.abs(prev.scale - next.scale);
+
+      if (deltaX < 0.5 && deltaY < 0.5 && deltaScale < 0.001) {
+        return prev;
+      }
+
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadFonts = async () => {
+      try {
+        await document.fonts.load('16px "icons"');
+        await document.fonts.ready;
+      } finally {
+        if (!cancelled) setFontsLoaded(true);
+      }
+    };
+
+    loadFonts();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
+    e.evt.preventDefault();
+
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const oldScale = stage.scaleX();
+    const pointer = stage.getPointerPosition();
+    if (!pointer) return;
+
+    const mousePointTo = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    };
+
+    let direction = e.evt.deltaY > 0 ? 1 : -1;
+    direction = -direction;
+
+    let newScale = direction > 0 ? oldScale * SCALE_BY : oldScale / SCALE_BY;
+    newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
+
+    stage.scale({ x: newScale, y: newScale });
+
+    const newPos = {
+      x: pointer.x - mousePointTo.x * newScale,
+      y: pointer.y - mousePointTo.y * newScale,
+    };
+    stage.position(newPos);
+
+    updateViewState();
+  };
+
+  const handleDragMove = () => {
+    updateViewState();
+  };
+
+  const handleDragEnd = () => {
+    updateViewState();
+  };
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (stage) {
+      updateViewState();
+    }
+  }, [updateViewState, grid]);
+
+  useEffect(() => {
+    if (dimensions.width === 0 || dimensions.height === 0) return;
+
+    const centerWorldX = (dimensions.width / 2 - viewState.x) / viewState.scale;
+    const centerWorldY = (dimensions.height / 2 - viewState.y) / viewState.scale;
+    // const centerWorldX = (width / 2 - viewState.x) / viewState.scale;
+    // const centerWorldY = (height / 2 - viewState.y) / viewState.scale;
+
+    const centerTileX = centerWorldX / TILE_SIZE;
+    const centerTileY = centerWorldY / TILE_SIZE;
+
+    const nextPositionX = Math.floor(centerTileX / CHUNK_SIZE);
+    const nextPositionY = Math.floor(centerTileY / CHUNK_SIZE);
+
+    setMapOptions((prev) => {
+      if (prev.positionX === nextPositionX && prev.positionY === nextPositionY) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        positionX: nextPositionX,
+        positionY: nextPositionY,
+      };
+    });
+  }, [viewState, dimensions, TILE_SIZE, CHUNK_SIZE]);
+
+  const GetContent = () => {
+    if (!fontsLoaded || (loading && !grid)) {
+      return (
+        <div>
+          <div>Loading map...</div>
+          <div style={{ fontFamily: "icons" }}></div>
+        </div>
+      );
+    } else if (error) {
+      return <div>Error while loading map: {error}</div>;
+    } else {
+      return (
+        <Stage
+          width={dimensions.width}
+          height={dimensions.height}
+          ref={stageRef}
+          onWheel={handleWheel}
+          draggable={true}
+          onDragMove={handleDragMove}
+          onDragEnd={handleDragEnd}
+        >
+          <MapLayer
+            width={dimensions.width}
+            height={dimensions.height}
+            TILE_MARGIN={TILE_MARGIN}
+            TILE_SIZE={TILE_SIZE}
+            viewState={viewState}
+            grid={grid}
+          />
+          <BuildingsLayer
+            width={dimensions.width}
+            height={dimensions.height}
+            TILE_MARGIN={TILE_MARGIN}
+            TILE_SIZE={TILE_SIZE}
+            viewState={viewState}
+            buildings={buildings}
+          />
+        </Stage>
+      );
+    }
+  };
+
+  return (
+    <div ref={containerRef} className={styles.canvas}>
+      {dimensions.width > 0 && GetContent()}
+    </div>
+  );
 };

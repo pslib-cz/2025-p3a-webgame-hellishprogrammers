@@ -1,0 +1,9 @@
+.game {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.canvas {
+    flex-grow: 1;
+}
