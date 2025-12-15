@@ -1,5 +1,5 @@
 const SettingsMenu = () => {
-  return <>nigga</>;
+  return <>nice people</>;
 };
 
 export default SettingsMenu;
