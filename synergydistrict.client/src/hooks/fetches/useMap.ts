@@ -19,7 +19,6 @@ export function useMap(options: MapGeneratingOptions) {
         api.getMapTiles(options)
             .then((result) => {
                 if (!cancelled) {
-                    console.log(result);
                     setData(result);
                 }
             })
