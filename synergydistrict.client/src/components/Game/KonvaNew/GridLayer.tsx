@@ -1,72 +1,41 @@
-import { useRef, useEffect, useCallback } from "react";
-import type { Shape as KonvaShape } from "konva/lib/Shape";
-import type { Context } from "konva/lib/Context";
+import { use } from "react";
+import type { Position } from "../../../types/Game/Grid";
+import GridShape from "./GridShape";
 import { Layer, Shape } from "react-konva";
+import { useGameOptions } from "../../../hooks/providers/useGameOptions";
+import useGameProperties from "../../../hooks/providers/useGameProperties";
 
 type GridLayerProp = {
-    TILE_SIZE: number
-    mapWidthTiles: number;
-    mapHeightTiles: number;
     opacity: number;
+    origin: Position;
+    chunkWidth: number;
+    chunkHeight: number;
 }
 
-const GridLayer: React.FC<GridLayerProp> = ({ TILE_SIZE, mapHeightTiles, mapWidthTiles, opacity }) => {
-    const shapeRef = useRef<KonvaShape>(null);
+const GridLayer: React.FC<GridLayerProp> = ({ opacity, origin, chunkWidth, chunkHeight }) => {
 
-    const drawGrid = useCallback(
-        (con: Context, shape: KonvaShape) => {
-            con.save();
+    const {TILE_SIZE, CHUNK_SIZE} = useGameProperties();
 
-            con.strokeStyle = "#191919";
-            con.globalAlpha = opacity;
-            con.lineWidth = 1;
-
-            const widthPx = mapWidthTiles * TILE_SIZE;
-            const heightPx = mapHeightTiles * TILE_SIZE;
-
-            con.beginPath();
-
-            for (let x = 0; x <= mapWidthTiles; x++) {
-                const px = x * TILE_SIZE;
-                con.moveTo(px, 0);
-                con.lineTo(px, heightPx);
-            }
-
-            for (let y = 0; y <= mapHeightTiles; y++) {
-                const py = y * TILE_SIZE;
-                con.moveTo(0, py);
-                con.lineTo(widthPx, py);
-            }
-
-            con.stroke();
-            con.restore();
-
-            con.fillStrokeShape(shape);
-        },
-        [mapWidthTiles, mapHeightTiles, TILE_SIZE, opacity]
-    );
-
-    // useEffect(() => {
-    //     const node = shapeRef.current as any;
-    //     if (!node) return;
-
-    //     node.clearCache();
-    //     node.cache({ pixelRatio: window.devicePixelRatio || 1 });
-    //     node.drawHitFromCache?.();
-    // }, [mapWidthTiles, mapHeightTiles, TILE_SIZE]);
+    const MapGrids = () => {
+      //console.log(`Rendering GridLayer with origin (${origin.x}, ${origin.y}), chunkWidth: ${chunkWidth}, chunkHeight: ${chunkHeight}`);
+      const grids = [];
+      for (let i = 0; i < chunkWidth; i++) {
+        for (let j = 0; j < chunkHeight; j++) {
+          const pos: Position = {
+            x: (origin.x + i) * CHUNK_SIZE * TILE_SIZE,
+            y: (origin.y + j) * CHUNK_SIZE * TILE_SIZE,
+          };
+          grids.push(<GridShape key={`${i}-${j}`} opacity={opacity} pos={pos}/>);
+        }
+      }
+      return grids;
+    }
 
     return (
     <Layer listening={false}>
-      <Shape
-        ref={shapeRef as any}
-        width={mapWidthTiles * TILE_SIZE}
-        height={mapHeightTiles * TILE_SIZE}
-        strokeScaleEnabled={true} // keep line thickness constant on zoom
-        perfectDrawEnabled={false}
-        sceneFunc={drawGrid}
-      />
+      {MapGrids()}
     </Layer>
   );
-};
+}
 
-export default GridLayer
+export default GridLayer;

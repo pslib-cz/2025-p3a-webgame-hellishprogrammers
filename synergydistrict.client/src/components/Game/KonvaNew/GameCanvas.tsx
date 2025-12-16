@@ -70,8 +70,8 @@ const GameCanvas = () => {
     const [mapOptions, setMapOptions] = useState<MapGeneratingOptions>({
         seed: 12345678,
         chunkSize: CHUNK_SIZE,
-        startChunkPos: { x: -1, y: -1 },
-        endChunkPos: { x: 1, y: 1 },
+        startChunkPos: { x: -5, y: -5 },
+        endChunkPos: { x: 5, y: 5 },
     });
 
     const [loadedChunks, setLoadedChunks] = useState<Record<string, MapTile[]>>();
@@ -120,12 +120,12 @@ const GameCanvas = () => {
                     onDragMove={handleDragMove}
                 >
                     <MapLayer chunks={newChunks!} />
-                    {/* <GridLayer
-                        mapHeightTiles={dimensions.height / TILE_SIZE}
-                        mapWidthTiles={dimensions.width / TILE_SIZE}
-                        TILE_SIZE={TILE_SIZE}
+                    <GridLayer
                         opacity={0.35}
-                    /> */}
+                        origin={{ x: mapOptions.startChunkPos.x, y: mapOptions.startChunkPos.y }}
+                        chunkWidth={mapOptions.endChunkPos.x - mapOptions.startChunkPos.x + 1}
+                        chunkHeight={mapOptions.endChunkPos.y - mapOptions.startChunkPos.y + 1}
+                    />
                 </Stage>
             );
         }
