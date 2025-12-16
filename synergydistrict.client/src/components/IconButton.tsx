@@ -20,7 +20,9 @@ export const IconButton:FC<IconButtonProps> = ({isSelected,iconKey,OnClick,amoun
     } 
     return(
         <button onClick={handleOnClick} className={styleSelector()}>
-            {iconKey}{amount !== undefined && <span>{amount}</span>}
+            <span className={IconButtonStyle.icon}>{iconKey}</span>
+            {amount !== undefined && <span className={IconButtonStyle.amount}>{amount}</span>}
         </button>
+
     )
 }
