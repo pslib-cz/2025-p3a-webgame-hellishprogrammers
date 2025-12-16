@@ -1,4 +1,5 @@
 .default{
+    position: relative;
     display: flex;
     width: 48px;
     padding: 16px;
@@ -8,11 +9,18 @@
     border: none;
     align-self: stretch;
     background-color: var(--background);
-    color: var(--text);
-    font-family: 'icons';
-    font-size: 24px;
+    color: var(--text);    
 }
 .selected{
     background-color: var(--text, );
     color: var(--background);
+}
+.icon{
+    font-family: 'icons';
+    font-size: 24px;
+}
+.amount{
+    position: absolute;
+    right: 4px;
+    bottom: 8px;
 }
