@@ -4,6 +4,7 @@ import type { MapBuilding, Position, Edge, EdgeSide } from "../types/Game/Grid";
 import styles from "../styles/Game.module.css";
 import GameCanvas from "../components/Game/KonvaNew/GameCanvas";
 import { GamePropertiesProvider } from "../provider/GamePropertiesProvider";
+import GameBar from "./Game/GameBar/GameBar";
 
 export default function Game() {
     const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
@@ -94,6 +95,7 @@ export default function Game() {
                 <GameCanvas />
             </GamePropertiesProvider>
             <div>
+                <GameBar />
                 <button onClick={handleOnClick}>Build</button>
                 <input
                     type="number"
