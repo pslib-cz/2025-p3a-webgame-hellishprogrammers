@@ -7,7 +7,7 @@ export type GamePropertiesValue = {
 };
 
 export const defaultGameProperties: GamePropertiesValue = {
-    CHUNK_SIZE: 16,
+    CHUNK_SIZE: 64,
     SCALE_BY: 1.15,
     MIN_SCALE: 0.01,
     MAX_SCALE: 5,
