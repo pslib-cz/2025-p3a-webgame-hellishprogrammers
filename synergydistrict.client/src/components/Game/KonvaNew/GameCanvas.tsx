@@ -26,27 +26,22 @@ const GameCanvas = () => {
         event.evt.preventDefault();
         const stage = stageRef.current;
         if (!stage) return;
-
         const pointer = stage.getPointerPosition();
         if (!pointer) return;
-
         const direction = event.evt.deltaY > 0 ? -1 : 1;
         const zoomFactor = direction > 0 ? SCALE_BY : 1 / SCALE_BY;
         const oldScale = stageScale;
         const nextScale = clamp(oldScale * zoomFactor, MIN_SCALE, MAX_SCALE);
         if (nextScale === oldScale) return;
-
         // Keep the zoom centered around the current cursor position.
         const mousePointTo = {
             x: (pointer.x - stage.x()) / oldScale,
             y: (pointer.y - stage.y()) / oldScale,
         };
-
         const newPosition = {
             x: pointer.x - mousePointTo.x * nextScale,
             y: pointer.y - mousePointTo.y * nextScale,
         };
-
         setStageScale(nextScale);
         setStagePosition(newPosition);
     };
@@ -125,12 +120,12 @@ const GameCanvas = () => {
                     onDragMove={handleDragMove}
                 >
                     <MapLayer chunks={newChunks!} />
-                    <GridLayer
+                    {/* <GridLayer
                         mapHeightTiles={dimensions.height / TILE_SIZE}
                         mapWidthTiles={dimensions.width / TILE_SIZE}
                         TILE_SIZE={TILE_SIZE}
                         opacity={0.35}
-                    />
+                    /> */}
                 </Stage>
             );
         }

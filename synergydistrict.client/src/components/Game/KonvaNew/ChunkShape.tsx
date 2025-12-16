@@ -35,7 +35,7 @@ const ChunkShape: React.FC<ChunkShapeProps> = ({ tiles, origin, debug }) => {
             const relY = (tile.position.y - origin.y) * TILE_SIZE;
             const iconOffset = TILE_SIZE / 2;
             con.fillStyle = BACKGROUND_COLOR_MAP[tile.tileType.toLowerCase()] ?? "#ccc";
-            con.fillRect(relX, relY, TILE_SIZE, TILE_SIZE);
+            con.fillRect(relX, relY, TILE_SIZE + 2, TILE_SIZE + 2);
 
             con.fillStyle = ICON_COLOR_MAP[tile.tileType.toLowerCase()] ?? "#000000";
 
@@ -64,6 +64,7 @@ const ChunkShape: React.FC<ChunkShapeProps> = ({ tiles, origin, debug }) => {
             y={origin.y * TILE_SIZE}
             listening={false}
             sceneFunc={displayTiles}
+            perfectDrawEnabled={false}
         />
     );
 };
