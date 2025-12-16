@@ -2,7 +2,7 @@ import InputToggle from "../../components/Inputs/InputToggle";
 import InputValue from "../../components/Inputs/InputValue";
 import TextButton from "../../components/TextButton";
 import ToggleButton from "../../components/ToggleButton";
-import { useGameOptions } from "../../hooks/useGameOptions";
+import { useGameOptions } from "../../hooks/providers/useGameOptions";
 import styles from "/src/styles/Menu.module.css";
 
 const PlayMenu = () => {
@@ -10,7 +10,7 @@ const PlayMenu = () => {
 
   return (
     <>
-      <div className={styles.playMenu}>
+      <div className={styles.menuContent}>
         <h3>Gamemode</h3>
         <ToggleButton
           options={["Time presure", "Survival"]}

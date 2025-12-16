@@ -1,5 +1,5 @@
 import { useState, type FC, type PropsWithChildren, createContext } from "react";
-import { defaultGameOptions, type GameOptions } from "../types/GameOptions";
+import { defaultGameOptions, type GameOptions } from "../types/Menu/GameOptions";
 
 type GameOptionsContextValue = {
   options: GameOptions;

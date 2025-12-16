@@ -1,4 +1,4 @@
-import type { BuildingPreview, BuildingTileType } from "./Buildings";
+import type { BuildingPreview, BuildingTileType } from "./Game/Buildings";
 
 export type EdgeSide = "top" | "bottom" | "left" | "right";
 

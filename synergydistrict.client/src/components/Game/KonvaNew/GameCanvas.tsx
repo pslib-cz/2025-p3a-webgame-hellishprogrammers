@@ -1,5 +1,5 @@
-import { useMap } from "../../../hooks/useMap";
-import type { MapGeneratingOptions, MapTile, Position } from "../../../types/Grid";
+import { useMap } from "../../../hooks/fetches/useMap";
+import type { MapGeneratingOptions, MapTile, Position } from "../../../types/Game/Grid";
 import { useState, useEffect, useRef } from "react";
 import MapLayer from "./MapLayer";
 import { Stage } from "react-konva";
@@ -7,7 +7,7 @@ import type Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import GridLayer from "./GridLayer";
 import styles from "../../../styles/Game.module.css";
-import useGameProperties from "../../../hooks/useGameProperties";
+import useGameProperties from "../../../hooks/providers/useGameProperties";
 
 const GameCanvas = () => {
     const containerRef = useRef<HTMLDivElement>(null);

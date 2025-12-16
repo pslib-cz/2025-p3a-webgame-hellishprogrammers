@@ -46,14 +46,14 @@ const GridLayer: React.FC<GridLayerProp> = ({ TILE_SIZE, mapHeightTiles, mapWidt
         [mapWidthTiles, mapHeightTiles, TILE_SIZE, opacity]
     );
 
-    useEffect(() => {
-        const node = shapeRef.current as any;
-        if (!node) return;
+    // useEffect(() => {
+    //     const node = shapeRef.current as any;
+    //     if (!node) return;
 
-        node.clearCache();
-        node.cache({ pixelRatio: window.devicePixelRatio || 1 });
-        node.drawHitFromCache?.();
-    }, [mapWidthTiles, mapHeightTiles, TILE_SIZE]);
+    //     node.clearCache();
+    //     node.cache({ pixelRatio: window.devicePixelRatio || 1 });
+    //     node.drawHitFromCache?.();
+    // }, [mapWidthTiles, mapHeightTiles, TILE_SIZE]);
 
     return (
     <Layer listening={false}>
@@ -61,7 +61,7 @@ const GridLayer: React.FC<GridLayerProp> = ({ TILE_SIZE, mapHeightTiles, mapWidt
         ref={shapeRef as any}
         width={mapWidthTiles * TILE_SIZE}
         height={mapHeightTiles * TILE_SIZE}
-        strokeScaleEnabled={false} // keep line thickness constant on zoom
+        strokeScaleEnabled={true} // keep line thickness constant on zoom
         perfectDrawEnabled={false}
         sceneFunc={drawGrid}
       />

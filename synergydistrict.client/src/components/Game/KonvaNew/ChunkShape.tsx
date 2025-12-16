@@ -1,9 +1,9 @@
 import { Shape } from "react-konva";
-import type { MapTile, Position } from "../../../types/Grid";
+import type { MapTile, Position } from "../../../types/Game/Grid";
 import type { Context } from "konva/lib/Context";
 import type { Shape as KonvaShape } from "konva/lib/Shape";
 import { useRef } from "react";
-import useGameProperties from "../../../hooks/useGameProperties";
+import useGameProperties from "../../../hooks/providers/useGameProperties";
 
 const BACKGROUND_COLOR_MAP: Record<string, string> = {
     water: "#5d8a9e",

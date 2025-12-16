@@ -1,5 +1,5 @@
 import { Layer } from "react-konva";
-import type { MapTile, Position } from "../../../types/Grid";
+import type { MapTile, Position } from "../../../types/Game/Grid";
 import ChunkShape from "./ChunkShape";
 
 type MapLayerProps = {

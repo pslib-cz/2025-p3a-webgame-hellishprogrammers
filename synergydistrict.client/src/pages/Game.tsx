@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { BuildingPreview, BuildingTileType } from "../types/Buildings";
-import type { MapBuilding, Position, Edge, EdgeSide } from "../types/Grid";
+import type { BuildingPreview, BuildingTileType } from "../types/Game/Buildings";
+import type { MapBuilding, Position, Edge, EdgeSide } from "../types/Game/Grid";
 import styles from "../styles/Game.module.css";
 import GameCanvas from "../components/Game/KonvaNew/GameCanvas";
 import { GamePropertiesProvider } from "../provider/GamePropertiesProvider";

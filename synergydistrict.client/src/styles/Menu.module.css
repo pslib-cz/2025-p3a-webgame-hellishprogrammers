@@ -67,7 +67,7 @@
   margin: 0;
 }
 
-.playMenu {
+.menuContent {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -81,19 +81,19 @@
   justify-content: flex-end;
 }
 
-.playMenu::-webkit-scrollbar {
+.menuContent::-webkit-scrollbar {
   width: 6px;
 }
 
-.playMenu::-webkit-scrollbar-track {
+.menuContent::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.playMenu::-webkit-scrollbar-thumb {
+.menuContent::-webkit-scrollbar-thumb {
   background: var(--text);
   border-radius: 4px;
 }
 
-.playMenu::-webkit-scrollbar-thumb:hover {
+.menuContent::-webkit-scrollbar-thumb:hover {
   background: color-mix(in srgb, var(--text) 50%, transparent);
 }

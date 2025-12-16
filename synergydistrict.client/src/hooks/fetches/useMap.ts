@@ -1,6 +1,6 @@
-import { MapApi } from "../api/MapApi";
+import { MapApi } from "../../api/MapApi";
 import { useEffect, useState } from "react";
-import type { MapGeneratingOptions, MapTile } from "../types/Grid";
+import type { MapGeneratingOptions, MapTile } from "../../types/Game/Grid";
 
 const api = new MapApi();
 
