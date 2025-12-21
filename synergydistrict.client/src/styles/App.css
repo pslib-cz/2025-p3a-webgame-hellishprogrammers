@@ -1,0 +1,14 @@
+﻿.container {
+    height: 100dvh;
+}
+
+.image--responsive {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.border {
+    border: 4px solid var(--text, #fefae0);
+}

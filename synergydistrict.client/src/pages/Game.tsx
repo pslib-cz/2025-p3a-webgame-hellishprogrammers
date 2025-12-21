@@ -95,7 +95,6 @@ export default function Game() {
                 <GameCanvas />
             </GamePropertiesProvider>
             <div>
-                <GameBar />
                 <button onClick={handleOnClick}>Build</button>
                 <input
                     type="number"
@@ -105,6 +104,7 @@ export default function Game() {
                     type="number"
                     onChange={(e) => setPosition((p) => ({ ...p, y: parseInt(e.target.value) }))}
                 ></input>
+                <GameBar />
             </div>
         </div>
     );

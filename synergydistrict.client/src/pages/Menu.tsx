@@ -1,6 +1,6 @@
 import styles from "/src/styles/Menu.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
-import TextButton from "../components/TextButton";
+import TextButton from "../components/Buttons/TextButton/TextButton";
 import { NavLink, Outlet } from "react-router-dom";
 import { IconClose } from "../components/Icons";
 

@@ -1,4 +1,4 @@
-import "../styles/icons.css";
+import "../styles/Icons.css";
 
 export const IconClose = () => <span className="icon-close"></span>;
 export const IconVolumeOn = () => <span className="icon-volumeOn"></span>;

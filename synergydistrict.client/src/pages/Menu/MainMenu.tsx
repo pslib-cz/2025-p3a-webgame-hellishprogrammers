@@ -1,5 +1,5 @@
-import styles from "/src/styles/Menu.module.css";
-import "/src/App.css";
+import styles from "../../styles/Menu.module.css";
+import "../../styles/App.css";
 
 const MainMenu = () => {
   return (

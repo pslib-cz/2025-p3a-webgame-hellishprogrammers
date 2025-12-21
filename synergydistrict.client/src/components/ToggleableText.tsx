@@ -1,13 +1,13 @@
 import type { FC } from "react";
 
-type ButtonTextProps = {
+type ToggleableTextProps = {
   text: string;
   isActive: boolean;
 };
 
-export const ButtonText: FC<ButtonTextProps> = ({ text, isActive }) => {
+export const ToggleableText: FC<ToggleableTextProps> = ({ text, isActive }) => {
   const displayedText = isActive ? `[ ${text} ]` : `< ${text} >`;
   return <span>{displayedText}</span>;
 };
 
-export default ButtonText;
+export default ToggleableText;

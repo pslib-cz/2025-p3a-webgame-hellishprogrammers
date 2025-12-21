@@ -1,7 +1,7 @@
 import { type FC, type PropsWithChildren } from "react";
-import BorderLayoutStyle from "../styles/BorderLayoutStyle.module.css";
+import styles from "./BorderLayout.module.css";
 
 const BorderLayout: FC<PropsWithChildren> = ({ children }) => {
-    return <div className={BorderLayoutStyle.layout}>{children}</div>;
+    return <div className={styles.layout}>{children}</div>;
 };
 export default BorderLayout;

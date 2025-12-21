@@ -6,13 +6,13 @@
 .showInfo__left {
     width: 12.5rem;
     display: flex;
-    align-items: center;
     background: var(--text);
     color: var(--background);
     padding: 1rem;
 }
 
 .showInfo__left > * {
+    width: 100%;
     position: relative;
     z-index: 1;
     padding: 1rem;

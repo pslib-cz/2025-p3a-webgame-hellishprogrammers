@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import IconButtonStyle from "../styles/IconButton.module.css"
+import IconButtonStyle from "./IconButton.module.css"
 type IconButtonProps = {
     isSelected: boolean,
     iconKey:string,
