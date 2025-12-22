@@ -15,10 +15,20 @@ const GameCanvas = () => {
 
     const stageRef = useRef<Konva.Stage | null>(null);
 
-    const { CHUNK_SIZE, SCALE_BY, MIN_SCALE, MAX_SCALE, TILE_SIZE } = useGameProperties();
+    const {
+        CHUNK_SIZE,
+        SCALE_BY,
+        MIN_SCALE,
+        MAX_SCALE,
+        TILE_SIZE,
+        RENDER_DISTANCE_CHUNKS,
+        MAX_LOADED_CHUNKS,
+        MAP_SEED,
+    } = useGameProperties();
 
     const [stageScale, setStageScale] = useState(1);
     const [stagePosition, setStagePosition] = useState<Position>({ x: 0, y: 0 });
+    const [centerChunk, setCenterChunk] = useState<Position | null>(null);
 
     const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(value, min));
 
@@ -51,7 +61,6 @@ const GameCanvas = () => {
         if (!stage) return;
         const pos = stage.position();
         setStagePosition(pos);
-        // TODO: trigger chunk fetch here if needed
     };
 
     useEffect(() => {
@@ -72,13 +81,13 @@ const GameCanvas = () => {
     const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
 
     const [mapOptions, setMapOptions] = useState<MapGeneratingOptions>({
-        seed: 12345678,
+        seed: MAP_SEED,
         chunkSize: CHUNK_SIZE,
-        startChunkPos: { x: -5, y: -5 },
-        endChunkPos: { x: 5, y: 5 },
+        startChunkPos: { x: -RENDER_DISTANCE_CHUNKS, y: -RENDER_DISTANCE_CHUNKS },
+        endChunkPos: { x: RENDER_DISTANCE_CHUNKS, y: RENDER_DISTANCE_CHUNKS },
     });
 
-    const [loadedChunks, setLoadedChunks] = useState<Record<string, MapTile[]>>();
+    const [loadedChunks, setLoadedChunks] = useState<Record<string, MapTile[]>>({});
 
     const { data: newChunks, loading, error } = useMap(mapOptions);
 
@@ -100,44 +109,142 @@ const GameCanvas = () => {
         };
     }, []);
 
+    useEffect(() => {
+        if (!dimensions.width || !dimensions.height) return;
+
+        const chunkSizeInPixels = CHUNK_SIZE * TILE_SIZE;
+        const worldCenterX = (dimensions.width / 2 - stagePosition.x) / stageScale;
+        const worldCenterY = (dimensions.height / 2 - stagePosition.y) / stageScale;
+
+        const nextCenter = {
+            x: Math.floor(worldCenterX / chunkSizeInPixels),
+            y: Math.floor(worldCenterY / chunkSizeInPixels),
+        };
+
+        setCenterChunk((prev) => {
+            if (prev && prev.x === nextCenter.x && prev.y === nextCenter.y) {
+                return prev;
+            }
+            return nextCenter;
+        });
+    }, [dimensions.width, dimensions.height, stagePosition.x, stagePosition.y, stageScale, CHUNK_SIZE, TILE_SIZE]);
+
+    useEffect(() => {
+        if (!centerChunk) return;
+
+        const startChunkPos = {
+            x: centerChunk.x - RENDER_DISTANCE_CHUNKS,
+            y: centerChunk.y - RENDER_DISTANCE_CHUNKS,
+        };
+        const endChunkPos = {
+            x: centerChunk.x + RENDER_DISTANCE_CHUNKS,
+            y: centerChunk.y + RENDER_DISTANCE_CHUNKS,
+        };
+
+        setMapOptions((prev) => {
+            if (
+                prev.seed === MAP_SEED &&
+                prev.chunkSize === CHUNK_SIZE &&
+                prev.startChunkPos.x === startChunkPos.x &&
+                prev.startChunkPos.y === startChunkPos.y &&
+                prev.endChunkPos.x === endChunkPos.x &&
+                prev.endChunkPos.y === endChunkPos.y
+            ) {
+                return prev;
+            }
+
+            return {
+                seed: MAP_SEED,
+                chunkSize: CHUNK_SIZE,
+                startChunkPos,
+                endChunkPos,
+            };
+        });
+    }, [centerChunk, RENDER_DISTANCE_CHUNKS, CHUNK_SIZE, MAP_SEED]);
+
+    useEffect(() => {
+        if (!newChunks) return;
+
+        setLoadedChunks((prev) => {
+            let hasChanges = false;
+            const combined: Record<string, MapTile[]> = { ...prev };
+
+            for (const [key, value] of Object.entries(newChunks)) {
+                if (combined[key] !== value) {
+                    combined[key] = value;
+                    hasChanges = true;
+                }
+            }
+
+            let finalChunks = combined;
+
+            if (centerChunk && MAX_LOADED_CHUNKS > 0) {
+                const keys = Object.keys(combined);
+                if (keys.length > MAX_LOADED_CHUNKS) {
+                    const sorted = keys
+                        .map((key) => {
+                            const [chunkX, chunkY] = key.split(";").map(Number);
+                            const distance = Math.hypot(chunkX - centerChunk.x, chunkY - centerChunk.y);
+                            return { key, distance };
+                        })
+                        .sort((a, b) => a.distance - b.distance);
+
+                    finalChunks = sorted.slice(0, MAX_LOADED_CHUNKS).reduce<Record<string, MapTile[]>>((acc, entry) => {
+                        acc[entry.key] = combined[entry.key];
+                        return acc;
+                    }, {});
+
+                    hasChanges = true;
+                }
+            }
+
+            return hasChanges ? finalChunks : prev;
+        });
+    }, [newChunks, centerChunk, MAX_LOADED_CHUNKS]);
+
     const GetContent = () => {
-        if (!fontsLoaded || (loading && !newChunks)) {
+        const loadedChunkCount = Object.keys(loadedChunks).length;
+
+        if (!fontsLoaded || (loading && loadedChunkCount === 0)) {
             return (
                 <div>
                     <div>Loading map...</div>
                 </div>
             );
-        } else if (error) {
+        } else if (error && loadedChunkCount === 0) {
             return <div>Error while loading map: {error}</div>;
         } else {
             return (
-                <Stage
-                    ref={stageRef}
-                    width={dimensions.width}
-                    height={dimensions.height}
-                    draggable={true}
-                    onWheel={handleWheel}
-                    scaleX={stageScale}
-                    scaleY={stageScale}
-                    x={stagePosition.x}
-                    y={stagePosition.y}
-                    onDragEnd={handleDragEnd}
-                >
-                    <MapLayer
-                        chunks={newChunks!}
-                        stageX={stagePosition.x}
-                        stageY={stagePosition.y}
-                        scale={stageScale}
+                <>
+                    <Stage
+                        ref={stageRef}
                         width={dimensions.width}
                         height={dimensions.height}
-                    />
-                    <GridLayer
-                        opacity={0.35}
-                        origin={{ x: mapOptions.startChunkPos.x, y: mapOptions.startChunkPos.y }}
-                        chunkWidth={mapOptions.endChunkPos.x - mapOptions.startChunkPos.x + 1}
-                        chunkHeight={mapOptions.endChunkPos.y - mapOptions.startChunkPos.y + 1}
-                    />
-                </Stage>
+                        draggable={true}
+                        onWheel={handleWheel}
+                        scaleX={stageScale}
+                        scaleY={stageScale}
+                        x={stagePosition.x}
+                        y={stagePosition.y}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <MapLayer
+                            chunks={loadedChunks}
+                            stageX={stagePosition.x}
+                            stageY={stagePosition.y}
+                            scale={stageScale}
+                            width={dimensions.width}
+                            height={dimensions.height}
+                        />
+                        <GridLayer
+                            opacity={0.35}
+                            origin={{ x: mapOptions.startChunkPos.x, y: mapOptions.startChunkPos.y }}
+                            chunkWidth={mapOptions.endChunkPos.x - mapOptions.startChunkPos.x + 1}
+                            chunkHeight={mapOptions.endChunkPos.y - mapOptions.startChunkPos.y + 1}
+                        />
+                    </Stage>
+                    {error ? <div>Error while loading map: {error}</div> : null}
+                </>
             );
         }
     };
