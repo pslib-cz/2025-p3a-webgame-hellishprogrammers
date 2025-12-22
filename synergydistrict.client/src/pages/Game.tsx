@@ -104,7 +104,7 @@ export default function Game() {
                     type="number"
                     onChange={(e) => setPosition((p) => ({ ...p, y: parseInt(e.target.value) }))}
                 ></input>
-                <GameBar />
+                {/* <GameBar /> */}
             </div>
         </div>
     );
