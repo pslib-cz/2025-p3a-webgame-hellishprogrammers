@@ -46,8 +46,12 @@ const GameCanvas = () => {
         setStagePosition(newPosition);
     };
 
-    const handleDragMove = (event: KonvaEventObject<DragEvent>) => {
-        setStagePosition({ x: event.target.x(), y: event.target.y() });
+    const handleDragEnd = () => {
+        const stage = stageRef.current;
+        if (!stage) return;
+        const pos = stage.position();
+        setStagePosition(pos);
+        // TODO: trigger chunk fetch here if needed
     };
 
     useEffect(() => {
@@ -117,9 +121,16 @@ const GameCanvas = () => {
                     scaleY={stageScale}
                     x={stagePosition.x}
                     y={stagePosition.y}
-                    onDragMove={handleDragMove}
+                    onDragEnd={handleDragEnd}
                 >
-                    <MapLayer chunks={newChunks!} />
+                    <MapLayer
+                        chunks={newChunks!}
+                        stageX={stagePosition.x}
+                        stageY={stagePosition.y}
+                        scale={stageScale}
+                        width={dimensions.width}
+                        height={dimensions.height}
+                    />
                     <GridLayer
                         opacity={0.35}
                         origin={{ x: mapOptions.startChunkPos.x, y: mapOptions.startChunkPos.y }}
