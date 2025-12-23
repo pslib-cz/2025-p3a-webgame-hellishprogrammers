@@ -1,8 +1,6 @@
-import { MapApi } from "../../api/MapApi";
+import { GetChunks } from "../../api/MapApi";
 import { useEffect, useState } from "react";
 import type { MapGeneratingOptions, MapTile } from "../../types/Game/Grid";
-
-const api = new MapApi();
 
 export function useMap(options: MapGeneratingOptions) {
     const [data, setData] = useState<Record<string, MapTile[]> | null>(null);
@@ -16,7 +14,7 @@ export function useMap(options: MapGeneratingOptions) {
         setLoading(true);
         setError(null);
 
-        api.getMapTiles(options)
+        GetChunks(options)
             .then((result) => {
                 if (!cancelled) {
                     setData(result);

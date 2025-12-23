@@ -7,3 +7,11 @@
 .canvas {
     flex-grow: 1;
 }
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}

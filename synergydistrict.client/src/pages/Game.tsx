@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { BuildingPreview, BuildingTileType } from "../types/Game/Buildings";
 import type { MapBuilding, Position, Edge, EdgeSide } from "../types/Game/Grid";
 import styles from "../styles/Game.module.css";
-import GameCanvas from "../components/Game/KonvaNew/GameCanvas";
+import GameCanvas from "../components/Game/HTMLCanvas/GameCanvas";
 import { GamePropertiesProvider } from "../provider/GamePropertiesProvider";
 import GameBar from "./Game/GameBar/GameBar";
 
