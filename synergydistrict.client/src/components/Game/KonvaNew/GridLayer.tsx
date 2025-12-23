@@ -1,8 +1,6 @@
-import { use } from "react";
 import type { Position } from "../../../types/Game/Grid";
 import GridShape from "./GridShape";
-import { Layer, Shape } from "react-konva";
-import { useGameOptions } from "../../../hooks/providers/useGameOptions";
+import { Layer } from "react-konva";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
 
 type GridLayerProp = {

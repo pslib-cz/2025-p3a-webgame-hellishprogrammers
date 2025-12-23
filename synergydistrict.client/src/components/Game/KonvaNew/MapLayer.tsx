@@ -48,7 +48,7 @@ const MapLayer: React.FC<MapLayerProps> = ({ chunks, stageX, stageY, scale, widt
         }
     });
 
-    console.log(chunksWithPos.length);
+    // console.log(chunksWithPos.length);
 
     return (
         <Layer listening={false}>

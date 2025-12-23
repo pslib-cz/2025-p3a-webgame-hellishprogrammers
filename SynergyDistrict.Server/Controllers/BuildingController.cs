@@ -31,7 +31,7 @@ namespace SynergyDistrict.Server.Controllers
                 IconKey = b.IconKey,
                 Shape = b.Shape
             }).ToList();
-            return Ok(buildings);
+            return Ok(buildingPreviews);
         }
 
         [HttpGet("{id}")]
