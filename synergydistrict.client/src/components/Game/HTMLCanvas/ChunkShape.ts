@@ -70,7 +70,7 @@ export const prepareChunk = ({
 		if (tile.hasIcon) {
 			context.textAlign = "center";
 			context.textBaseline = "middle";
-			context.font = "40px icons";
+			context.font = `${(40 / 64) * tileSize}px icons`;
 			context.fillText(tile.tileType.toLowerCase(), relX + iconOffset, relY + iconOffset);
 		}
 	}

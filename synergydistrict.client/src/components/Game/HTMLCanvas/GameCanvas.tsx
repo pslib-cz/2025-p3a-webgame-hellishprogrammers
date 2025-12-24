@@ -4,6 +4,7 @@ import useGameProperties from "../../../hooks/providers/useGameProperties"
 import type { MapGeneratingOptions, Position } from "../../../types/Game/Grid";
 import prepareChunk from "./ChunkShape";
 import styles from "../../../styles/Game.module.css";
+import prepareGrid from "./GridShape";
 
 const GameCanvas = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -22,9 +23,10 @@ const GameCanvas = () => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const [ fontsLoaded, setFontsLoaded ] = useState<boolean>(false);
     const chunksImgRef = useRef<Record<string, ImageBitmap>>({});
+    const gridImgRef = useRef<ImageBitmap | null>(null);
     const [preparedVersion, setPreparedVersion] = useState(0);
     const [viewportOffset, setViewportOffset] = useState({ x: 0, y: 0 });
-    const [zoom, setZoom] = useState(1);
+    const [zoom, setZoom] = useState(0.5);
     const dragStateRef = useRef<{
         pointerId: number;
         startX: number;
@@ -88,6 +90,7 @@ const GameCanvas = () => {
                 chunkOrigin: origin,
                 tileSize: TILE_SIZE,
                 chunkSize: CHUNK_SIZE,
+                debug: true,
             });
             if (preparedChunk) {
                 prepared[key] = preparedChunk.img;
@@ -99,6 +102,15 @@ const GameCanvas = () => {
     }, [CHUNK_SIZE, TILE_SIZE, fontsLoaded, newChunks])
 
     useEffect(() => {
+        gridImgRef.current = prepareGrid({
+            opacity: 0.2,
+            tileSize: TILE_SIZE,
+            chunkSize: CHUNK_SIZE,
+        });
+        setPreparedVersion((prev) => prev + 1);
+    }, [CHUNK_SIZE, TILE_SIZE]);
+
+    useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const context = canvas.getContext("2d");
@@ -107,11 +119,15 @@ const GameCanvas = () => {
         context.setTransform(1, 0, 0, 1, 0, 0);
         context.clearRect(0, 0, canvas.width, canvas.height);
         context.setTransform(zoom, 0, 0, zoom, viewportOffset.x, viewportOffset.y);
+        const gridImg = gridImgRef.current;
         for (const [key, img] of Object.entries(chunksImgRef.current)) {
             const [originX, originY] = key.split(";").map(Number);
             const relX = originX * TILE_SIZE * CHUNK_SIZE;
             const relY = originY * TILE_SIZE * CHUNK_SIZE;
             context.drawImage(img, relX, relY);
+            if (gridImg) {
+                context.drawImage(gridImg, relX, relY);
+            }
         }
         context.setTransform(1, 0, 0, 1, 0, 0);
     }, [preparedVersion, dimensions.width, dimensions.height, viewportOffset, CHUNK_SIZE, TILE_SIZE, zoom]);
