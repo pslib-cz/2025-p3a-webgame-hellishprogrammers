@@ -1,4 +1,5 @@
-import type { BuildingPreview, BuildingTileType } from "./Game/Buildings";
+import type { BuildingTileType, TileType } from "..";
+import type { BuildingPreview } from "./Buildings";
 
 export type EdgeSide = "top" | "bottom" | "left" | "right";
 
@@ -24,8 +25,6 @@ export type MapGeneratingOptions = {
     startChunkPos: Position;
     endChunkPos: Position;
 };
-
-export type TileType = "water" | "grass" | "mountain" | "forest";
 
 export type MapTile = {
     position: Position;

@@ -1,6 +1,4 @@
-export type BuildingType = "Residential" | "Commercial" | "Industrial" | "Extractional" | "Recreational";
-export type BuildingTileType = "Solid" | "Empty" | "Icon";
-export type ResourceType = "Money" | "People" | "Energy" | "Happiness" | "Industry";
+import type { BuildingTileType, BuildingType, StatsType } from "..";
 
 export type BuildingPreview = {
     buildingId: number;
@@ -25,14 +23,14 @@ export type BuildingSynergy = {
 };
 
 export type Production = {
-    resourceType: ResourceType;
+    resourceType: StatsType;
     amount: number;
 };
 
 export type BuildingDetail = {
     buildingId: number;
     name: string;
-    category: string;
+    category: BuildingType;
     description: string;
     colorHex: string;
     iconKey: string;

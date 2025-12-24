@@ -1,7 +1,28 @@
 .gameBar {
     background: var(--background);
+    height: 3rem;
     padding: 1.5rem;
     display: flex;
     justify-content: space-between;
     gap: 1.5rem;
+}
+
+.gameBar > * {
+    align-self: stretch;
+}
+
+.timeSection {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.timeSection > * {
+    align-self: stretch;
+}
+
+.timer {
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
 }

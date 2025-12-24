@@ -1,28 +1,15 @@
 import type { FC } from "react";
-import IconButtonStyle from "./IconButton.module.css"
+import styles from "./IconButton.module.css";
 type IconButtonProps = {
-    isSelected: boolean,
-    iconKey:string,
-    OnClick:() => void,
-    amount?:React.ReactNode
+    isActive: boolean;
+    iconKey: string;
+    OnClick: () => void;
 };
 
-export const IconButton:FC<IconButtonProps> = ({isSelected,iconKey,OnClick,amount}) => {
-    const handleOnClick = () => {
-        OnClick()
-    }
-    const styleSelector = () => {
-        let trida: string = IconButtonStyle.default;
-        if(isSelected){
-            trida += " " + IconButtonStyle.selected
-        }
-        return trida;
-    } 
-    return(
-        <button onClick={handleOnClick} className={styleSelector()}>
-            <span className={IconButtonStyle.icon}>{iconKey}</span>
-            {amount !== undefined && <span className={IconButtonStyle.amount}>{amount}</span>}
+export const IconButton: FC<IconButtonProps> = ({ isActive, OnClick, iconKey }) => {
+    return (
+        <button onClick={OnClick} className={`${styles.button} ${isActive ? styles.active : ""}`}>
+            <span className={"icon"}>{iconKey}</span>
         </button>
-
-    )
-}
+    );
+};

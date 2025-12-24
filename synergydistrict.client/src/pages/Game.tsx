@@ -1,10 +1,12 @@
 import { useState } from "react";
-import type { BuildingPreview, BuildingTileType } from "../types/Game/Buildings";
+import type { BuildingPreview } from "../types/Game/Buildings";
 import type { MapBuilding, Position, Edge, EdgeSide } from "../types/Game/Grid";
 import styles from "../styles/Game.module.css";
 import GameCanvas from "../components/Game/HTMLCanvas/GameCanvas";
 import { GamePropertiesProvider } from "../provider/GamePropertiesProvider";
+import { GameVariablesProvider } from "../provider/GameVariablesProvider";
 import GameBar from "./Game/GameBar/GameBar";
+import type { BuildingTileType } from "../types";
 
 export default function Game() {
     const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
@@ -85,27 +87,14 @@ export default function Game() {
         return null;
     };
 
-    const handleOnClick = () => {
-        setBuildings((bs) => [...bs, buildBuilding(placeholderBuilding, position)]);
-    };
-
     return (
-        <div className={styles.game}>
-            <GamePropertiesProvider>
-                <GameCanvas />
-            </GamePropertiesProvider>
-            <div>
-                <button onClick={handleOnClick}>Build</button>
-                <input
-                    type="number"
-                    onChange={(e) => setPosition((p) => ({ ...p, x: parseInt(e.target.value) }))}
-                ></input>
-                <input
-                    type="number"
-                    onChange={(e) => setPosition((p) => ({ ...p, y: parseInt(e.target.value) }))}
-                ></input>
-                {/* <GameBar /> */}
+        <GameVariablesProvider>
+            <div className={styles.game}>
+                <GamePropertiesProvider>
+                    <GameCanvas />
+                </GamePropertiesProvider>
+                <GameBar />
             </div>
-        </div>
+        </GameVariablesProvider>
     );
 }
