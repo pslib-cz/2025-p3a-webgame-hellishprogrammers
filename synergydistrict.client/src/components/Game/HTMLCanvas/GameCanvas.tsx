@@ -22,8 +22,10 @@ const GameCanvas = () => {
     const { data: newChunks, loading, error } = useMap(mapOptions);
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const [ fontsLoaded, setFontsLoaded ] = useState<boolean>(false);
+
     const chunksImgRef = useRef<Record<string, ImageBitmap>>({});
     const gridImgRef = useRef<ImageBitmap | null>(null);
+
     const [preparedVersion, setPreparedVersion] = useState(0);
     const [viewportOffset, setViewportOffset] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(0.5);
@@ -73,6 +75,7 @@ const GameCanvas = () => {
         };
     }, []);
 
+    //prepare chunks when new ones arrive
     useEffect(() => {
         if (!fontsLoaded || !newChunks) {
             return;
@@ -101,6 +104,7 @@ const GameCanvas = () => {
         setPreparedVersion((prev) => prev + 1);
     }, [CHUNK_SIZE, TILE_SIZE, fontsLoaded, newChunks])
 
+    //prepare grid image
     useEffect(() => {
         gridImgRef.current = prepareGrid({
             opacity: 0.2,
@@ -110,6 +114,7 @@ const GameCanvas = () => {
         setPreparedVersion((prev) => prev + 1);
     }, [CHUNK_SIZE, TILE_SIZE]);
 
+    //draw loop
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -132,14 +137,17 @@ const GameCanvas = () => {
         context.setTransform(1, 0, 0, 1, 0, 0);
     }, [preparedVersion, dimensions.width, dimensions.height, viewportOffset, CHUNK_SIZE, TILE_SIZE, zoom]);
 
+    //dragging logic
     useEffect(() => {
         viewportOffsetRef.current = viewportOffset;
     }, [viewportOffset]);
 
+    //zoom logic
     useEffect(() => {
         zoomRef.current = zoom;
     }, [zoom]);
 
+    //drag handlers
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -196,6 +204,7 @@ const GameCanvas = () => {
         };
     }, []);
 
+    //zoom handlers
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
