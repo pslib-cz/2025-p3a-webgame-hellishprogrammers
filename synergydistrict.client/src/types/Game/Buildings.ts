@@ -1,14 +1,5 @@
 import type { BuildingTileType, BuildingType, StatsType } from "..";
 
-export type BuildingPreview = {
-    buildingId: number;
-    name: string;
-    category: BuildingType;
-    colorHex: string;
-    iconKey: string;
-    shape: BuildingTileType[][];
-};
-
 export type SynergyBuilding = {
     buildingId: number;
     name: string;
@@ -27,7 +18,7 @@ export type Production = {
     amount: number;
 };
 
-export type BuildingDetail = {
+export type Building = {
     buildingId: number;
     name: string;
     category: BuildingType;
@@ -36,7 +27,7 @@ export type BuildingDetail = {
     iconKey: string;
     cost: number;
     shape: BuildingTileType[][];
-    baseProduction: Production;
+    baseProduction: Production[];
     incomingSynergies: BuildingSynergy[];
     outgoingSynergies: BuildingSynergy[];
 };

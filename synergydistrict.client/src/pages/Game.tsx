@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { BuildingPreview } from "../types/Game/Buildings";
+// import type { Building } from "../types/Game/Buildings";
 import type { MapBuilding, Position, Edge, EdgeSide } from "../types/Game/Grid";
 import styles from "../styles/Game.module.css";
 import GameCanvas from "../components/Game/HTMLCanvas/GameCanvas";
@@ -9,83 +9,83 @@ import GameBar from "./Game/GameBar/GameBar";
 import type { BuildingTileType } from "../types";
 
 export default function Game() {
-    const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
-    const [buildings, setBuildings] = useState<MapBuilding[]>([]);
+    // const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
+    // const [buildings, setBuildings] = useState<MapBuilding[]>([]);
 
-    const placeholderBuilding: BuildingPreview = {
-        buildingId: 0,
-        name: "park",
-        category: "Extractional",
-        colorHex: "",
-        iconKey: "",
-        shape: [
-            ["Solid", "Solid"],
-            ["Icon", "Solid"],
-        ],
-    };
+    // const placeholderBuilding: BuildingPreview = {
+    //     buildingId: 0,
+    //     name: "park",
+    //     category: "Extractional",
+    //     colorHex: "",
+    //     iconKey: "",
+    //     shape: [
+    //         ["Solid", "Solid"],
+    //         ["Icon", "Solid"],
+    //     ],
+    // };
 
-    const buildBuilding = (building: BuildingPreview, position: Position): MapBuilding => {
-        const edges: Edge[] = [];
-        for (let i = 0; i < building.shape.length; i++) {
-            const row = building.shape[i];
-            for (let j = 0; j < row.length; j++) {
-                const temp = [];
-                temp.push(makeEdge(building.shape, { x: i, y: j }, "top"));
-                temp.push(makeEdge(building.shape, { x: i, y: j }, "bottom"));
-                temp.push(makeEdge(building.shape, { x: i, y: j }, "left"));
-                temp.push(makeEdge(building.shape, { x: i, y: j }, "right"));
+    // const buildBuilding = (building: BuildingPreview, position: Position): MapBuilding => {
+    //     const edges: Edge[] = [];
+    //     for (let i = 0; i < building.shape.length; i++) {
+    //         const row = building.shape[i];
+    //         for (let j = 0; j < row.length; j++) {
+    //             const temp = [];
+    //             temp.push(makeEdge(building.shape, { x: i, y: j }, "top"));
+    //             temp.push(makeEdge(building.shape, { x: i, y: j }, "bottom"));
+    //             temp.push(makeEdge(building.shape, { x: i, y: j }, "left"));
+    //             temp.push(makeEdge(building.shape, { x: i, y: j }, "right"));
 
-                edges.push(...temp.filter((e) => e != null));
-            }
-        }
+    //             edges.push(...temp.filter((e) => e != null));
+    //         }
+    //     }
 
-        return {
-            buildingType: building,
-            position: position,
-            shape: building.shape, //will rotate
-            isSelected: false,
-            edges: edges,
-        };
-    };
+    //     return {
+    //         buildingType: building,
+    //         position: position,
+    //         shape: building.shape, //will rotate
+    //         isSelected: false,
+    //         edges: edges,
+    //     };
+    // };
 
-    const makeEdge = (shape: BuildingTileType[][], position: Position, side: EdgeSide): Edge | null => {
-        //console.log(`Origin position x:${position.x} y:${position.y}`)
-        const target: Position = { x: position.x, y: position.y };
+    // const makeEdge = (shape: BuildingTileType[][], position: Position, side: EdgeSide): Edge | null => {
+    //     //console.log(`Origin position x:${position.x} y:${position.y}`)
+    //     const target: Position = { x: position.x, y: position.y };
 
-        switch (side) {
-            case "top":
-                target.y += -1;
-                break;
-            case "bottom":
-                target.y += 1;
-                break;
-            case "left":
-                target.x += -1;
-                break;
-            case "right":
-                target.x += 1;
-                break;
-        }
+    //     switch (side) {
+    //         case "top":
+    //             target.y += -1;
+    //             break;
+    //         case "bottom":
+    //             target.y += 1;
+    //             break;
+    //         case "left":
+    //             target.x += -1;
+    //             break;
+    //         case "right":
+    //             target.x += 1;
+    //             break;
+    //     }
 
-        if (
-            target.x < 0 ||
-            target.x >= shape.length ||
-            target.y < 0 ||
-            target.y >= shape[target.x].length ||
-            shape[target.x][target.y] == "Empty"
-        ) {
-            console.log(`Edge found: ${side} at position x:${position.x} y:${position.y}`);
-            console.log(`Target war: at position x:${target.x} y:${target.y}`);
-            return {
-                position: position,
-                side: side,
-                synergy: null,
-            };
-        }
+    //     if (
+    //         target.x < 0 ||
+    //         target.x >= shape.length ||
+    //         target.y < 0 ||
+    //         target.y >= shape[target.x].length ||
+    //         shape[target.x][target.y] == "Empty"
+    //     ) {
+    //         console.log(`Edge found: ${side} at position x:${position.x} y:${position.y}`);
+    //         console.log(`Target war: at position x:${target.x} y:${target.y}`);
+    //         return {
+    //             position: position,
+    //             side: side,
+    //             synergy: null,
+    //         };
+    //     }
 
-        console.log(null);
-        return null;
-    };
+    //     console.log(null);
+    //     return null;
+    // };
 
     return (
         <GameVariablesProvider>

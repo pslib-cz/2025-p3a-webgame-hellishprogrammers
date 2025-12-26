@@ -1,5 +1,4 @@
 import { IconButton } from "../../../components/Buttons/IconButton/IconButton";
-import { TimeControl } from "../../../components/Game/TimeControl/TimeControl";
 import useGameVariables from "../../../hooks/providers/useGameVariables";
 import styles from "./GameBar.module.css";
 
@@ -8,20 +7,38 @@ const GameBar = () => {
 
     return (
         <div className={styles.gameBar}>
-            <div className={styles.timeSection}>
-                <TimeControl />
-                <div className="border">
+            <div className={styles.row}>
+                <div className={`${styles.timeControl} border--narrow`}>
+                    <IconButton
+                        OnClick={() => setVariables((v) => ({ ...v, timerSpeed: "pause" }))}
+                        isActive={variables.timerSpeed === "pause"}
+                        iconKey="pause"
+                    />
+                    <IconButton
+                        OnClick={() => setVariables((v) => ({ ...v, timerSpeed: "play" }))}
+                        isActive={variables.timerSpeed === "play"}
+                        iconKey="play"
+                    />
+                    <IconButton
+                        OnClick={() => setVariables((v) => ({ ...v, timerSpeed: "fastforward" }))}
+                        isActive={variables.timerSpeed === "fastforward"}
+                        iconKey="fastforward"
+                    />
+                </div>
+                <div className="border--narrow">
                     <IconButton
                         OnClick={() => setVariables((v) => ({ ...v, isSound: !v.isSound }))}
                         isActive={variables.isSound}
                         iconKey={variables.isSound ? "volumeon" : "volumeoff"}
                     />
                 </div>
-                <div className={`${styles.timer} border`}>
+                <div className={`${styles.timer} border--narrow`}>
                     <h3>{variables.timer}</h3>
                 </div>
             </div>
-            {/* <BuildingBar buttonName="townhall" amount={8} /> */}
+            <div className={styles.row}>
+                
+            </div>
         </div>
     );
 };

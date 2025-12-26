@@ -1,35 +1,12 @@
 import { useState, type FC } from "react";
-import { BuildingButton } from "./BuildingButton";
-type BuildingBarProps = {
-    buttonName: string;
-    amount: number;
-};
+import { BuildingApi } from "../../api/BuildingApi";
 
-export const BuildingBar: FC<BuildingBarProps> = (props: BuildingBarProps) => {
-    const handleOnClick = (buildingName: string) => {
-        setActive(buildingName);
-    };
-    const [active, setActive] = useState<string>();
+export const BuildingBar: FC = () => {
+    const buildings = new BuildingApi();
+
     return (
         <div className="bar">
-            <BuildingButton
-                OnClick={() => handleOnClick("townhall")}
-                isSelected={active == props.buttonName}
-                amount={props.amount}
-                buildingIconName={props.buttonName}
-            />
-            <BuildingButton
-                OnClick={() => handleOnClick("townhall")}
-                isSelected={active == props.buttonName}
-                amount={props.amount}
-                buildingIconName={props.buttonName}
-            />
-            <BuildingButton
-                OnClick={() => handleOnClick("townhall")}
-                isSelected={active == props.buttonName}
-                amount={props.amount}
-                buildingIconName={props.buttonName}
-            />
+
         </div>
     );
 };

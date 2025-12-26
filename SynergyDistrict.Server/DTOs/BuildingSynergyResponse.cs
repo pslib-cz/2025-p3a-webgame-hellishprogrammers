@@ -24,15 +24,13 @@ namespace SynergyDistrict.Server.DTOs
                 {
                     BuildingId = synergy.TargetBuilding.BuildingId,
                     Name = synergy.TargetBuilding.Name,
-                    Type = synergy.TargetBuilding.Type,
-                    ColorHex = synergy.TargetBuilding.ColorHex,
+                    Type = synergy.TargetBuilding.Type
                 },
                 SourceBuilding = new BuildingSynergyBuildingResponse
                 {
                     BuildingId = synergy.SourceBuilding.BuildingId,
                     Name = synergy.SourceBuilding.Name,
-                    Type = synergy.SourceBuilding.Type,
-                    ColorHex = synergy.SourceBuilding.ColorHex,
+                    Type = synergy.SourceBuilding.Type
                 },
                 SynergyProductions = synergy.SynergyProductions
             };

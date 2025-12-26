@@ -11,14 +11,18 @@
     align-self: stretch;
 }
 
-.timeSection {
+.row {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
 
-.timeSection > * {
+.row > * {
     align-self: stretch;
+}
+
+.timeControl {
+    display: flex;
 }
 
 .timer {

@@ -1,4 +1,4 @@
-import type { BuildingDetail, BuildingPreview } from "../types/Game/Buildings";
+import type { Building } from "../types/Game/Buildings";
 
 export class BuildingApi {
     private readonly baseUrl: string;
@@ -7,23 +7,7 @@ export class BuildingApi {
         this.baseUrl = baseUrl;
     }
 
-    async getAllBuildings(): Promise<BuildingPreview[]> {
-        const res = await fetch(this.baseUrl, {
-            method: "GET",
-            headers: {
-                Accept: "application/json",
-            },
-        });
-
-        if (!res.ok) {
-            throw new Error(`Failed to fetch buildings. Status: ${res.status}`);
-        }
-
-        const data = (await res.json()) as BuildingPreview[];
-        return data;
-    }
-
-    async getBuildingDetail(id: number): Promise<BuildingDetail> {
+    async getBuildings(id: number): Promise<Building> {
         const res = await fetch(`${this.baseUrl}/${id}`, {
             method: "GET",
             headers: {
@@ -40,7 +24,7 @@ export class BuildingApi {
             throw new Error(`Failed to fetch building detail. Status: ${res.status}. ${message}`);
         }
 
-        const data = (await res.json()) as BuildingDetail;
+        const data = (await res.json()) as Building;
         return data;
     }
 }

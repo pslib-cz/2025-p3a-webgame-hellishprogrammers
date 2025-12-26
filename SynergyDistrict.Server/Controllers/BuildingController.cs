@@ -19,60 +19,41 @@ namespace SynergyDistrict.Server.Controllers
         }
 
         [HttpGet]
-        public ActionResult<BuildingPreviewResponse> GetAllBuildings()
+        public ActionResult<IEnumerable<GetBuildingsResponse>> GetBuildings()
         {
-            var buildings = _appDBContext.Buildings.AsNoTracking().ToList();
-            var buildingPreviews = buildings.Select(b => new DTOs.BuildingPreviewResponse
+            var buildings = _appDBContext.Buildings
+                .AsNoTracking()
+                .Include(b => b.BaseProduction)
+                .Include(b => b.IncomingSynergies)
+                    .ThenInclude(s => s.SourceBuilding)
+                .Include(b => b.IncomingSynergies)
+                    .ThenInclude(s => s.TargetBuilding)
+                .Include(b => b.IncomingSynergies)
+                    .ThenInclude(s => s.SynergyProductions)
+                .Include(b => b.OutgoingSynergies)
+                    .ThenInclude(s => s.SourceBuilding)
+                .Include(b => b.OutgoingSynergies)
+                    .ThenInclude(s => s.TargetBuilding)
+                .Include(b => b.OutgoingSynergies)
+                    .ThenInclude(s => s.SynergyProductions)
+                .ToList();
+
+            var response = buildings.Select(b => new GetBuildingsResponse
             {
                 BuildingId = b.BuildingId,
                 Name = b.Name,
                 Type = b.Type,
-                ColorHex = b.ColorHex,
+                Description = b.Description,
                 IconKey = b.IconKey,
-                Shape = b.Shape
+                Cost = b.Cost,
+                Shape = b.Shape,
+                BaseProduction = b.BaseProduction,
+                IncomingSynergies = BuildingSynergyResponse.FromModelList(b.IncomingSynergies),
+                OutgoingSynergies = BuildingSynergyResponse.FromModelList(b.OutgoingSynergies)
             }).ToList();
-            return Ok(buildingPreviews);
-        }
 
-        [HttpGet("{id}")]
-        public ActionResult<BuildingDetailResponse> GetBuildingDetail(int id)
-        {
-            var building = _appDBContext.Buildings
-                .AsNoTracking()
-                .Include(b => b.BaseProduction)
-                .Include(b => b.IncomingSynergies)
-                .Include(b => b.OutgoingSynergies)
-                .FirstOrDefault(b => b.BuildingId == id);
-            if (building == null) { return NotFound(); }
-
-            if(building.IncomingSynergies == null || building.OutgoingSynergies == null)
-            {
-                _logger.LogError("Building with ID {BuildingId} has null synergies.", id);
-                return StatusCode(500, "Internal server error: Building synergies are not properly loaded.");
-            }
-            try
-            {
-                var response = new BuildingDetailResponse
-                {
-                    BuildingId = building.BuildingId,
-                    Name = building.Name,
-                    Type = building.Type,
-                    Description = building.Description,
-                    ColorHex = building.ColorHex,
-                    IconKey = building.IconKey,
-                    Cost = building.Cost,
-                    Shape = building.Shape,
-                    BaseProduction = building.BaseProduction,
-                    IncomingSynergies = BuildingSynergyResponse.FromModelList(building.IncomingSynergies),
-                    OutgoingSynergies = BuildingSynergyResponse.FromModelList(building.OutgoingSynergies)
-                };
-                return Ok(response);
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex, "Error while processing synergies for building with ID {BuildingId}.", id);
-                return StatusCode(500, "Internal server error: Error while processing building synergies.");
-            }
+            _logger.LogInformation($"Got {buildings.Count} buildings");
+            return Ok(response);
         }
     }
 }

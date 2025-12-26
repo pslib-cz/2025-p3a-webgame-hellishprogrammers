@@ -1,5 +1,5 @@
 import type { BuildingTileType, TileType } from "..";
-import type { BuildingPreview } from "./Buildings";
+import type { Building } from "./Buildings";
 
 export type EdgeSide = "top" | "bottom" | "left" | "right";
 
@@ -33,7 +33,7 @@ export type MapTile = {
 };
 
 export type MapBuilding = {
-    buildingType: BuildingPreview;
+    buildingType: Building;
     position: Position;
     shape: BuildingTileType[][];
     edges: Edge[];
