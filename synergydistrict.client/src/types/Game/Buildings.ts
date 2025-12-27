@@ -23,7 +23,6 @@ export type Building = {
     name: string;
     category: BuildingType;
     description: string;
-    colorHex: string;
     iconKey: string;
     cost: number;
     shape: BuildingTileType[][];
