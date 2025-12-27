@@ -1,4 +1,4 @@
-import type { Building } from "../types/Game/Buildings";
+import type { GameData } from "../types/Game/GameData";
 
 export class BuildingApi {
     private readonly baseUrl: string;
@@ -7,7 +7,7 @@ export class BuildingApi {
         this.baseUrl = baseUrl;
     }
 
-    async getBuildings(): Promise<Building[]> {
+    async getGameData(): Promise<GameData> {
         const res = await fetch(`${this.baseUrl}`, {
             method: "GET",
             headers: {
@@ -20,7 +20,7 @@ export class BuildingApi {
             throw new Error(`Failed to fetch buildings. Status: ${res.status}. ${message}`);
         }
 
-        const data = (await res.json()) as Building[];
+        const data = (await res.json()) as GameData;
         return data;
     }
 }

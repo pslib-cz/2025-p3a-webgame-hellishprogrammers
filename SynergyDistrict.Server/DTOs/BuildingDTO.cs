@@ -2,7 +2,7 @@
 
 namespace SynergyDistrict.Server.DTOs
 {
-    public class GetBuildingsResponse
+    public class BuildingDTO
     {
         public int BuildingId { get; set; }
         public required string Name { get; set; }
@@ -10,11 +10,7 @@ namespace SynergyDistrict.Server.DTOs
         public required string Description { get; set; }
         public required string IconKey { get; set; }
         public int Cost { get; set; }
-
         public required BuildingTileType[][] Shape { get; set; }
-
-        public ICollection<BuildingProduction> BaseProduction { get; set; } = [];
-        public ICollection<BuildingSynergyResponse> IncomingSynergies { get; set; } = [];
-        public ICollection<BuildingSynergyResponse> OutgoingSynergies { get; set; } = [];
+        public IEnumerable<BuildingProductionDTO> BaseProduction { get; set; } = [];
     }
 }

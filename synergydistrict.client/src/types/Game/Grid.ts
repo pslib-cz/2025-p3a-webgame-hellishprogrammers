@@ -1,17 +1,12 @@
-import type { BuildingTileType, TileType } from "..";
+import type { TileType } from "..";
 import type { Building } from "./Buildings";
 
 export type EdgeSide = "top" | "bottom" | "left" | "right";
 
 export type Edge = {
+    // buildingId: number;
     position: Position;
     side: EdgeSide;
-    synergy: ActiveSynergy | null;
-};
-
-export type ActiveSynergy = {
-    source: Edge | null;
-    target: Edge | null;
 };
 
 export type Position = {
@@ -33,9 +28,8 @@ export type MapTile = {
 };
 
 export type MapBuilding = {
-    buildingType: Building;
+    building: Building;
     position: Position;
-    shape: BuildingTileType[][];
     edges: Edge[];
     isSelected: boolean;
 };

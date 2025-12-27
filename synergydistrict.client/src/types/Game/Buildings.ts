@@ -1,32 +1,24 @@
 import type { BuildingTileType, BuildingType, StatsType } from "..";
 
-export type SynergyBuilding = {
-    buildingId: number;
-    name: string;
-    category: BuildingType;
-    colorHex: string;
-};
-
 export type BuildingSynergy = {
-    sourceBuildingId: SynergyBuilding;
-    targetBuildingId: SynergyBuilding;
-    productionBonuses: Production[];
+    sourceBuildingId: number;
+    targetBuildingId: number;
+    synergyProduction: Production[];
 };
 
 export type Production = {
-    resourceType: StatsType;
-    amount: number;
+    type: StatsType;
+    value: number;
 };
 
 export type Building = {
     buildingId: number;
     name: string;
-    category: BuildingType;
+    type: BuildingType;
     description: string;
     iconKey: string;
     cost: number;
     shape: BuildingTileType[][];
     baseProduction: Production[];
-    incomingSynergies: BuildingSynergy[];
-    outgoingSynergies: BuildingSynergy[];
+    synergies: BuildingSynergy[];
 };
