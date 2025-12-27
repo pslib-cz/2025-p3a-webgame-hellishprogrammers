@@ -8,7 +8,8 @@ import { GameVariablesProvider } from "../provider/GameVariablesProvider";
 import GameBar from "./Game/GameBar/GameBar";
 import type { BuildingTileType } from "../types";
 
-export default function Game() {
+const Game = () => {
+    const [buildingDocsId, setBuildingDocsId] = useState<number | null>(null);
     // const [position, setPosition] = useState<Position>({ x: 0, y: 0 });
     // const [buildings, setBuildings] = useState<MapBuilding[]>([]);
 
@@ -93,8 +94,10 @@ export default function Game() {
                 <GamePropertiesProvider>
                     <GameCanvas />
                 </GamePropertiesProvider>
-                <GameBar />
+                <GameBar setBuilding={(x) => setBuildingDocsId(x)} />
             </div>
         </GameVariablesProvider>
     );
-}
+};
+
+export default Game;

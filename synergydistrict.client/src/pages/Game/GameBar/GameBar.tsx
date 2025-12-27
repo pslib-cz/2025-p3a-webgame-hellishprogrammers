@@ -1,9 +1,17 @@
+import { useState, type FC } from "react";
 import { IconButton } from "../../../components/Buttons/IconButton/IconButton";
+import { useBuildings } from "../../../hooks/fetches/useBuildings";
 import useGameVariables from "../../../hooks/providers/useGameVariables";
 import styles from "./GameBar.module.css";
 
-const GameBar = () => {
+type GameBarProps = {
+    setBuilding: (x: number | null) => void;
+};
+
+const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
     const { variables, setVariables } = useGameVariables();
+    const { data, loading, error } = useBuildings();
+    const [activeBuilding, setActiveBuilding] = useState<number | null>(null);
 
     return (
         <div className={styles.gameBar}>
@@ -37,8 +45,23 @@ const GameBar = () => {
                 </div>
             </div>
             <div className={styles.row}>
-                
+                {!loading &&
+                    data &&
+                    data!.map((building) => (
+                        <div key={building.buildingId} className="border--narrow">
+                            <IconButton
+                                OnClick={() => {
+                                    const id = activeBuilding === null || building.buildingId !== activeBuilding ? building.buildingId : null;
+                                    setBuilding(id);
+                                    setActiveBuilding(id);
+                                }}
+                                isActive={building.buildingId === activeBuilding}
+                                iconKey={building.iconKey}
+                            />
+                        </div>
+                    ))}
             </div>
+            <div className={styles.row}></div>
         </div>
     );
 };

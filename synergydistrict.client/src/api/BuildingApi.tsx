@@ -7,24 +7,20 @@ export class BuildingApi {
         this.baseUrl = baseUrl;
     }
 
-    async getBuildings(id: number): Promise<Building> {
-        const res = await fetch(`${this.baseUrl}/${id}`, {
+    async getBuildings(): Promise<Building[]> {
+        const res = await fetch(`${this.baseUrl}`, {
             method: "GET",
             headers: {
                 Accept: "application/json",
             },
         });
 
-        if (res.status === 404) {
-            throw new Error(`Building with id ${id} not found.`);
-        }
-
         if (!res.ok) {
             const message = await res.text().catch(() => "");
-            throw new Error(`Failed to fetch building detail. Status: ${res.status}. ${message}`);
+            throw new Error(`Failed to fetch buildings. Status: ${res.status}. ${message}`);
         }
 
-        const data = (await res.json()) as Building;
+        const data = (await res.json()) as Building[];
         return data;
     }
 }
