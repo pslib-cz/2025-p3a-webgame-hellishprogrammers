@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useMap } from "../../../hooks/fetches/useMap";
 import useGameProperties from "../../../hooks/providers/useGameProperties"
 import type { MapGeneratingOptions, Position } from "../../../types/Game/Grid";
@@ -10,13 +10,21 @@ const GameCanvas = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-    const { CHUNK_SIZE, MAP_SEED, TILE_SIZE, MIN_SCALE, MAX_SCALE, SCALES } = useGameProperties();
+    const {
+        CHUNK_SIZE,
+        MAP_SEED,
+        TILE_SIZE,
+        MIN_SCALE,
+        MAX_SCALE,
+        RENDER_DISTANCE_CHUNKS: render_distance_chunks,
+        MAX_LOADED_CHUNKS: max_loaded_chunks,
+    } = useGameProperties();
 
     const [mapOptions, setMapOptions] = useState<MapGeneratingOptions>({
         chunkSize: CHUNK_SIZE,
         seed: MAP_SEED,
-        startChunkPos: { x: -10, y: -10 },
-        endChunkPos: { x: 10, y: 10 },
+        startChunkPos: { x: -render_distance_chunks, y: -render_distance_chunks },
+        endChunkPos: { x: render_distance_chunks, y: render_distance_chunks },
     });
 
     const { data: newChunks, loading, error } = useMap(mapOptions);
@@ -29,6 +37,7 @@ const GameCanvas = () => {
     const [preparedVersion, setPreparedVersion] = useState(0);
     const [viewportOffset, setViewportOffset] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(0.5);
+    const [centerChunk, setCenterChunk] = useState<Position>({ x: 0, y: 0 });
     const dragStateRef = useRef<{
         pointerId: number;
         startX: number;
@@ -75,19 +84,97 @@ const GameCanvas = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const existing = chunksImgRef.current;
+        if (Object.keys(existing).length === 0) {
+            return;
+        }
+
+        for (const bitmap of Object.values(existing)) {
+            if (typeof bitmap.close === "function") {
+                bitmap.close();
+            }
+        }
+
+        chunksImgRef.current = {};
+        setPreparedVersion((prev) => prev + 1);
+    }, [CHUNK_SIZE, TILE_SIZE, MAP_SEED]);
+
+    const pruneChunks = useCallback(
+        (source: Record<string, ImageBitmap>) => {
+            let working = source;
+            let changed = false;
+
+            const removeChunk = (key: string) => {
+                if (working === source) {
+                    working = { ...source };
+                }
+                const bitmap = working[key];
+                if (bitmap && typeof bitmap.close === "function") {
+                    bitmap.close();
+                }
+                delete working[key];
+                changed = true;
+            };
+
+            if (centerChunk) {
+                for (const key of Object.keys(source)) {
+                    const [chunkX, chunkY] = key.split(";").map(Number);
+                    if (
+                        Math.abs(chunkX - centerChunk.x) > render_distance_chunks ||
+                        Math.abs(chunkY - centerChunk.y) > render_distance_chunks
+                    ) {
+                        removeChunk(key);
+                    }
+                }
+            }
+
+            if (centerChunk && max_loaded_chunks > 0) {
+                const keys = Object.keys(working);
+                if (keys.length > max_loaded_chunks) {
+                    const sorted = keys
+                        .map((key) => {
+                            const [chunkX, chunkY] = key.split(";").map(Number);
+                            const distance = Math.hypot(chunkX - centerChunk.x, chunkY - centerChunk.y);
+                            return { key, distance };
+                        })
+                        .sort((a, b) => a.distance - b.distance);
+
+                    const keep = new Set(sorted.slice(0, max_loaded_chunks).map((entry) => entry.key));
+
+                    for (const key of keys) {
+                        if (!keep.has(key)) {
+                            removeChunk(key);
+                        }
+                    }
+                }
+            }
+
+            return { next: working, changed };
+        },
+        [centerChunk, render_distance_chunks, max_loaded_chunks]
+    );
+
     //prepare chunks when new ones arrive
     useEffect(() => {
         if (!fontsLoaded || !newChunks) {
             return;
         }
 
-        const prepared: Record<string, ImageBitmap> = {};
+        let working = chunksImgRef.current;
+        let changed = false;
+
         for (const [key, chunk] of Object.entries(newChunks)) {
+            if (working[key]) {
+                continue;
+            }
+
             const [originX, originY] = key.split(";").map(Number);
             const origin: Position = {
                 x: originX * CHUNK_SIZE,
                 y: originY * CHUNK_SIZE,
             };
+
             const preparedChunk = prepareChunk({
                 tiles: chunk,
                 chunkOrigin: origin,
@@ -95,14 +182,33 @@ const GameCanvas = () => {
                 chunkSize: CHUNK_SIZE,
                 debug: true,
             });
-            if (preparedChunk) {
-                prepared[key] = preparedChunk.img;
+
+            if (!preparedChunk) {
+                continue;
             }
+
+            if (working === chunksImgRef.current) {
+                working = { ...chunksImgRef.current };
+            }
+
+            working[key] = preparedChunk.img;
+            changed = true;
         }
 
-        chunksImgRef.current = prepared;
-        setPreparedVersion((prev) => prev + 1);
-    }, [CHUNK_SIZE, TILE_SIZE, fontsLoaded, newChunks])
+        const { next, changed: pruned } = pruneChunks(working);
+        if (changed || pruned) {
+            chunksImgRef.current = next;
+            setPreparedVersion((prev) => prev + 1);
+        }
+    }, [CHUNK_SIZE, TILE_SIZE, fontsLoaded, newChunks, pruneChunks]);
+
+    useEffect(() => {
+        const { next, changed } = pruneChunks(chunksImgRef.current);
+        if (changed) {
+            chunksImgRef.current = next;
+            setPreparedVersion((prev) => prev + 1);
+        }
+    }, [centerChunk, pruneChunks]);
 
     //prepare grid image
     useEffect(() => {
@@ -240,6 +346,64 @@ const GameCanvas = () => {
             canvas.removeEventListener("wheel", handleWheel);
         };
     }, [MAX_SCALE, MIN_SCALE]);
+
+    useEffect(() => {
+        if (!dimensions.width || !dimensions.height) {
+            return;
+        }
+
+        const chunkSizeInPixels = CHUNK_SIZE * TILE_SIZE;
+        if (chunkSizeInPixels === 0 || zoom === 0) {
+            return;
+        }
+
+        const worldX = (dimensions.width / 2 - viewportOffset.x) / zoom;
+        const worldY = (dimensions.height / 2 - viewportOffset.y) / zoom;
+
+        const nextCenter = {
+            x: Math.floor(worldX / chunkSizeInPixels),
+            y: Math.floor(worldY / chunkSizeInPixels),
+        };
+
+        setCenterChunk((prev) => {
+            if (prev && prev.x === nextCenter.x && prev.y === nextCenter.y) {
+                return prev;
+            }
+            return nextCenter;
+        });
+    }, [dimensions.width, dimensions.height, viewportOffset.x, viewportOffset.y, zoom, CHUNK_SIZE, TILE_SIZE]);
+
+    useEffect(() => {
+        const startChunkPos = {
+            x: centerChunk.x - render_distance_chunks,
+            y: centerChunk.y - render_distance_chunks,
+        };
+
+        const endChunkPos = {
+            x: centerChunk.x + render_distance_chunks,
+            y: centerChunk.y + render_distance_chunks,
+        };
+
+        setMapOptions((prev) => {
+            if (
+                prev.seed === MAP_SEED &&
+                prev.chunkSize === CHUNK_SIZE &&
+                prev.startChunkPos.x === startChunkPos.x &&
+                prev.startChunkPos.y === startChunkPos.y &&
+                prev.endChunkPos.x === endChunkPos.x &&
+                prev.endChunkPos.y === endChunkPos.y
+            ) {
+                return prev;
+            }
+
+            return {
+                seed: MAP_SEED,
+                chunkSize: CHUNK_SIZE,
+                startChunkPos,
+                endChunkPos,
+            };
+        });
+    }, [centerChunk, CHUNK_SIZE, MAP_SEED, render_distance_chunks]);
 
 return (
   <div ref={containerRef} className={styles.canvas}>
