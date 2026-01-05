@@ -3,6 +3,7 @@ import { IconButton } from "../../../components/Buttons/IconButton/IconButton";
 import { useGameData } from "../../../hooks/providers/useGameData";
 import useGameVariables from "../../../hooks/providers/useGameVariables";
 import styles from "./GameBar.module.css";
+import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 
 type GameBarProps = {
     setBuilding: (x: number | null) => void;
@@ -64,7 +65,17 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
                         </div>
                     ))}
             </div>
-            <div className={styles.row}></div>
+            <div className={styles.row}>
+                <div className={`${styles.values} border--narrow`}>
+                    <ValuesBox iconKey="money" text={`${variables.moneyCurrent} (${variables.moneyPerTick}/t)`} />
+                </div>
+                <div className={`${styles.values} border--narrow`}>
+                    <ValuesBox iconKey="people" text={`${variables.peopleCurrent}/${variables.peopleMax}`} />
+                    <ValuesBox iconKey="electricity" text={`${variables.energyCurrent}/${variables.energyMax}`} />
+                    <ValuesBox iconKey="industry" text={`${variables.industry}`} />
+                    <ValuesBox iconKey="happiness" text={`${variables.happiness}%`} />
+                </div>
+            </div>
         </div>
     );
 };

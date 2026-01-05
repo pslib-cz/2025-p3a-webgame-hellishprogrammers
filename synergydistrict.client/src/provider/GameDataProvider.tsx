@@ -9,25 +9,53 @@ interface GameDataContextType {
     error: string | null;
 }
 
+const STORAGE_KEYS = {
+    BUILDINGS: "buildings",
+    SYNERGIES: "synergies",
+};
+
+const loadFromStorage = <T,>(key: string): T | null => {
+    try {
+        const item = sessionStorage.getItem(key);
+        return item ? JSON.parse(item) : null;
+    } catch {
+        return null;
+    }
+};
+
 const api = new BuildingApi();
 
 export const GameDataContext = createContext<GameDataContextType | null>(null);
 
 export function GameDataProvider({ children }: { children: ReactNode }) {
-    const [buildings, setBuildings] = useState<BuildingType[]>([]);
-    const [synergies, setSynergies] = useState<BuildingSynergy[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [buildings, setBuildings] = useState<BuildingType[]>(
+        () => loadFromStorage<BuildingType[]>(STORAGE_KEYS.BUILDINGS) || []
+    );
+
+    const [synergies, setSynergies] = useState<BuildingSynergy[]>(
+        () => loadFromStorage<BuildingSynergy[]>(STORAGE_KEYS.SYNERGIES) || []
+    );
+
+    const [loading, setLoading] = useState(() => {
+        const hasBuildings = !!sessionStorage.getItem(STORAGE_KEYS.BUILDINGS);
+        const hasSynergies = !!sessionStorage.getItem(STORAGE_KEYS.SYNERGIES);
+        return !hasBuildings || !hasSynergies;
+    });
+    
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        setLoading(true);
-        api.getGameData()
-            .then((result) => {
-                setBuildings(result.buildings);
-                setSynergies(result.synergies);
-            })
-            .catch((err) => setError(err.message))
-            .finally(() => setLoading(false));
+        if (loading) {
+            api.getGameData()
+                .then((result) => {
+                    setBuildings(result.buildings);
+                    setSynergies(result.synergies);
+                    sessionStorage.setItem(STORAGE_KEYS.BUILDINGS, JSON.stringify(result.buildings));
+                    sessionStorage.setItem(STORAGE_KEYS.SYNERGIES, JSON.stringify(result.synergies));
+                })
+                .catch((err) => setError(err.message))
+                .finally(() => setLoading(false));
+        }
     }, []);
 
     return (

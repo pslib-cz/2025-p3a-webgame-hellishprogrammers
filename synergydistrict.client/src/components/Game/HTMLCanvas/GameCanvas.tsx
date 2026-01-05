@@ -396,8 +396,8 @@ return (
       style={{ display: "block" }}
     />
 
-    {(loading || !fontsLoaded) && <div className={styles.overlay}>Loading map...</div>}
-    {error && <div className={styles.overlay}>Error while loading map: {error}</div>}
+    {/* {(loading || !fontsLoaded) && <div className={styles.overlay}>Loading map...</div>}
+    {error && <div className={styles.overlay}>Error while loading map: {error}</div>} */}
   </div>
 );
 }

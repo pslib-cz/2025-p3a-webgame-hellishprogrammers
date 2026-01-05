@@ -15,9 +15,9 @@ export const defaultGameProperties: GamePropertiesValue = {
     SCALE_BY: 1.1,
     MIN_SCALE: 0.06,
     MAX_SCALE: 5,
-    TILE_SIZE: 128,
+    TILE_SIZE: 64,
     RENDER_DISTANCE_CHUNKS: 2,
-    MAX_LOADED_CHUNKS: 225,
+    MAX_LOADED_CHUNKS: 255,
     MAP_SEED: 12345678,
     SCALES: [0.25, 0.5, 1, 2, 3, 4, 5],
 };

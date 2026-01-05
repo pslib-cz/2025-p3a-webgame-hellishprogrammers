@@ -281,12 +281,12 @@ const GameCanvas = () => {
                             height={dimensions.height}
                             chunkBitmaps={chunkBitmaps}
                         />
-                        <GridLayer
+                        {/* <GridLayer
                             origin={{ x: mapOptions.startChunkPos.x, y: mapOptions.startChunkPos.y }}
                             chunkWidth={mapOptions.endChunkPos.x - mapOptions.startChunkPos.x + 1}
                             chunkHeight={mapOptions.endChunkPos.y - mapOptions.startChunkPos.y + 1}
                             gridImage={gridBitmap}
-                        />
+                        /> */}
                     </Stage>
             {(loading || !fontsLoaded) && <div className={styles.overlay}>Loading map...</div>}
             {error && <div className={styles.overlay}>Error while loading map: {error}</div>}
