@@ -19,44 +19,6 @@ namespace SynergyDistrict.Server.Controllers
             _context = appDBContext;
         }
 
-        //[HttpGet]
-        //public ActionResult<IEnumerable<BuildingDTO>> GetBuildings()
-        //{
-        //    var buildings = _appDBContext.Buildings
-        //        .AsNoTracking()
-        //        .Include(b => b.BaseProduction)
-        //        .Include(b => b.IncomingSynergies)
-        //            .ThenInclude(s => s.SourceBuilding)
-        //        //.Include(b => b.IncomingSynergies)
-        //        //    .ThenInclude(s => s.TargetBuilding)
-        //        .Include(b => b.IncomingSynergies)
-        //            .ThenInclude(s => s.SynergyProductions)
-        //        //.Include(b => b.OutgoingSynergies)
-        //        //    .ThenInclude(s => s.SourceBuilding)
-        //        .Include(b => b.OutgoingSynergies)
-        //            .ThenInclude(s => s.TargetBuilding)
-        //        .Include(b => b.OutgoingSynergies)
-        //            .ThenInclude(s => s.SynergyProductions)
-        //        .ToList();
-
-        //    var response = buildings.Select(b => new BuildingDTO
-        //    {
-        //        BuildingId = b.BuildingId,
-        //        Name = b.Name,
-        //        Type = b.Type,
-        //        Description = b.Description,
-        //        IconKey = b.IconKey,
-        //        Cost = b.Cost,
-        //        Shape = b.Shape,
-        //        BaseProduction = b.BaseProduction,
-        //        IncomingSynergies = BuildingSynergyResponse.FromModelList(b.IncomingSynergies),
-        //        OutgoingSynergies = BuildingSynergyResponse.FromModelList(b.OutgoingSynergies)
-        //    }).ToList();
-
-        //    _logger.LogInformation($"Got {buildings.Count} buildings");
-        //    return Ok(response);
-        //}
-
         [HttpGet]
         public ActionResult<GameDataDTO> GetGameData()
         {
@@ -74,10 +36,8 @@ namespace SynergyDistrict.Server.Controllers
                     Shape = b.Shape,
                     BaseProduction = b.BaseProduction.Select(p => new BuildingProductionDTO
                     {
-                        //BuildingProductionId = p.BuildingProductionId,
                         Value = p.Value,
                         Type = p.Type,
-                        //BuildingId = p.BuildingId,
                     })
                 })
                 .ToList();
@@ -92,10 +52,8 @@ namespace SynergyDistrict.Server.Controllers
                     SourceBuildingId = s.SourceBuildingId,
                     SynergyProductions = s.SynergyProductions.Select(p => new BuildingProductionDTO
                     {
-                        //BuildingProductionId = p.BuildingProductionId,
                         Value = p.Value,
                         Type = p.Type,
-                        //BuildingId = p.BuildingId,
                     })
                 })
                 .ToList();

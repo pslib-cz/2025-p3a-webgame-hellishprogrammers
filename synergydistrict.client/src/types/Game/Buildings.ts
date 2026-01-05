@@ -20,5 +20,4 @@ export type BuildingType = {
     cost: number;
     shape: BuildingTileType[][];
     baseProduction: Production[];
-    synergies: BuildingSynergy[];
 };

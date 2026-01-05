@@ -1,13 +1,13 @@
-import type { Position } from "../../../types/Game/Grid";
 import { Image, Layer } from "react-konva";
-import useGameProperties from "../../../hooks/providers/useGameProperties";
+import useGameProperties from "../../../../hooks/providers/useGameProperties";
+import type { Position } from "../../../../types/Game/Grid";
 
 type GridLayerProp = {
     origin: Position;
     chunkWidth: number;
     chunkHeight: number;
     gridImage: ImageBitmap | null;
-}
+};
 
 const GridLayer: React.FC<GridLayerProp> = ({ origin, chunkWidth, chunkHeight, gridImage }) => {
     const { TILE_SIZE, CHUNK_SIZE } = useGameProperties();
@@ -41,6 +41,6 @@ const GridLayer: React.FC<GridLayerProp> = ({ origin, chunkWidth, chunkHeight, g
     }
 
     return <Layer listening={false}>{gridImages}</Layer>;
-}
+};
 
 export default GridLayer;

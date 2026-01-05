@@ -7,7 +7,6 @@ export type Edge = {
     // buildingId: number;
     position: Position;
     side: EdgeSide;
-    
 };
 
 export type Position = {
@@ -33,4 +32,6 @@ export type MapBuilding = {
     position: Position;
     edges: Edge[];
     isSelected: boolean;
+    rotation: number; // 0, 1, 2, 3 for 0°, 90°, 180°, 270°
+    buildingInstanceId: string;
 };

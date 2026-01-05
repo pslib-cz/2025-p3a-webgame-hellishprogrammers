@@ -5,11 +5,10 @@ import { GamePropertiesProvider } from "../provider/GamePropertiesProvider";
 import { GameVariablesProvider } from "../provider/GameVariablesProvider";
 import GameBar from "./Game/GameBar/GameBar";
 import { GameDataProvider } from "../provider/GameDataProvider";
-import type { BuildingTileType } from "../types";
-import { type Edge, type EdgeSide, type MapBuilding, type Position } from "../types/Game/Grid";
+import { PlacedBuildingsProvider } from "../provider/PlacedBuildingsProvider";
 
 const Game = () => {
-    const [buildingDocsId, setBuildingDocsId] = useState<number | null>(null);
+    const [selectedBuilding, setSelectedBuilding] = useState<number | null>(null);
 
     // const makeEdge = (shape: BuildingTileType[][], position: Position, side: EdgeSide): Edge | null => {
     //     //console.log(`Origin position x:${position.x} y:${position.y}`)
@@ -47,12 +46,14 @@ const Game = () => {
     return (
         <GameDataProvider>
             <GameVariablesProvider>
-                <div className={styles.game}>
-                    <GamePropertiesProvider>
-                        <GameCanvas />
-                    </GamePropertiesProvider>
-                    <GameBar setBuilding={(x) => setBuildingDocsId(x)} />
-                </div>
+                <PlacedBuildingsProvider>
+                    <div className={styles.game}>
+                        <GamePropertiesProvider>
+                            <GameCanvas selectedBuilding={selectedBuilding} />
+                        </GamePropertiesProvider>
+                        <GameBar setBuilding={(x) => setSelectedBuilding(x)} />
+                    </div>
+                </PlacedBuildingsProvider>
             </GameVariablesProvider>
         </GameDataProvider>
     );

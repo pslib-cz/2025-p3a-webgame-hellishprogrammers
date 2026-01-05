@@ -1,16 +1,16 @@
 import { Shape } from "react-konva";
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import { Context } from "konva/lib/Context";
 import { Shape as KonvaShape } from "konva/lib/Shape";
-import useGameProperties from "../../../hooks/providers/useGameProperties";
-import type { Position } from "../../../types/Game/Grid";
+import useGameProperties from "../../../../hooks/providers/useGameProperties";
+import type { Position } from "../../../../types/Game/Grid";
 
 type GridShapeProps = {
-    opacity: number
-    pos: Position
-}
+    opacity: number;
+    pos: Position;
+};
 
-const GridShape: React.FC<GridShapeProps> = ({opacity, pos}) => {
+const GridShape: React.FC<GridShapeProps> = ({ opacity, pos }) => {
     const { TILE_SIZE, CHUNK_SIZE } = useGameProperties();
 
     const drawGrid = useCallback(
@@ -47,15 +47,15 @@ const GridShape: React.FC<GridShapeProps> = ({opacity, pos}) => {
     );
     return (
         <Shape
-        x={pos.x}
-        y={pos.y}
-        width={CHUNK_SIZE * TILE_SIZE}
-        height={CHUNK_SIZE * TILE_SIZE}
-        strokeScaleEnabled={true}
-        perfectDrawEnabled={false}
-        sceneFunc={drawGrid}
-      />
+            x={pos.x}
+            y={pos.y}
+            width={CHUNK_SIZE * TILE_SIZE}
+            height={CHUNK_SIZE * TILE_SIZE}
+            strokeScaleEnabled={true}
+            perfectDrawEnabled={false}
+            sceneFunc={drawGrid}
+        />
     );
-}
+};
 
 export default GridShape;

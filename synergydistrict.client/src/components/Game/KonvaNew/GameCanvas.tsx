@@ -1,18 +1,26 @@
 import { useMap } from "../../../hooks/fetches/useMap";
-import type { MapGeneratingOptions, MapTile, Position } from "../../../types/Game/Grid";
-import { useState, useEffect, useRef } from "react";
+import { type MapGeneratingOptions, type MapTile, type Position } from "../../../types/Game/Grid";
+import { useState, useEffect, useRef, type FC } from "react";
 import MapLayer from "./MapLayer";
+import BuildingsLayer from "./Buildings/BuildingsLayer";
 import { Stage } from "react-konva";
 import type Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
-import GridLayer from "./GridLayer";
 import styles from "../../../styles/Game.module.css";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
 import { prepareChunk, type PreparedChunkCanvas } from "../HTMLCanvas/ChunkShape";
 import { prepareGrid } from "../HTMLCanvas/GridShape";
 import useFont from "../../../hooks/useFont";
+import { usePlacedBuildings } from "../../../hooks/providers/usePlacedBuildings";
+import { useGameData } from "../../../hooks/providers/useGameData";
+import { detectSynergies, calculateTotalProduction } from "../../../utils/buildingUtils";
+import useGameVariables from "../../../hooks/providers/useGameVariables";
 
-const GameCanvas = () => {
+type GameCanvasProps = {
+    selectedBuilding: number | null;
+};
+
+const GameCanvas: FC<GameCanvasProps> = ({ selectedBuilding }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -35,12 +43,31 @@ const GameCanvas = () => {
     const [stagePosition, setStagePosition] = useState<Position>({ x: 0, y: 0 });
     const [centerChunk, setCenterChunk] = useState<Position | null>(null);
     const [chunkBitmaps, setChunkBitmaps] = useState<Record<string, PreparedChunkCanvas>>({});
-    const [gridBitmap, setGridBitmap] = useState<ImageBitmap | null>(null);
+
+    const { placedBuildings, placeBuilding, selectBuilding } = usePlacedBuildings();
+    const { buildings, synergies } = useGameData();
+    const { setVariables } = useGameVariables();
+
+    const [placementMode, setPlacementMode] = useState<{ buildingId: number; rotation: number } | null>(null);
 
     const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(value, min));
 
     const handleWheel = (event: KonvaEventObject<WheelEvent>) => {
         event.evt.preventDefault();
+
+        // If in placement mode, rotate the preview
+        if (placementMode) {
+            const direction = event.evt.deltaY > 0 ? -1 : 1;
+            setPlacementMode((prev) => {
+                if (!prev) return prev;
+                return {
+                    ...prev,
+                    rotation: (prev.rotation + direction + 4) % 4,
+                };
+            });
+            return;
+        }
+
         const stage = stageRef.current;
         if (!stage) return;
         const pointer = stage.getPointerPosition();
@@ -69,6 +96,51 @@ const GameCanvas = () => {
         setStagePosition(pos);
     };
 
+    const handleStageClick = () => {
+        const stage = stageRef.current;
+        if (!stage) return;
+
+        // Get pointer position in screen coordinates
+        const pointer = stage.getPointerPosition();
+        if (!pointer) return;
+
+        // Convert screen coordinates to world coordinates
+        const worldX = (pointer.x - stagePosition.x) / stageScale;
+        const worldY = (pointer.y - stagePosition.y) / stageScale;
+
+        // Calculate which tile was clicked
+        const tileX = Math.floor(worldX / TILE_SIZE);
+        const tileY = Math.floor(worldY / TILE_SIZE);
+
+        // If in placement mode, place the building
+        if (placementMode) {
+            const buildingDef = buildings.find((b: any) => b.buildingId === placementMode.buildingId);
+            if (buildingDef) {
+                placeBuilding(buildingDef, { x: tileX, y: tileY }, placementMode.rotation);
+                // Exit placement mode after placing
+                setPlacementMode(null);
+            }
+        }
+    };
+
+    const handleMouseMove = () => {
+        if (!placementMode) return;
+
+        const stage = stageRef.current;
+        if (!stage) return;
+
+        // Get pointer position in screen coordinates
+        const pointer = stage.getPointerPosition();
+        if (!pointer) return;
+
+        // TODO: Render preview building at mouse position
+        // Convert screen coordinates to world coordinates
+        // const worldX = (pointer.x - stagePosition.x) / stageScale;
+        // const worldY = (pointer.y - stagePosition.y) / stageScale;
+        // const tileX = Math.floor(worldX / TILE_SIZE);
+        // const tileY = Math.floor(worldY / TILE_SIZE);
+    };
+
     useEffect(() => {
         if (!containerRef.current) return;
 
@@ -83,6 +155,31 @@ const GameCanvas = () => {
 
         return () => resizeObserver.disconnect();
     }, []);
+
+    // Handle selectedBuilding change to enter placement mode
+    useEffect(() => {
+        if (selectedBuilding !== null) {
+            setPlacementMode({ buildingId: selectedBuilding, rotation: 0 });
+        } else {
+            setPlacementMode(null);
+        }
+    }, [selectedBuilding]);
+
+    // Update game variables when buildings are placed or removed
+    useEffect(() => {
+        const detectedSynergies = detectSynergies(placedBuildings, synergies);
+        const totalProduction = calculateTotalProduction(placedBuildings, detectedSynergies);
+
+        // Update game variables with production values
+        setVariables((prev) => {
+            let updated = { ...prev };
+            for (const [type, value] of totalProduction) {
+                if (type === "money") updated = { ...updated, moneyPerTick: value };
+                // Add more production types mapping as needed (energy, people, etc.)
+            }
+            return updated;
+        });
+    }, [placedBuildings, synergies, setVariables]);
 
     const fontsLoaded = useFont('16px "icons"');
 
@@ -234,14 +331,7 @@ const GameCanvas = () => {
             chunkSize: CHUNK_SIZE,
         });
 
-        setGridBitmap((prev) => {
-            if (prev && prev !== gridImage) {
-                prev.close();
-            }
-
-            gridBitmapRef.current = gridImage ?? null;
-            return gridImage ?? null;
-        });
+        gridBitmapRef.current = gridImage ?? null;
     }, [TILE_SIZE, CHUNK_SIZE]);
 
     useEffect(() => {
@@ -261,33 +351,36 @@ const GameCanvas = () => {
     return (
         <div ref={containerRef} className={styles.canvas}>
             <Stage
-                        ref={stageRef}
-                        width={dimensions.width}
-                        height={dimensions.height}
-                        draggable={true}
-                        onWheel={handleWheel}
-                        scaleX={stageScale}
-                        scaleY={stageScale}
-                        x={stagePosition.x}
-                        y={stagePosition.y}
-                        onDragEnd={handleDragEnd}
-                    >
-                        <MapLayer
-                            chunks={loadedChunks}
-                            stageX={stagePosition.x}
-                            stageY={stagePosition.y}
-                            scale={stageScale}
-                            width={dimensions.width}
-                            height={dimensions.height}
-                            chunkBitmaps={chunkBitmaps}
-                        />
-                        {/* <GridLayer
+                ref={stageRef}
+                width={dimensions.width}
+                height={dimensions.height}
+                draggable={true}
+                onWheel={handleWheel}
+                scaleX={stageScale}
+                scaleY={stageScale}
+                x={stagePosition.x}
+                y={stagePosition.y}
+                onDragEnd={handleDragEnd}
+                onClick={handleStageClick}
+                onMouseMove={handleMouseMove}
+            >
+                <MapLayer
+                    chunks={loadedChunks}
+                    stageX={stagePosition.x}
+                    stageY={stagePosition.y}
+                    scale={stageScale}
+                    width={dimensions.width}
+                    height={dimensions.height}
+                    chunkBitmaps={chunkBitmaps}
+                />
+                <BuildingsLayer placedBuildings={placedBuildings} onBuildingClick={(id) => selectBuilding(id)} />
+                {/* <GridLayer
                             origin={{ x: mapOptions.startChunkPos.x, y: mapOptions.startChunkPos.y }}
                             chunkWidth={mapOptions.endChunkPos.x - mapOptions.startChunkPos.x + 1}
                             chunkHeight={mapOptions.endChunkPos.y - mapOptions.startChunkPos.y + 1}
                             gridImage={gridBitmap}
                         /> */}
-                    </Stage>
+            </Stage>
             {(loading || !fontsLoaded) && <div className={styles.overlay}>Loading map...</div>}
             {error && <div className={styles.overlay}>Error while loading map: {error}</div>}
         </div>
