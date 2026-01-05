@@ -1,5 +1,5 @@
 import type { TileType } from "..";
-import type { Building } from "./Buildings";
+import type { BuildingType } from "./Buildings";
 
 export type EdgeSide = "top" | "bottom" | "left" | "right";
 
@@ -7,6 +7,7 @@ export type Edge = {
     // buildingId: number;
     position: Position;
     side: EdgeSide;
+    
 };
 
 export type Position = {
@@ -28,7 +29,7 @@ export type MapTile = {
 };
 
 export type MapBuilding = {
-    building: Building;
+    building: BuildingType;
     position: Position;
     edges: Edge[];
     isSelected: boolean;

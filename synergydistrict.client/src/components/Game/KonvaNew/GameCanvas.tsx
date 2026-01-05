@@ -8,12 +8,17 @@ import type { KonvaEventObject } from "konva/lib/Node";
 import GridLayer from "./GridLayer";
 import styles from "../../../styles/Game.module.css";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
+import { prepareChunk, type PreparedChunkCanvas } from "../HTMLCanvas/ChunkShape";
+import { prepareGrid } from "../HTMLCanvas/GridShape";
+import useFont from "../../../hooks/useFont";
 
 const GameCanvas = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
     const stageRef = useRef<Konva.Stage | null>(null);
+    const chunkBitmapRef = useRef<Record<string, PreparedChunkCanvas>>({});
+    const gridBitmapRef = useRef<ImageBitmap | null>(null);
 
     const {
         CHUNK_SIZE,
@@ -29,6 +34,8 @@ const GameCanvas = () => {
     const [stageScale, setStageScale] = useState(1);
     const [stagePosition, setStagePosition] = useState<Position>({ x: 0, y: 0 });
     const [centerChunk, setCenterChunk] = useState<Position | null>(null);
+    const [chunkBitmaps, setChunkBitmaps] = useState<Record<string, PreparedChunkCanvas>>({});
+    const [gridBitmap, setGridBitmap] = useState<ImageBitmap | null>(null);
 
     const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(value, min));
 
@@ -43,7 +50,6 @@ const GameCanvas = () => {
         const oldScale = stageScale;
         const nextScale = clamp(oldScale * zoomFactor, MIN_SCALE, MAX_SCALE);
         if (nextScale === oldScale) return;
-        // Keep the zoom centered around the current cursor position.
         const mousePointTo = {
             x: (pointer.x - stage.x()) / oldScale,
             y: (pointer.y - stage.y()) / oldScale,
@@ -78,7 +84,7 @@ const GameCanvas = () => {
         return () => resizeObserver.disconnect();
     }, []);
 
-    const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
+    const fontsLoaded = useFont('16px "icons"');
 
     const [mapOptions, setMapOptions] = useState<MapGeneratingOptions>({
         seed: MAP_SEED,
@@ -90,24 +96,6 @@ const GameCanvas = () => {
     const [loadedChunks, setLoadedChunks] = useState<Record<string, MapTile[]>>({});
 
     const { data: newChunks, loading, error } = useMap(mapOptions);
-
-    useEffect(() => {
-        let cancelled = false;
-
-        const loadFonts = async () => {
-            try {
-                await document.fonts.load('16px "icons"');
-                await document.fonts.ready;
-            } finally {
-                if (!cancelled) setFontsLoaded(true);
-            }
-        };
-
-        loadFonts();
-        return () => {
-            cancelled = true;
-        };
-    }, []);
 
     useEffect(() => {
         if (!dimensions.width || !dimensions.height) return;
@@ -202,21 +190,77 @@ const GameCanvas = () => {
         });
     }, [newChunks, centerChunk, MAX_LOADED_CHUNKS]);
 
-    const GetContent = () => {
-        const loadedChunkCount = Object.keys(loadedChunks).length;
+    useEffect(() => {
+        if (!fontsLoaded) {
+            return;
+        }
 
-        if (!fontsLoaded || (loading && loadedChunkCount === 0)) {
-            return (
-                <div>
-                    <div>Loading map...</div>
-                </div>
-            );
-        } else if (error && loadedChunkCount === 0) {
-            return <div>Error while loading map: {error}</div>;
-        } else {
-            return (
-                <>
-                    <Stage
+        const prepared: Record<string, PreparedChunkCanvas> = {};
+
+        for (const [key, tiles] of Object.entries(loadedChunks)) {
+            const [chunkX, chunkY] = key.split(";").map(Number);
+            const chunkOrigin = {
+                x: chunkX * CHUNK_SIZE,
+                y: chunkY * CHUNK_SIZE,
+            };
+
+            const chunkImage = prepareChunk({
+                tiles,
+                chunkOrigin,
+                tileSize: TILE_SIZE,
+                chunkSize: CHUNK_SIZE,
+                debug: false,
+            });
+
+            if (chunkImage) {
+                prepared[key] = chunkImage;
+            }
+        }
+
+        setChunkBitmaps((prev) => {
+            for (const bitmap of Object.values(prev)) {
+                bitmap.img.close();
+            }
+
+            chunkBitmapRef.current = prepared;
+            return prepared;
+        });
+    }, [loadedChunks, fontsLoaded, TILE_SIZE, CHUNK_SIZE]);
+
+    useEffect(() => {
+        const gridImage = prepareGrid({
+            opacity: 0.35,
+            tileSize: TILE_SIZE,
+            chunkSize: CHUNK_SIZE,
+        });
+
+        setGridBitmap((prev) => {
+            if (prev && prev !== gridImage) {
+                prev.close();
+            }
+
+            gridBitmapRef.current = gridImage ?? null;
+            return gridImage ?? null;
+        });
+    }, [TILE_SIZE, CHUNK_SIZE]);
+
+    useEffect(() => {
+        return () => {
+            for (const bitmap of Object.values(chunkBitmapRef.current)) {
+                bitmap.img.close();
+            }
+            chunkBitmapRef.current = {};
+
+            if (gridBitmapRef.current) {
+                gridBitmapRef.current.close();
+                gridBitmapRef.current = null;
+            }
+        };
+    }, []);
+
+    return (
+        <div ref={containerRef} className={styles.canvas}>
+            <Stage
                         ref={stageRef}
                         width={dimensions.width}
                         height={dimensions.height}
@@ -235,23 +279,17 @@ const GameCanvas = () => {
                             scale={stageScale}
                             width={dimensions.width}
                             height={dimensions.height}
+                            chunkBitmaps={chunkBitmaps}
                         />
                         <GridLayer
-                            opacity={0.35}
                             origin={{ x: mapOptions.startChunkPos.x, y: mapOptions.startChunkPos.y }}
                             chunkWidth={mapOptions.endChunkPos.x - mapOptions.startChunkPos.x + 1}
                             chunkHeight={mapOptions.endChunkPos.y - mapOptions.startChunkPos.y + 1}
+                            gridImage={gridBitmap}
                         />
                     </Stage>
-                    {error ? <div>Error while loading map: {error}</div> : null}
-                </>
-            );
-        }
-    };
-
-    return (
-        <div ref={containerRef} className={styles.canvas}>
-            {GetContent()}
+            {(loading || !fontsLoaded) && <div className={styles.overlay}>Loading map...</div>}
+            {error && <div className={styles.overlay}>Error while loading map: {error}</div>}
         </div>
     );
 };

@@ -1,4 +1,4 @@
-import type { BuildingTileType, BuildingType, StatsType } from "..";
+import type { BuildingTileType, BuildingCategory, StatsType } from "..";
 
 export type BuildingSynergy = {
     sourceBuildingId: number;
@@ -11,10 +11,10 @@ export type Production = {
     value: number;
 };
 
-export type Building = {
+export type BuildingType = {
     buildingId: number;
     name: string;
-    type: BuildingType;
+    type: BuildingCategory;
     description: string;
     iconKey: string;
     cost: number;

@@ -1,6 +1,6 @@
-import type { Building, BuildingSynergy } from "./Buildings";
+import type { BuildingType, BuildingSynergy } from "./Buildings";
 
 export type GameData = {
-    buildings: Building[];
+    buildings: BuildingType[];
     synergies: BuildingSynergy[];
 };

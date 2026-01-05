@@ -1,39 +1,46 @@
 import type { Position } from "../../../types/Game/Grid";
-import GridShape from "./GridShape";
-import { Layer } from "react-konva";
+import { Image, Layer } from "react-konva";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
 
 type GridLayerProp = {
-    opacity: number;
     origin: Position;
     chunkWidth: number;
     chunkHeight: number;
+    gridImage: ImageBitmap | null;
 }
 
-const GridLayer: React.FC<GridLayerProp> = ({ opacity, origin, chunkWidth, chunkHeight }) => {
+const GridLayer: React.FC<GridLayerProp> = ({ origin, chunkWidth, chunkHeight, gridImage }) => {
+    const { TILE_SIZE, CHUNK_SIZE } = useGameProperties();
 
-    const {TILE_SIZE, CHUNK_SIZE} = useGameProperties();
-
-    const MapGrids = () => {
-      //console.log(`Rendering GridLayer with origin (${origin.x}, ${origin.y}), chunkWidth: ${chunkWidth}, chunkHeight: ${chunkHeight}`);
-      const grids = [];
-      for (let i = 0; i < chunkWidth; i++) {
-        for (let j = 0; j < chunkHeight; j++) {
-          const pos: Position = {
-            x: (origin.x + i) * CHUNK_SIZE * TILE_SIZE,
-            y: (origin.y + j) * CHUNK_SIZE * TILE_SIZE,
-          };
-          grids.push(<GridShape key={`${i}-${j}`} opacity={opacity} pos={pos}/>);
-        }
-      }
-      return grids;
+    if (!gridImage) {
+        return null;
     }
 
-    return (
-    <Layer listening={false}>
-      {MapGrids()}
-    </Layer>
-  );
+    const chunkPixelSize = CHUNK_SIZE * TILE_SIZE;
+
+    const gridImages = [];
+    for (let i = 0; i < chunkWidth; i++) {
+        for (let j = 0; j < chunkHeight; j++) {
+            const pos: Position = {
+                x: (origin.x + i) * chunkPixelSize,
+                y: (origin.y + j) * chunkPixelSize,
+            };
+
+            gridImages.push(
+                <Image
+                    key={`${origin.x + i}-${origin.y + j}`}
+                    x={pos.x}
+                    y={pos.y}
+                    width={gridImage.width}
+                    height={gridImage.height}
+                    image={gridImage}
+                    listening={false}
+                />
+            );
+        }
+    }
+
+    return <Layer listening={false}>{gridImages}</Layer>;
 }
 
 export default GridLayer;

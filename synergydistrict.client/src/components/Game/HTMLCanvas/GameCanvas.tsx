@@ -5,6 +5,7 @@ import type { MapGeneratingOptions, Position } from "../../../types/Game/Grid";
 import prepareChunk from "./ChunkShape";
 import styles from "../../../styles/Game.module.css";
 import prepareGrid from "./GridShape";
+import useFont from "../../../hooks/useFont";
 
 const GameCanvas = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -29,8 +30,7 @@ const GameCanvas = () => {
 
     const { data: newChunks, loading, error } = useMap(mapOptions);
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
-    const [ fontsLoaded, setFontsLoaded ] = useState<boolean>(false);
-
+    const fontsLoaded = useFont('16px "icons"');
     const chunksImgRef = useRef<Record<string, ImageBitmap>>({});
     const gridImgRef = useRef<ImageBitmap | null>(null);
 
@@ -38,6 +38,7 @@ const GameCanvas = () => {
     const [viewportOffset, setViewportOffset] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(0.5);
     const [centerChunk, setCenterChunk] = useState<Position>({ x: 0, y: 0 });
+
     const dragStateRef = useRef<{
         pointerId: number;
         startX: number;
@@ -45,6 +46,7 @@ const GameCanvas = () => {
         originX: number;
         originY: number;
     } | null>(null);
+
     const viewportOffsetRef = useRef({ x: 0, y: 0 });
     const zoomRef = useRef(1);
 
@@ -62,26 +64,6 @@ const GameCanvas = () => {
         resizeObserver.observe(containerRef.current);
 
         return () => resizeObserver.disconnect();
-    }, []);
-
-
-    //makes sure fonts are loaded
-    useEffect(() => {
-        let cancelled = false;
-
-        const loadFonts = async () => {
-            try {
-                await document.fonts.load('16px "icons"');
-                await document.fonts.ready;
-            } finally {
-                if (!cancelled) setFontsLoaded(true);
-            }
-        };
-
-        loadFonts();
-        return () => {
-            cancelled = true;
-        };
     }, []);
 
     useEffect(() => {

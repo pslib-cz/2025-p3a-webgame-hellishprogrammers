@@ -1,7 +1,7 @@
-import { Layer } from "react-konva";
+import { Image, Layer } from "react-konva";
 import type { MapTile, Position } from "../../../types/Game/Grid";
-import ChunkShape from "./ChunkShape";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
+import type { PreparedChunkCanvas } from "../HTMLCanvas/ChunkShape";
 
 type MapLayerProps = {
     chunks: Record<string, MapTile[]>;
@@ -10,12 +10,13 @@ type MapLayerProps = {
     scale: number;
     width: number;
     height: number;
+    chunkBitmaps: Record<string, PreparedChunkCanvas>;
 };
 
-const MapLayer: React.FC<MapLayerProps> = ({ chunks, stageX, stageY, scale, width, height }) => {
+const MapLayer: React.FC<MapLayerProps> = ({ chunks, stageX, stageY, scale, width, height, chunkBitmaps }) => {
     const { TILE_SIZE, CHUNK_SIZE } = useGameProperties();
 
-    const chunksWithPos: { position: Position; tiles: MapTile[] }[] = [];
+    const chunksWithPos: { position: Position; key: string }[] = [];
 
     const buffer = CHUNK_SIZE * TILE_SIZE;
 
@@ -26,15 +27,12 @@ const MapLayer: React.FC<MapLayerProps> = ({ chunks, stageX, stageY, scale, widt
 
     const chunkPixelSize = CHUNK_SIZE * TILE_SIZE;
 
-    Object.entries(chunks).forEach(([k, chunk]) => {
+    Object.entries(chunks).forEach(([k]) => {
         const [x, y] = k.split(";").map(Number);
 
-        // Chunk top-left position in pixels
         const chunkX = x * CHUNK_SIZE * TILE_SIZE;
         const chunkY = y * CHUNK_SIZE * TILE_SIZE;
 
-        // Axis-Aligned Bounding Box (AABB) Intersection Check
-        // Check if the chunk rectangle overlaps with the visible rectangle
         if (
             chunkX < maxVisibleX &&
             chunkX + chunkPixelSize > minVisibleX &&
@@ -43,23 +41,31 @@ const MapLayer: React.FC<MapLayerProps> = ({ chunks, stageX, stageY, scale, widt
         ) {
             chunksWithPos.push({
                 position: { x, y },
-                tiles: chunk,
+                key: k,
             });
         }
     });
 
-    // console.log(chunksWithPos.length);
-
     return (
         <Layer listening={false}>
-            {chunksWithPos.map((chp) => (
-                <ChunkShape
-                    key={`${chp.position.x};${chp.position.y}`}
-                    tiles={chp.tiles}
-                    origin={chp.position}
-                    debug={false}
-                />
-            ))}
+            {chunksWithPos.map((chp) => {
+                const prepared = chunkBitmaps[chp.key];
+                if (!prepared) {
+                    return null;
+                }
+
+                return (
+                    <Image
+                        key={`${chp.position.x};${chp.position.y}`}
+                        x={chp.position.x * CHUNK_SIZE * TILE_SIZE}
+                        y={chp.position.y * CHUNK_SIZE * TILE_SIZE}
+                        width={prepared.width}
+                        height={prepared.height}
+                        image={prepared.img}
+                        listening={false}
+                    />
+                );
+            })}
         </Layer>
     );
 };
