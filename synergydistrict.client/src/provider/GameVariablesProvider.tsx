@@ -32,21 +32,16 @@ export const GameVariablesProvider: FC<PropsWithChildren> = ({ children }) => {
 
         const tickStep = speed === "fastforward" ? 2 : 1;
         const intervalMs = 1000 / (ticksPerSecond * tickStep);
-        
 
         const id = window.setInterval(() => {
             elapsedGameTicksRef.current += 1;
             setVariables((prev) => ({ ...prev, timer: elapsedGameTicksRef.current }));
         }, intervalMs);
 
-        console.log("Started game timer with interval:", intervalMs, "ms");
-
         return () => window.clearInterval(id);
     }, [variables.timerSpeed, TPS, setVariables]);
 
     return (
-        <GameVariablesContext.Provider value={{ variables, setVariables }}>
-            {children}
-        </GameVariablesContext.Provider>
+        <GameVariablesContext.Provider value={{ variables, setVariables }}>{children}</GameVariablesContext.Provider>
     );
 };
