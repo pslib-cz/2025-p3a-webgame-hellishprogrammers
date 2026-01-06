@@ -6,9 +6,11 @@ import { GameVariablesProvider } from "../provider/GameVariablesProvider";
 import GameBar from "./Game/GameBar/GameBar";
 import { GameDataProvider } from "../provider/GameDataProvider";
 import { BuildingsBitmapProvider } from "../provider/BuildingsBitmapProvider";
+import { useGameOptions } from "../hooks/providers/useGameOptions";
 
 const Game = () => {
     const [selectedBuilding, setSelectedBuilding] = useState<number | null>(null);
+    const { options } = useGameOptions();
 
     // const makeEdge = (shape: BuildingTileType[][], position: Position, side: EdgeSide): Edge | null => {
     //     //console.log(`Origin position x:${position.x} y:${position.y}`)
@@ -49,7 +51,7 @@ const Game = () => {
                 <GameVariablesProvider>
                     <div className={styles.game}>
                         <BuildingsBitmapProvider>
-                        <GameCanvas selectedBuilding={selectedBuilding} disableDynamicLoading={true} />
+                        <GameCanvas selectedBuilding={selectedBuilding} disableDynamicLoading={!options.infiniteMap} />
                         </BuildingsBitmapProvider>
                         <GameBar setBuilding={(x) => setSelectedBuilding(x)} />
                     </div>
