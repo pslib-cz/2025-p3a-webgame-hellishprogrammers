@@ -1,4 +1,4 @@
-import { createContext, type FC, type PropsWithChildren, useEffect, useRef } from "react";
+import { createContext, type FC, type PropsWithChildren, useEffect, useState } from "react";
 import { useGameData } from "../hooks/providers/useGameData";
 import useGameProperties from "../hooks/providers/useGameProperties";
 import type { BuildingTileType } from "../types";
@@ -27,8 +27,7 @@ const ICON_COLOR = "#FEFAE0";
 export const BuildingsBitmapContext = createContext<BuildingsBitmapContextValue | null>(null);
 
 export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => {
-    // const [images, setImages] = useState<ImageBitmap[]>([]);
-    const images = useRef<ImageBitmap[]>([]);
+    const [images, setImages] = useState<ImageBitmap[]>([]);
     const { buildings } = useGameData();
     const { TILE_SIZE } = useGameProperties();
 
@@ -98,12 +97,12 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
                         context.lineTo(relX + TILE_SIZE, relY);
                     }
                     // RIGHT
-                    if (x === building.shape[y][x].length - 1 || building.shape[y][x + 1] === "Empty") {
+                    if (x === building.shape[y].length - 1 || building.shape[y][x + 1] === "Empty") {
                         context.moveTo(relX + TILE_SIZE, relY);
                         context.lineTo(relX + TILE_SIZE, relY + TILE_SIZE);
                     }
                     // DOWN
-                    if (y === building.shape[y].length - 1 || building.shape[y + 1][x] === "Empty") {
+                    if (y === building.shape.length - 1 || building.shape[y + 1][x] === "Empty") {
                         context.moveTo(relX + TILE_SIZE, relY + TILE_SIZE);
                         context.lineTo(relX, relY + TILE_SIZE);
                     }
@@ -128,11 +127,11 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
             }
 
             // Converting canvas to bitmap
-            images.current.push(canvas.transferToImageBitmap());
+            setImages(x => [...x, canvas.transferToImageBitmap()]);
         });
     }, []);
 
     return (
-        <BuildingsBitmapContext.Provider value={{ images: images.current }}>{children}</BuildingsBitmapContext.Provider>
+        <BuildingsBitmapContext.Provider value={{ images }}>{children}</BuildingsBitmapContext.Provider>
     );
 };
