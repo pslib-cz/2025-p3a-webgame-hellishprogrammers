@@ -14,7 +14,7 @@ type BuildingsLayerProps = {
 
 const BuildingsLayer: FC<BuildingsLayerProps> = ({ placedBuildings, onBuildingClick }) => {
     const { TILE_SIZE } = useGameProperties();
-    const { removeBuilding, getSelectedBuilding } = usePlacedBuildings();
+    const { getSelectedBuilding } = usePlacedBuildings();
 
     const buildingBitmaps = useMemo(() => {
         const bitmaps: Record<string, ReturnType<typeof prepareBuilding>> = {};
@@ -43,21 +43,6 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ placedBuildings, onBuildingCl
         return bitmaps;
     }, [placedBuildings, TILE_SIZE]);
 
-    // Handle delete key to remove selected building
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Delete") {
-                const selected = getSelectedBuilding();
-                if (selected) {
-                    removeBuilding(selected.buildingInstanceId);
-                }
-            }
-        };
-
-        window.addEventListener("keydown", handleKeyDown);
-        return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [removeBuilding, getSelectedBuilding]);
-
     return (
         <Layer
             listening={true}
@@ -70,6 +55,33 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ placedBuildings, onBuildingCl
                 const bitmap = buildingBitmaps[building.buildingInstanceId];
                 if (!bitmap) return null;
 
+                const handleClick = (e: any) => {
+                    // Check if click hit a non-transparent pixel
+                    const pos = e.target.getRelativePointerPosition();
+                    if (!pos) return;
+
+                    const canvas = document.createElement("canvas");
+                    canvas.width = bitmap.width;
+                    canvas.height = bitmap.height;
+                    const ctx = canvas.getContext("2d");
+                    if (!ctx) return;
+
+                    ctx.drawImage(bitmap.img as any, 0, 0);
+
+                    const x = Math.floor(pos.x);
+                    const y = Math.floor(pos.y);
+
+                    if (x < 0 || x >= bitmap.width || y < 0 || y >= bitmap.height) return;
+
+                    const imageData = ctx.getImageData(x, y, 1, 1);
+                    const alpha = imageData.data[3];
+
+                    // Only select if clicked on a non-transparent pixel (alpha > 128)
+                    if (alpha > 128) {
+                        onBuildingClick?.(building.buildingInstanceId);
+                    }
+                };
+
                 return (
                     <Image
                         key={building.buildingInstanceId}
@@ -79,16 +91,8 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ placedBuildings, onBuildingCl
                         height={bitmap.height}
                         image={bitmap.img}
                         listening={true}
-                        onClick={() => {
-                            onBuildingClick?.(building.buildingInstanceId);
-                        }}
-                        onContextMenu={(e) => {
-                            e.evt.preventDefault();
-                            removeBuilding(building.buildingInstanceId);
-                        }}
+                        onClick={handleClick}
                         opacity={building.isSelected ? 0.8 : 1}
-                        shadowColor={building.isSelected ? "#FEFAE0" : undefined}
-                        shadowBlur={building.isSelected ? 20 : undefined}
                     />
                 );
             })}
