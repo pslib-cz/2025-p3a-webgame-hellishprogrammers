@@ -63,9 +63,11 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
                     const relX = x * TILE_SIZE;
                     const relY = y * TILE_SIZE;
 
+
                     // Draw tile
                     context.fillStyle = BACKGROUND_COLOR_MAP[building.type.toLowerCase()];
                     context.fillRect(relX, relY, TILE_SIZE, TILE_SIZE);
+
 
                     // Draw tile border
                     context.strokeStyle = OUTLINE_COLOR_MAP["tile"];
@@ -75,14 +77,45 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
                     context.beginPath();
 
                     context.moveTo(relX, relY);
-                    context.lineTo(relX + TILE_SIZE, relY);
-                    context.lineTo(relX + TILE_SIZE, relY + TILE_SIZE);
-                    context.lineTo(relX, relY + TILE_SIZE);
-                    context.lineTo(relX, relY);
+                    context.lineTo(relX + TILE_SIZE, relY); // UP
+                    context.lineTo(relX + TILE_SIZE, relY + TILE_SIZE); // RIGHT
+                    context.lineTo(relX, relY + TILE_SIZE); // DOWN
+                    context.lineTo(relX, relY); // LEFT
 
                     // Draws the path
                     context.stroke();
 
+
+                    // Drawing building border
+                    context.strokeStyle = OUTLINE_COLOR_MAP["building"];
+                    context.lineWidth = strokeWidth;
+
+                    context.beginPath();
+
+                    // UP
+                    if (y === 0 || building.shape[y - 1][x] === "Empty") {
+                        context.moveTo(relX, relY);
+                        context.lineTo(relX + TILE_SIZE, relY);
+                    }
+                    // RIGHT
+                    if (x === building.shape[y][x].length - 1 || building.shape[y][x + 1] === "Empty") {
+                        context.moveTo(relX + TILE_SIZE, relY);
+                        context.lineTo(relX + TILE_SIZE, relY + TILE_SIZE);
+                    }
+                    // DOWN
+                    if (y === building.shape[y].length - 1 || building.shape[y + 1][x] === "Empty") {
+                        context.moveTo(relX + TILE_SIZE, relY + TILE_SIZE);
+                        context.lineTo(relX, relY + TILE_SIZE);
+                    }
+                    // LEFT
+                    if (x === 0 || building.shape[y][x - 1] === "Empty") {
+                        context.moveTo(relX, relY + TILE_SIZE);
+                        context.lineTo(relX, relY);
+                    }
+
+                    context.stroke();
+
+                    
                     // Draw icon
                     if (tile === "Icon") {
                         context.fillStyle = ICON_COLOR;
@@ -93,6 +126,7 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
                     }
                 }
             }
+
             // Converting canvas to bitmap
             images.current.push(canvas.transferToImageBitmap());
         });
