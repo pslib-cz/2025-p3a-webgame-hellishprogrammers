@@ -7,6 +7,7 @@ export type GamePropertiesValue = {
     RENDER_DISTANCE_CHUNKS: number;
     MAX_LOADED_CHUNKS: number;
     MAP_SEED: number;
+    TPS: number;
     SCALES: number[];
 };
 
@@ -19,5 +20,6 @@ export const defaultGameProperties: GamePropertiesValue = {
     RENDER_DISTANCE_CHUNKS: 2,
     MAX_LOADED_CHUNKS: 255,
     MAP_SEED: 12345678,
+    TPS: 4,
     SCALES: [0.25, 0.5, 1, 2, 3, 4, 5],
 };
