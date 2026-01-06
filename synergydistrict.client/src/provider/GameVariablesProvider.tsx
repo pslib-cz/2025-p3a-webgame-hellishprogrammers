@@ -9,6 +9,7 @@ import {
     type SetStateAction,
 } from "react";
 import { defaultGameVariables, type GameVariablesValue } from "../types/Game/GameVariables";
+import useGameProperties from "../hooks/providers/useGameProperties";
 
 type GameVariablesContextValue = {
     variables: GameVariablesValue;
@@ -17,33 +18,31 @@ type GameVariablesContextValue = {
 
 export const GameVariablesContext = createContext<GameVariablesContextValue | null>(null);
 
-const formatTime = (totalSeconds: number) => {
-    const minutes = Math.floor(totalSeconds / 60)
-        .toString()
-        .padStart(2, "0");
-    const seconds = Math.floor(totalSeconds % 60)
-        .toString()
-        .padStart(2, "0");
-    return `${minutes}:${seconds}`;
-};
-
 export const GameVariablesProvider: FC<PropsWithChildren> = ({ children }) => {
     const [variables, setVariables] = useState<GameVariablesValue>(defaultGameVariables);
-    const elapsedSecondsRef = useRef(0);
+    const { TPS } = useGameProperties();
+    const elapsedGameTicksRef = useRef(0);
 
     useEffect(() => {
         const speed = variables.timerSpeed;
-        const intervalMs = speed === "pause" ? null : speed === "fastforward" ? 500 : 1000;
-        if (intervalMs === null) return undefined;
+        const ticksPerSecond = Math.max(TPS, 1);
+        if (speed === "pause") {
+            return undefined;
+        }
 
-        const tickAmount = speed === "fastforward" ? 2 : 1;
+        const tickStep = speed === "fastforward" ? 2 : 1;
+        const intervalMs = 1000 / (ticksPerSecond * tickStep);
+        
+
         const id = window.setInterval(() => {
-            elapsedSecondsRef.current += tickAmount;
-            setVariables((prev) => ({ ...prev, timer: formatTime(elapsedSecondsRef.current) }));
+            elapsedGameTicksRef.current += 1;
+            setVariables((prev) => ({ ...prev, timer: elapsedGameTicksRef.current }));
         }, intervalMs);
 
+        console.log("Started game timer with interval:", intervalMs, "ms");
+
         return () => window.clearInterval(id);
-    }, [variables.timerSpeed]);
+    }, [variables.timerSpeed, TPS, setVariables]);
 
     return (
         <GameVariablesContext.Provider value={{ variables, setVariables }}>

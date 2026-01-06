@@ -9,7 +9,7 @@ export type GameVariablesValue = {
     energyMax: number;
     industry: number;
     happiness: number;
-    timer: string;
+    timer: number;
     timerSpeed: TimerSpeedType;
     isSound: boolean;
 };
@@ -23,7 +23,7 @@ export const defaultGameVariables: GameVariablesValue = {
     energyMax: 0,
     industry: 0,
     happiness: 0,
-    timer: "00:00",
+    timer: 0,
     timerSpeed: "play",
     isSound: true,
 };

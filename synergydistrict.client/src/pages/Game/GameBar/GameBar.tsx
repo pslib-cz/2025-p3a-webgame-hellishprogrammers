@@ -4,6 +4,7 @@ import { useGameData } from "../../../hooks/providers/useGameData";
 import useGameVariables from "../../../hooks/providers/useGameVariables";
 import styles from "./GameBar.module.css";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
+import useGameProperties from "../../../hooks/providers/useGameProperties";
 
 type GameBarProps = {
     setBuilding: (x: number | null) => void;
@@ -12,7 +13,18 @@ type GameBarProps = {
 const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
     const { variables, setVariables } = useGameVariables();
     const { buildings, loading, error } = useGameData();
+    const { TPS } = useGameProperties();
     const [activeBuilding, setActiveBuilding] = useState<number | null>(null);
+
+    const formatTime = (totalSeconds: number) => {
+    const minutes = Math.floor(totalSeconds / 60)
+        .toString()
+        .padStart(2, "0");
+    const seconds = Math.floor(totalSeconds % 60)
+        .toString()
+        .padStart(2, "0");
+    return `${minutes}:${seconds}`;
+};
 
     return (
         <div className={styles.gameBar}>
@@ -42,7 +54,7 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
                     />
                 </div>
                 <div className={`${styles.timer} border--narrow`}>
-                    <h3>{variables.timer}</h3>
+                    <h3>{formatTime(variables.timer / TPS)}</h3>
                 </div>
             </div>
             <div className={styles.row}>

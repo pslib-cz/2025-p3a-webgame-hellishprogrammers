@@ -45,16 +45,16 @@ const Game = () => {
 
     return (
         <GameDataProvider>
-            <GameVariablesProvider>
-                <div className={styles.game}>
-                    <GamePropertiesProvider>
+            <GamePropertiesProvider>
+                <GameVariablesProvider>
+                    <div className={styles.game}>
                         <BuildingsBitmapProvider>
-                            <GameCanvas selectedBuilding={selectedBuilding} disableDynamicLoading={true} />
+                        <GameCanvas selectedBuilding={selectedBuilding} disableDynamicLoading={true} />
                         </BuildingsBitmapProvider>
-                    </GamePropertiesProvider>
-                    <GameBar setBuilding={(x) => setSelectedBuilding(x)} />
-                </div>
-            </GameVariablesProvider>
+                        <GameBar setBuilding={(x) => setSelectedBuilding(x)} />
+                    </div>
+                </GameVariablesProvider>
+            </GamePropertiesProvider>
         </GameDataProvider>
     );
 };
