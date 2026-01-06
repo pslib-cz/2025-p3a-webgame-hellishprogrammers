@@ -5,6 +5,7 @@ import { GamePropertiesProvider } from "../provider/GamePropertiesProvider";
 import { GameVariablesProvider } from "../provider/GameVariablesProvider";
 import GameBar from "./Game/GameBar/GameBar";
 import { GameDataProvider } from "../provider/GameDataProvider";
+import { BuildingsBitmapProvider } from "../provider/BuildingsBitmapProvider";
 
 const Game = () => {
     const [selectedBuilding, setSelectedBuilding] = useState<number | null>(null);
@@ -47,7 +48,9 @@ const Game = () => {
             <GamePropertiesProvider>
                 <GameVariablesProvider>
                     <div className={styles.game}>
+                        <BuildingsBitmapProvider>
                         <GameCanvas selectedBuilding={selectedBuilding} disableDynamicLoading={true} />
+                        </BuildingsBitmapProvider>
                         <GameBar setBuilding={(x) => setSelectedBuilding(x)} />
                     </div>
                 </GameVariablesProvider>
