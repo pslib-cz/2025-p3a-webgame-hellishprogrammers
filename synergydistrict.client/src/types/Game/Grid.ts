@@ -1,12 +1,12 @@
 import type { TileType } from "..";
-import type { BuildingType } from "./Buildings";
+import type { BuildingType, Production } from "./Buildings";
 
 export type EdgeSide = "top" | "bottom" | "left" | "right";
 
 export type Edge = {
-    // buildingId: number;
     position: Position;
     side: EdgeSide;
+    synergy: ActiveSynergies | null;
 };
 
 export type Position = {
@@ -28,10 +28,16 @@ export type MapTile = {
 };
 
 export type MapBuilding = {
+    MapBuildingId: string;
     building: BuildingType;
     position: Position;
-    edges: Edge[];
     isSelected: boolean;
-    rotation: number; // 0, 1, 2, 3 for 0°, 90°, 180°, 270°
-    buildingInstanceId: string;
+    rotation: number;
+    edges: Edge[];
+};
+
+export type ActiveSynergies = {
+    activeSynergyId: number;
+    targetBuildingId: number;
+    synergyProduction: Production[];
 };
