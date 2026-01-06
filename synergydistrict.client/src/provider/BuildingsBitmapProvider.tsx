@@ -2,6 +2,7 @@ import { createContext, type FC, type PropsWithChildren, useEffect, useState } f
 import { useGameData } from "../hooks/providers/useGameData";
 import useGameProperties from "../hooks/providers/useGameProperties";
 import type { BuildingTileType } from "../types";
+import useFont from "../hooks/useFont";
 
 type BuildingBitmapType = {
     buildingId: number;
@@ -38,8 +39,12 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
     const { buildings } = useGameData();
     const { TILE_SIZE } = useGameProperties();
 
+    const isFontLoaded = useFont("16px icons");
+
     // Generating bitmap for each building (Once)
     useEffect(() => {
+        if (!buildings || buildings.length === 0 || !isFontLoaded) return;
+
         const newBitmaps: BuildingBitmapType[] = [];
 
         buildings.forEach((building) => {
@@ -50,6 +55,7 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
             // Constants
             const iconOffset = TILE_SIZE / 2;
             const strokeWidth = 1;
+            const borderOffset = strokeWidth / 2;
 
             const canvas: OffscreenCanvas = new OffscreenCanvas(width, height);
 
@@ -99,23 +105,23 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
 
                     // UP
                     if (y === 0 || building.shape[y - 1][x] === "Empty") {
-                        context.moveTo(relX, relY);
-                        context.lineTo(relX + TILE_SIZE, relY);
+                        context.moveTo(relX + borderOffset, relY + borderOffset);
+                        context.lineTo(relX + TILE_SIZE - borderOffset, relY + borderOffset);
                     }
                     // RIGHT
                     if (x === building.shape[y].length - 1 || building.shape[y][x + 1] === "Empty") {
-                        context.moveTo(relX + TILE_SIZE, relY);
-                        context.lineTo(relX + TILE_SIZE, relY + TILE_SIZE);
+                        context.moveTo(relX + TILE_SIZE - borderOffset, relY + borderOffset);
+                        context.lineTo(relX + TILE_SIZE - borderOffset, relY + TILE_SIZE - borderOffset);
                     }
                     // DOWN
                     if (y === building.shape.length - 1 || building.shape[y + 1][x] === "Empty") {
-                        context.moveTo(relX + TILE_SIZE, relY + TILE_SIZE);
-                        context.lineTo(relX, relY + TILE_SIZE);
+                        context.moveTo(relX + TILE_SIZE - borderOffset, relY + TILE_SIZE - borderOffset);
+                        context.lineTo(relX + borderOffset, relY + TILE_SIZE - borderOffset);
                     }
                     // LEFT
                     if (x === 0 || building.shape[y][x - 1] === "Empty") {
-                        context.moveTo(relX, relY + TILE_SIZE);
-                        context.lineTo(relX, relY);
+                        context.moveTo(relX + borderOffset, relY + TILE_SIZE - borderOffset);
+                        context.lineTo(relX + borderOffset, relY + borderOffset);
                     }
 
                     context.stroke();
@@ -141,7 +147,7 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
         });
 
         setBuildingsBitmap(newBitmaps);
-    }, [buildings, TILE_SIZE]);
+    }, [buildings, TILE_SIZE, isFontLoaded]);
 
     return <BuildingsBitmapContext.Provider value={{ buildingsBitmap }}>{children}</BuildingsBitmapContext.Provider>;
 };
