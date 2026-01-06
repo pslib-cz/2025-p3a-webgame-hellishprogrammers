@@ -9,6 +9,9 @@ import { prepareGrid } from "../HTMLCanvas/GridShape";
 import useFont from "../../../hooks/useFont";
 import useStageTransform from "../../../hooks/useStateTransform";
 import useChunkLoader from "../../../hooks/useChunkLoader";
+import type { MapBuilding } from "../../../types/Game/Grid";
+import BuildingsLayer from "./Buildings/BuildingsLayer";
+import { useGameData } from "../../../hooks/providers/useGameData";
 
 type GameCanvasProps = {
     selectedBuilding: number | null;
@@ -16,9 +19,11 @@ type GameCanvasProps = {
 };
 
 const GameCanvas: FC<GameCanvasProps> = ({ selectedBuilding, disableDynamicLoading = false }) => {
-
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+    const { buildings } = useGameData();
+    const [placedBuildings, setPlacedBuildings] = useState<MapBuilding[]>([]);
 
     const stageRef = useRef<Konva.Stage | null>(null);
     const chunkBitmapRef = useRef<Record<string, PreparedChunkCanvas>>({});
@@ -43,6 +48,24 @@ const GameCanvas: FC<GameCanvasProps> = ({ selectedBuilding, disableDynamicLoadi
     });
     const [chunkBitmaps, setChunkBitmaps] = useState<Record<string, PreparedChunkCanvas>>({});
 
+    const handleOnClick = () => {
+        if (!selectedBuilding) {
+            setPlacedBuildings([]);
+            return;
+        }
+
+        setPlacedBuildings([
+            {
+                MapBuildingId: "gg",
+                building: buildings[selectedBuilding - 1],
+                position: { x: 0, y: 0 },
+                isSelected: false,
+                rotation: 0,
+                edges: [],
+            },
+        ]);
+    };
+
     useEffect(() => {
         if (!containerRef.current) return;
 
@@ -60,7 +83,11 @@ const GameCanvas: FC<GameCanvasProps> = ({ selectedBuilding, disableDynamicLoadi
 
     const fontsLoaded = useFont('16px "icons"');
 
-    const { loadedChunks, loading: chunksLoading, error: chunkError } = useChunkLoader({
+    const {
+        loadedChunks,
+        loading: chunksLoading,
+        error: chunkError,
+    } = useChunkLoader({
         seed: MAP_SEED,
         chunkSize: CHUNK_SIZE,
         renderDistanceChunks: RENDER_DISTANCE_CHUNKS,
@@ -146,6 +173,7 @@ const GameCanvas: FC<GameCanvasProps> = ({ selectedBuilding, disableDynamicLoadi
                 x={stagePosition.x}
                 y={stagePosition.y}
                 onDragEnd={handleDragEnd}
+                onClick={handleOnClick}
             >
                 <MapLayer
                     chunks={loadedChunks}
@@ -156,6 +184,7 @@ const GameCanvas: FC<GameCanvasProps> = ({ selectedBuilding, disableDynamicLoadi
                     height={dimensions.height}
                     chunkBitmaps={chunkBitmaps}
                 />
+                <BuildingsLayer buildings={placedBuildings} />
                 {/* <GridLayer
                             origin={}
                             chunkWidth={}

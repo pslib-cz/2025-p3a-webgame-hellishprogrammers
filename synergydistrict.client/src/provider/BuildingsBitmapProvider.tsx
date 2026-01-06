@@ -3,8 +3,15 @@ import { useGameData } from "../hooks/providers/useGameData";
 import useGameProperties from "../hooks/providers/useGameProperties";
 import type { BuildingTileType } from "../types";
 
+type BuildingBitmapType = {
+    buildingId: number;
+    image: ImageBitmap;
+    width: number;
+    height: number;
+};
+
 type BuildingsBitmapContextValue = {
-    images: ImageBitmap[];
+    buildingsBitmap: BuildingBitmapType[];
 };
 
 const BACKGROUND_COLOR_MAP: Record<string, string> = {
@@ -27,12 +34,14 @@ const ICON_COLOR = "#FEFAE0";
 export const BuildingsBitmapContext = createContext<BuildingsBitmapContextValue | null>(null);
 
 export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => {
-    const [images, setImages] = useState<ImageBitmap[]>([]);
+    const [buildingsBitmap, setBuildingsBitmap] = useState<BuildingBitmapType[]>([]);
     const { buildings } = useGameData();
     const { TILE_SIZE } = useGameProperties();
 
     // Generating bitmap for each building (Once)
     useEffect(() => {
+        const newBitmaps: BuildingBitmapType[] = [];
+
         buildings.forEach((building) => {
             // Dimensions of building
             const width = building.shape[0].length * TILE_SIZE;
@@ -62,11 +71,9 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
                     const relX = x * TILE_SIZE;
                     const relY = y * TILE_SIZE;
 
-
                     // Draw tile
                     context.fillStyle = BACKGROUND_COLOR_MAP[building.type.toLowerCase()];
                     context.fillRect(relX, relY, TILE_SIZE, TILE_SIZE);
-
 
                     // Draw tile border
                     context.strokeStyle = OUTLINE_COLOR_MAP["tile"];
@@ -83,7 +90,6 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
 
                     // Draws the path
                     context.stroke();
-
 
                     // Drawing building border
                     context.strokeStyle = OUTLINE_COLOR_MAP["building"];
@@ -114,7 +120,6 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
 
                     context.stroke();
 
-                    
                     // Draw icon
                     if (tile === "Icon") {
                         context.fillStyle = ICON_COLOR;
@@ -127,11 +132,16 @@ export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => 
             }
 
             // Converting canvas to bitmap
-            setImages(x => [...x, canvas.transferToImageBitmap()]);
+            newBitmaps.push({
+                buildingId: building.buildingId,
+                image: canvas.transferToImageBitmap(),
+                width: width,
+                height: height,
+            });
         });
-    }, []);
 
-    return (
-        <BuildingsBitmapContext.Provider value={{ images }}>{children}</BuildingsBitmapContext.Provider>
-    );
+        setBuildingsBitmap(newBitmaps);
+    }, [buildings, TILE_SIZE]);
+
+    return <BuildingsBitmapContext.Provider value={{ buildingsBitmap }}>{children}</BuildingsBitmapContext.Provider>;
 };
