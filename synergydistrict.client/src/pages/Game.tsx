@@ -1,63 +1,84 @@
 import { useState } from "react";
 import styles from "../styles/Game.module.css";
 import GameCanvas from "../components/Game/KonvaNew/GameCanvas";
-import { GamePropertiesProvider } from "../provider/GamePropertiesProvider";
-import { GameVariablesProvider } from "../provider/GameVariablesProvider";
 import GameBar from "./Game/GameBar/GameBar";
-import { GameDataProvider } from "../provider/GameDataProvider";
 import { BuildingsBitmapProvider } from "../provider/BuildingsBitmapProvider";
 import { useGameOptions } from "../hooks/providers/useGameOptions";
+import type { MapBuilding, Position } from "../types/Game/Grid";
+import { useGameData } from "../hooks/providers/useGameData";
+import { CanPlaceBuilding, createEgdesForShape } from "../utils/PlacingUtils";
+import useGameVariables from "../hooks/providers/useGameVariables";
 
 const Game = () => {
     const [selectedBuilding, setSelectedBuilding] = useState<number | null>(null);
+    const [buildingPreview, setBuildingPreview] = useState<MapBuilding | null>(null);
     const { options } = useGameOptions();
+    const { buildings } = useGameData();
+    const { variables, setVariables } = useGameVariables();
 
-    // const makeEdge = (shape: BuildingTileType[][], position: Position, side: EdgeSide): Edge | null => {
-    //     //console.log(`Origin position x:${position.x} y:${position.y}`)
-    //     const target: Position = {x: position.x, y:position.y}
+    const OnMapClick = (position: Position) => {
 
-    //     switch (side) {
-    //         case "top":
-    //             target.y += -1;
-    //             break;
-    //         case "bottom":
-    //             target.y += 1;
-    //             break;
-    //         case "left":
-    //             target.x += -1;
-    //             break;
-    //         case "right":
-    //             target.x += 1;
-    //             break;
-    //     }
+        if (selectedBuilding === null) return;
 
-    //     if (target.x < 0 || target.x >= shape.length || target.y < 0 || target.y >= shape[target.x].length || shape[target.x][target.y] == "Empty") {
-    //         console.log(`Edge found: ${side} at position x:${position.x} y:${position.y}`)
-    //         console.log(`Target war: at position x:${target.x} y:${target.y}`)
-    //         return {
-    //             position: position,
-    //             side: side,
-    //             synergy: null
-    //         }
-    //     }
+        if (CanPlaceBuilding(buildingPreview!.shape, position, variables.placedBuildingsMappped, variables.loadedMapTiles)) {
+            console.log("Placing building at:", position);
+            const newBuilding: MapBuilding = {
+                building: buildings[selectedBuilding - 1],
+                MapBuildingId: crypto.randomUUID(),
+                position: position,
+                edges: buildingPreview!.edges,
+                rotation: buildingPreview!.rotation,
+                shape: buildingPreview!.shape,
+                isSelected: false,
+            };
 
-    //     console.log(null)
-    //     return null;
-    // }
+            setVariables({
+                ...variables,
+                placedBuildings: [...variables.placedBuildings, newBuilding],
+                placedBuildingsMappped: { ...variables.placedBuildingsMappped, 
+                    ...Object.fromEntries(newBuilding.shape.map((row, y) => 
+                        row.map((tile, x) => 
+                            tile !== "Empty" ? [`${newBuilding.position.x + x};${newBuilding.position.y + y}`, newBuilding] : null
+                        ).filter((entry): entry is [string, MapBuilding] => entry !== null)
+                    ).flat())
+                 },
+            });
+        }
+    }
+
+    const OnPlaceSelect = (buildingId: number | null) => {
+        setSelectedBuilding(buildingId);
+
+        if (buildingId === null) {
+            setBuildingPreview(null);
+            return;
+        }
+
+        const shape = buildings[buildingId - 1].shape;
+        const edges = createEgdesForShape(shape);
+
+        const prewiewBuilding: MapBuilding = {
+            building: buildings[buildingId - 1],
+            MapBuildingId: "preview",
+            position: { x: 0, y: 0 },
+            edges: edges,
+            rotation: 0,
+            shape: shape,
+            isSelected: false,
+        }
+
+        setBuildingPreview(prewiewBuilding);
+    }
+
+
 
     return (
-        <GameDataProvider>
-            <GamePropertiesProvider>
-                <GameVariablesProvider>
-                    <div className={styles.game}>
-                        <BuildingsBitmapProvider>
-                        <GameCanvas selectedBuilding={selectedBuilding} disableDynamicLoading={!options.infiniteMap} />
-                        </BuildingsBitmapProvider>
-                        <GameBar setBuilding={(x) => setSelectedBuilding(x)} />
-                    </div>
-                </GameVariablesProvider>
-            </GamePropertiesProvider>
-        </GameDataProvider>
+        <div className={styles.game}>
+            <BuildingsBitmapProvider>
+                <GameCanvas selectedBuilding={selectedBuilding} disableDynamicLoading={!options.infiniteMap} onMapClick={OnMapClick} />
+            </BuildingsBitmapProvider>
+            <GameBar setBuilding={OnPlaceSelect} />
+        </div>
     );
 };
 

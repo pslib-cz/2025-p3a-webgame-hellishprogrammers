@@ -1,4 +1,4 @@
-import type { TileType } from "..";
+import type { BuildingTileType, TileType } from "..";
 import type { BuildingType, Production } from "./Buildings";
 
 export type EdgeSide = "top" | "bottom" | "left" | "right";
@@ -34,6 +34,7 @@ export type MapBuilding = {
     isSelected: boolean;
     rotation: number;
     edges: Edge[];
+    shape: BuildingTileType[][];
 };
 
 export type ActiveSynergies = {

@@ -1,4 +1,5 @@
 import type { TimerSpeedType } from "..";
+import type { MapBuilding, MapTile } from "./Grid";
 
 export type GameVariablesValue = {
     moneyCurrent: number;
@@ -12,6 +13,10 @@ export type GameVariablesValue = {
     timer: number;
     timerSpeed: TimerSpeedType;
     isSound: boolean;
+    loadedChunks: Record<string, MapTile[]>;
+    loadedMapTiles: Record<string, MapTile>;
+    placedBuildings: MapBuilding[];
+    placedBuildingsMappped: Record<string, MapBuilding>;
 };
 
 export const defaultGameVariables: GameVariablesValue = {
@@ -26,4 +31,8 @@ export const defaultGameVariables: GameVariablesValue = {
     timer: 0,
     timerSpeed: "play",
     isSound: true,
+    loadedChunks: {},
+    loadedMapTiles: {},
+    placedBuildings: [],
+    placedBuildingsMappped: {},
 };

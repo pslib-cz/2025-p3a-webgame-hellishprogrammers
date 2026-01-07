@@ -8,8 +8,6 @@ import styles from "/src/styles/Menu.module.css";
 const PlayMenu = () => {
     const { options, setOptions } = useGameOptions();
 
-    const audio = new Audio("/audio/gameOver.mp3");
-
     return (
         <>
             <div className={styles.menuContent}>
@@ -40,7 +38,7 @@ const PlayMenu = () => {
                 />
             </div>
             <div className={`h2 ${styles.right}`}>
-                <TextButton text="start" linkTo="/game" onClick={() => audio.play()} />
+                <TextButton text="start" linkTo="/game"/>
             </div>
         </>
     );
