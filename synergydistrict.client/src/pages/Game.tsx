@@ -21,7 +21,6 @@ const Game = () => {
         if (selectedBuilding === null) return;
 
         if (CanPlaceBuilding(buildingPreview!.shape, position, variables.placedBuildingsMappped, variables.loadedMapTiles)) {
-            console.log("Placing building at:", position);
             const newBuilding: MapBuilding = {
                 building: buildings[selectedBuilding - 1],
                 MapBuildingId: crypto.randomUUID(),

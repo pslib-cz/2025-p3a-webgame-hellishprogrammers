@@ -3,17 +3,14 @@ import type { BuildingType } from "../types/Game/Buildings";
 import type { Edge, MapBuilding, MapTile } from "../types/Game/Grid";
 
 export const CanPlaceBuilding = (shape: BuildingTileType[][], position: { x: number; y: number }, placedBuildingsMappped: Record<string, MapBuilding>, loadedMapTiles: Record<string, MapTile>): boolean => {
-    console.log(shape)
     for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
             if (shape[y][x] != "Empty") {
                 const tileX = position.x + x;
                 const tileY = position.y + y;
                 const key = `${tileX};${tileY}`;
-                console.log("Checking tile:", key);
                 if (placedBuildingsMappped[key]) {
                     const building = placedBuildingsMappped[key];
-                    console.log(building.shape[y][x]);
                     if (building.building.shape[y][x] != "Empty") {
                         return false; // Kolize s další budovou (velký špatný)
                     }
