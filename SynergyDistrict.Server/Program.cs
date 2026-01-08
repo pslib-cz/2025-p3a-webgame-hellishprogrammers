@@ -20,6 +20,22 @@ builder.Services.AddOpenApiDocument();
 
 var app = builder.Build();
 
+// Seeding the database with data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AppDBContext>();
+        DbInitializer.Initialize(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred creating the DB.");
+    }
+}
+
 app.UseDefaultFiles();
 app.MapStaticAssets();
 

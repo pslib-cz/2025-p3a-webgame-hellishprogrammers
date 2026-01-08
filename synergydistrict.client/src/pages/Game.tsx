@@ -5,24 +5,29 @@ import GameBar from "./Game/GameBar/GameBar";
 import { BuildingsBitmapProvider } from "../provider/BuildingsBitmapProvider";
 import { useGameOptions } from "../hooks/providers/useGameOptions";
 import type { MapBuilding, Position } from "../types/Game/Grid";
-import { useGameData } from "../hooks/providers/useGameData";
 import { CanPlaceBuilding, createEgdesForShape } from "../utils/PlacingUtils";
 import useGameVariables from "../hooks/providers/useGameVariables";
+import type { BuildingType } from "../types/Game/Buildings";
 
 const Game = () => {
-    const [selectedBuilding, setSelectedBuilding] = useState<number | null>(null);
+    const [selectedBuilding, setSelectedBuilding] = useState<BuildingType | null>(null);
     const [buildingPreview, setBuildingPreview] = useState<MapBuilding | null>(null);
     const { options } = useGameOptions();
-    const { buildings } = useGameData();
     const { variables, setVariables } = useGameVariables();
 
     const OnMapClick = (position: Position) => {
-
         if (selectedBuilding === null) return;
 
-        if (CanPlaceBuilding(buildingPreview!.shape, position, variables.placedBuildingsMappped, variables.loadedMapTiles)) {
+        if (
+            CanPlaceBuilding(
+                buildingPreview!.shape,
+                position,
+                variables.placedBuildingsMappped,
+                variables.loadedMapTiles
+            )
+        ) {
             const newBuilding: MapBuilding = {
-                building: buildings[selectedBuilding - 1],
+                building: selectedBuilding,
                 MapBuildingId: crypto.randomUUID(),
                 position: position,
                 edges: buildingPreview!.edges,
@@ -34,47 +39,57 @@ const Game = () => {
             setVariables({
                 ...variables,
                 placedBuildings: [...variables.placedBuildings, newBuilding],
-                placedBuildingsMappped: { ...variables.placedBuildingsMappped, 
-                    ...Object.fromEntries(newBuilding.shape.map((row, y) => 
-                        row.map((tile, x) => 
-                            tile !== "Empty" ? [`${newBuilding.position.x + x};${newBuilding.position.y + y}`, newBuilding] : null
-                        ).filter((entry): entry is [string, MapBuilding] => entry !== null)
-                    ).flat())
-                 },
+                placedBuildingsMappped: {
+                    ...variables.placedBuildingsMappped,
+                    ...Object.fromEntries(
+                        newBuilding.shape
+                            .map((row, y) =>
+                                row
+                                    .map((tile, x) =>
+                                        tile !== "Empty"
+                                            ? [
+                                                  `${newBuilding.position.x + x};${newBuilding.position.y + y}`,
+                                                  newBuilding,
+                                              ]
+                                            : null
+                                    )
+                                    .filter((entry): entry is [string, MapBuilding] => entry !== null)
+                            )
+                            .flat()
+                    ),
+                },
             });
         }
-    }
+    };
 
-    const OnPlaceSelect = (buildingId: number | null) => {
-        setSelectedBuilding(buildingId);
+    const OnPlaceSelect = (building: BuildingType | null) => {
+        setSelectedBuilding(building);
 
-        if (buildingId === null) {
+        if (building === null) {
             setBuildingPreview(null);
             return;
         }
 
-        const shape = buildings[buildingId - 1].shape;
+        const shape = building.shape;
         const edges = createEgdesForShape(shape);
 
         const prewiewBuilding: MapBuilding = {
-            building: buildings[buildingId - 1],
+            building: building,
             MapBuildingId: "preview",
             position: { x: 0, y: 0 },
             edges: edges,
             rotation: 0,
             shape: shape,
             isSelected: false,
-        }
+        };
 
         setBuildingPreview(prewiewBuilding);
-    }
-
-
+    };
 
     return (
         <div className={styles.game}>
             <BuildingsBitmapProvider>
-                <GameCanvas selectedBuilding={selectedBuilding} disableDynamicLoading={!options.infiniteMap} onMapClick={OnMapClick} />
+                <GameCanvas disableDynamicLoading={!options.infiniteMap} onMapClick={OnMapClick} />
             </BuildingsBitmapProvider>
             <GameBar setBuilding={OnPlaceSelect} />
         </div>

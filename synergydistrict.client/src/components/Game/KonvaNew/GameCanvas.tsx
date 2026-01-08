@@ -14,12 +14,11 @@ import BuildingsLayer from "./Buildings/BuildingsLayer";
 import useGameVariables from "../../../hooks/providers/useGameVariables";
 
 type GameCanvasProps = {
-    selectedBuilding: number | null;
     disableDynamicLoading?: boolean;
     onMapClick: (position: Position) => void;
 };
 
-const GameCanvas: FC<GameCanvasProps> = ({ selectedBuilding, disableDynamicLoading = false , onMapClick}) => {
+const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false , onMapClick}) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const stageRef = useRef<Konva.Stage | null>(null);

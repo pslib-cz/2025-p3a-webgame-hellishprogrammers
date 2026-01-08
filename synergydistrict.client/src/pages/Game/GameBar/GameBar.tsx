@@ -5,16 +5,17 @@ import useGameVariables from "../../../hooks/providers/useGameVariables";
 import styles from "./GameBar.module.css";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
+import type { BuildingType } from "../../../types/Game/Buildings";
 
 type GameBarProps = {
-    setBuilding: (x: number | null) => void;
+    setBuilding: (x: BuildingType | null) => void;
 };
 
 const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
     const { variables, setVariables } = useGameVariables();
-    const { buildings, loading, error } = useGameData();
+    const { buildings, loading } = useGameData();
     const { TPS } = useGameProperties();
-    const [activeBuilding, setActiveBuilding] = useState<number | null>(null);
+    const [activeBuilding, setActiveBuilding] = useState<BuildingType | null>(null);
 
     const formatTime = (totalSeconds: number) => {
     const minutes = Math.floor(totalSeconds / 60)
@@ -64,14 +65,13 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
                         <div key={building.buildingId} className="border--narrow">
                             <IconButton
                                 OnClick={() => {
-                                    const id =
-                                        activeBuilding === null || building.buildingId !== activeBuilding
-                                            ? building.buildingId
-                                            : null;
-                                    setBuilding(id);
-                                    setActiveBuilding(id);
+                                    const isSelected = activeBuilding?.buildingId === building.buildingId;
+                                    const next = isSelected ? null : building;
+                                    
+                                    setBuilding(next);
+                                    setActiveBuilding(next);
                                 }}
-                                isActive={building.buildingId === activeBuilding}
+                                isActive={activeBuilding?.buildingId === building.buildingId}
                                 iconKey={building.iconKey}
                             />
                         </div>
