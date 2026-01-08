@@ -13,7 +13,7 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
     const { TILE_SIZE } = useGameProperties();
     const { buildingsBitmap } = useBuildingsBitmap();
 
-    const { bitmap: err, loading, error } = useImageBitmap("/images/example.jpg");
+    const { bitmap: err, loading, error } = useImageBitmap("/images/err.jpg");
 
     return (
         <Layer listening={false}>
@@ -28,7 +28,7 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
                         y={building.position.y * TILE_SIZE}
                         width={bitmap.width}
                         height={bitmap.height}
-                        image={bitmap}
+                        image={bitmap!}
                         listening={false}
                         //rotation={building.rotation * 90}
                     />
