@@ -73,8 +73,6 @@ export const rotateShape = (shape: BuildingTileType[][], rotation: number): Buil
     if (shape.length === 0) {
         return [];
     }
-
-    const normalizedRotation = ((rotation % 4) + 4) % 4;
     let currentShape = shape.map((row) => [...row]);
 
     const rotateClockwise = (matrix: BuildingTileType[][]): BuildingTileType[][] => {
@@ -95,9 +93,10 @@ export const rotateShape = (shape: BuildingTileType[][], rotation: number): Buil
         return rotated;
     };
 
-    for (let i = 0; i < normalizedRotation; i++) {
+    for (let i = 0; i < rotation; i++) {
         currentShape = rotateClockwise(currentShape);
     }
+    console.log(currentShape);
 
     return currentShape;
 }

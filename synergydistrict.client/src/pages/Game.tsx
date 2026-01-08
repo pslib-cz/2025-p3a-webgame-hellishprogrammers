@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "../styles/Game.module.css";
-import GameCanvas from "../components/Game/KonvaNew/GameCanvas";
+import GameCanvas from "../components/Game/Rendering/GameCanvas";
 import GameBar from "./Game/GameBar/GameBar";
 import { BuildingsBitmapProvider } from "../provider/BuildingsBitmapProvider";
 import { useGameOptions } from "../hooks/providers/useGameOptions";
@@ -88,7 +88,7 @@ const Game = () => {
     return (
         <div className={styles.game}>
             <BuildingsBitmapProvider>
-                <GameCanvas selectedBuilding={selectedBuilding} disableDynamicLoading={!options.infiniteMap} onMapClick={OnMapClick} />
+                <GameCanvas selectedBuilding={selectedBuilding} disableDynamicLoading={!options.infiniteMap} onMapClick={OnMapClick} onContext={OnRotate}/>
             </BuildingsBitmapProvider>
             <GameBar setBuilding={OnPlaceSelect} />
         </div>

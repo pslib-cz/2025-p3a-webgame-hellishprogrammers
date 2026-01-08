@@ -4,22 +4,23 @@ import { Stage } from "react-konva";
 import type Konva from "konva";
 import styles from "../../../styles/Game.module.css";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
-import { prepareChunk, type PreparedChunkCanvas } from "../HTMLCanvas/ChunkShape";
-import { prepareGrid } from "../HTMLCanvas/GridShape";
+import { prepareChunk, type PreparedChunkCanvas } from "./Shapes/ChunkShape";
+import { prepareGrid } from "./Shapes/GridShape";
 import useFont from "../../../hooks/useFont";
 import useStageTransform from "../../../hooks/useStateTransform";
 import useChunkLoader from "../../../hooks/useChunkLoader";
 import type { MapBuilding, MapTile, Position } from "../../../types/Game/Grid";
-import BuildingsLayer from "./Buildings/BuildingsLayer";
+import BuildingsLayer from "./BuildingsLayer";
 import useGameVariables from "../../../hooks/providers/useGameVariables";
 
 type GameCanvasProps = {
     selectedBuilding: number | null;
     disableDynamicLoading?: boolean;
     onMapClick: (position: Position) => void;
+    onContext: () => void;
 };
 
-const GameCanvas: FC<GameCanvasProps> = ({ selectedBuilding, disableDynamicLoading = false , onMapClick}) => {
+const GameCanvas: FC<GameCanvasProps> = ({ selectedBuilding, disableDynamicLoading = false, onMapClick, onContext }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const stageRef = useRef<Konva.Stage | null>(null);
@@ -63,19 +64,28 @@ const GameCanvas: FC<GameCanvasProps> = ({ selectedBuilding, disableDynamicLoadi
     });
 
     useEffect(() => {
-        setVariables((prev) => ({...prev, loadedChunks, loadedMapTiles: Object.values(loadedChunks).flat().reduce((acc, tile) => {
-            acc[`${tile.position.x};${tile.position.y}`] = tile;
-            return acc;
-        }, {} as Record<string, MapTile>) }) );
+        setVariables((prev) => ({
+            ...prev, loadedChunks, loadedMapTiles: Object.values(loadedChunks).flat().reduce((acc, tile) => {
+                acc[`${tile.position.x};${tile.position.y}`] = tile;
+                return acc;
+            }, {} as Record<string, MapTile>)
+        }));
     }, [loadedChunks]);
     const [chunkBitmaps, setChunkBitmaps] = useState<Record<string, PreparedChunkCanvas>>({});
 
-    const handleOnClick = (e: MouseEvent) => {
+    const handleStageOnClick = (evt: Konva.KonvaEventObject<PointerEvent>) => {
+        if (evt.evt.button != 0) return;
+        const pointer = stageRef.current?.getPointerPosition();
+        if (!pointer) return;
 
-        const tileX = Math.floor((e.offsetX - stagePosition.x) / (TILE_SIZE * stageScale));
-        const tileY = Math.floor((e.offsetY - stagePosition.y) / (TILE_SIZE * stageScale));
-
+        const tileX = Math.floor((pointer.x - stagePosition.x) / (TILE_SIZE * stageScale));
+        const tileY = Math.floor((pointer.y - stagePosition.y) / (TILE_SIZE * stageScale));
         onMapClick({ x: tileX, y: tileY });
+    };
+
+    const handleStageContextMenu = (evt: Konva.KonvaEventObject<PointerEvent>) => {
+        evt.evt.preventDefault();
+        onContext();
     };
 
     useEffect(() => {
@@ -169,7 +179,8 @@ const GameCanvas: FC<GameCanvasProps> = ({ selectedBuilding, disableDynamicLoadi
                 x={stagePosition.x}
                 y={stagePosition.y}
                 onDragEnd={handleDragEnd}
-                onClick={(ek) => handleOnClick(ek.evt)}
+                onClick={handleStageOnClick}
+                onContextMenu={handleStageContextMenu}
             >
                 <MapLayer
                     chunks={loadedChunks}
