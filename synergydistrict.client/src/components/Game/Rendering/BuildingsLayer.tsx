@@ -26,8 +26,8 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
                         key={building.MapBuildingId}
                         x={building.position.x * TILE_SIZE}
                         y={building.position.y * TILE_SIZE}
-                        width={bitmap.width}
-                        height={bitmap.height}
+                        width={building.shape[0].length * TILE_SIZE}
+                        height={building.shape.length * TILE_SIZE}
                         image={bitmap!}
                         listening={false}
                         //rotation={building.rotation * 90}

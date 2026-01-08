@@ -9,9 +9,12 @@ export const CanPlaceBuilding = (shape: BuildingTileType[][], position: { x: num
                 const tileX = position.x + x;
                 const tileY = position.y + y;
                 const key = `${tileX};${tileY}`;
+                console.log("Checking tile:", key);
                 if (placedBuildingsMappped[key]) {
                     const building = placedBuildingsMappped[key];
-                    if (building.building.shape[y][x] != "Empty") {
+                    const otherX = tileX - building.position.x;
+                    const otherY = tileY - building.position.y;
+                    if (building.shape[otherX][otherY] != "Empty") {
                         return false; // Kolize s další budovou (velký špatný)
                     }
                 }
