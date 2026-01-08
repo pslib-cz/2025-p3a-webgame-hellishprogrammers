@@ -158,9 +158,32 @@ namespace SynergyDistrict.Server.Data
                     BaseProduction =
                     [
                         new BuildingProduction { Type = BuildingProductionType.People, Value = -3 },
-                        new BuildingProduction { Type = BuildingProductionType.Money, Value = 3 },
                     ]
-                }
+                },
+                //new Building
+                //{
+                //    Name = "Germany",
+                //    Type = BuildingType.Industrial,
+                //    Description = "Arian paradise",
+                //    IconKey = "townhall",
+                //    Cost = 0,
+                //    Shape =
+                //    [
+                //        [BuildingTileType.Solid, BuildingTileType.Empty, BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Solid],
+                //        [BuildingTileType.Solid, BuildingTileType.Empty, BuildingTileType.Solid, BuildingTileType.Empty, BuildingTileType.Empty],
+                //        [BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Solid],
+                //        [BuildingTileType.Empty, BuildingTileType.Empty, BuildingTileType.Solid, BuildingTileType.Empty, BuildingTileType.Solid],
+                //        [BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Empty, BuildingTileType.Solid],
+                //    ],
+                //    BaseProduction =
+                //    [
+                //        new BuildingProduction { Type = BuildingProductionType.People, Value = 1000 },
+                //        new BuildingProduction { Type = BuildingProductionType.Money, Value = 1000 },
+                //        new BuildingProduction { Type = BuildingProductionType.Happiness, Value = 1000 },
+                //        new BuildingProduction { Type = BuildingProductionType.Industry, Value = 1000 },
+                //        new BuildingProduction { Type = BuildingProductionType.Energy, Value = 1000 },
+                //    ]
+                //}
             };
 
             context.Buildings.AddRange(buildings);
@@ -168,17 +191,8 @@ namespace SynergyDistrict.Server.Data
 
             var buildingMap = buildings.ToDictionary(b => b.Name, b => b);
 
-            var synergies = new BuildingSynergy[]
+            var synergies = new List<BuildingSynergy>
             {
-                new BuildingSynergy
-                {
-                    SourceBuilding = buildingMap["Lumberjack"],
-                    TargetBuilding = buildingMap["Lumberjack"],
-                    SynergyProductions =
-                    [
-                        new BuildingProduction { Type = BuildingProductionType.Industry, Value = 1 }
-                    ]
-                },
                 new BuildingSynergy
                 {
                     SourceBuilding = buildingMap["Lumberjack"],
@@ -188,7 +202,106 @@ namespace SynergyDistrict.Server.Data
                         new BuildingProduction { Type = BuildingProductionType.Happiness, Value = -5 }
                     ]
                 },
+                new BuildingSynergy
+                {
+                    SourceBuilding = buildingMap["Mine"],
+                    TargetBuilding = buildingMap["House"],
+                    SynergyProductions =
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Happiness, Value = -30 }
+                    ]
+                },
+                new BuildingSynergy
+                {
+                    SourceBuilding = buildingMap["Farm"],
+                    TargetBuilding = buildingMap["Farm"],
+                    SynergyProductions =
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Money, Value = 1 }
+                    ]
+                },
+                new BuildingSynergy
+                {
+                    SourceBuilding = buildingMap["Farm"],
+                    TargetBuilding = buildingMap["House"],
+                    SynergyProductions =
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Happiness, Value = 10 }
+                    ]
+                },
+                new BuildingSynergy
+                {
+                    SourceBuilding = buildingMap["Factory"],
+                    TargetBuilding = buildingMap["Lumberjack"],
+                    SynergyProductions =
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Industry, Value = 5 }
+                    ]
+                },
+                new BuildingSynergy
+                {
+                    SourceBuilding = buildingMap["Factory"],
+                    TargetBuilding = buildingMap["Mine"],
+                    SynergyProductions =
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Industry, Value = 5 }
+                    ]
+                },
+                new BuildingSynergy
+                {
+                    SourceBuilding = buildingMap["Factory"],
+                    TargetBuilding = buildingMap["House"],
+                    SynergyProductions =
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Happiness, Value = -5 }
+                    ]
+                },
+                new BuildingSynergy
+                {
+                    SourceBuilding = buildingMap["Factory"],
+                    TargetBuilding = buildingMap["Market"],
+                    SynergyProductions =
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 }
+                    ]
+                },
+                new BuildingSynergy
+                {
+                    SourceBuilding = buildingMap["House"],
+                    TargetBuilding = buildingMap["Market"],
+                    SynergyProductions =
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Money, Value = 3 }
+                    ]
+                },
+                new BuildingSynergy
+                {
+                    SourceBuilding = buildingMap["Market"],
+                    TargetBuilding = buildingMap["House"],
+                    SynergyProductions =
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Happiness, Value = 10 }
+                    ]
+                },
             };
+
+            
+            foreach (var building in buildings)
+            {
+                // Park broadcast
+                if (building.Name != "Park")
+                {
+                    synergies.Add(new BuildingSynergy
+                    {
+                        SourceBuilding = buildingMap["Park"],
+                        TargetBuilding = building,
+                        SynergyProductions =
+                        [
+                            new BuildingProduction { Type = BuildingProductionType.Happiness, Value = 10 }
+                        ]
+                    });
+                }
+            }
 
             context.BuildingSynergies.AddRange(synergies);
             context.SaveChanges();
