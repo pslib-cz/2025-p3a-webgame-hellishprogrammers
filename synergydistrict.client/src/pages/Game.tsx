@@ -6,7 +6,7 @@ import { BuildingsBitmapProvider } from "../provider/BuildingsBitmapProvider";
 import { useGameOptions } from "../hooks/providers/useGameOptions";
 import type { MapBuilding, Position } from "../types/Game/Grid";
 import { useGameData } from "../hooks/providers/useGameData";
-import { CanPlaceBuilding, createEgdesForShape } from "../utils/PlacingUtils";
+import { CanPlaceBuilding, createEgdesForShape, rotateShape } from "../utils/PlacingUtils";
 import useGameVariables from "../hooks/providers/useGameVariables";
 
 const Game = () => {
@@ -69,7 +69,21 @@ const Game = () => {
         setBuildingPreview(prewiewBuilding);
     }
 
+    const OnRotate = () => {
+        if (buildingPreview === null) return;
 
+        const newRotation = (buildingPreview.rotation + 1) % 4;
+        const newShape = rotateShape(buildingPreview.shape, 1);
+        const newEdges = createEgdesForShape(newShape);
+        setBuildingPreview({
+            ...buildingPreview,
+            rotation: newRotation,
+            shape: newShape,
+            edges: newEdges,
+        });
+    }
+
+    
 
     return (
         <div className={styles.game}>

@@ -27,6 +27,7 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
                         height={bitmap.height}
                         image={bitmap.image}
                         listening={false}
+                        rotation={building.rotation * 90}
                     />
                 );
             })}
