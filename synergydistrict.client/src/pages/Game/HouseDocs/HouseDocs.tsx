@@ -1,5 +1,8 @@
 import type { FC } from "react";
 import { useGameData } from "../../../hooks/providers/useGameData";
+import ProductionListing from "../../../components/Game/ProductionListing/ProductionListing";
+import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
+import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 type HouseDocsProps = {
     BuildingId: number
 }
@@ -23,9 +26,8 @@ const HouseDocs: FC<HouseDocsProps> = ({ BuildingId }) => {
                 </header>
                 <main>
                     <p>{houseInfo?.description}</p>
-                    {/* <div><h2>Cost</h2>
-                        <p>{houseInfo?.cost}</p></div>
-                    <p></p> tohle musí být další componenta*/}
+                    <ProductionListing title="Cost"><ValuesBox iconKey="money" text={`${houseInfo?.cost}`}/></ProductionListing>
+                    {houseInfo?.baseProduction.map(x => <ShowInfo  key={`${x.type}${x.value}`} left={<div className="icon">{x.type.toLowerCase()=="energy" ? "electricity" : x.type.toLowerCase()}</div>} right={<>{x.value}</>}/>)}
                 </main>
             </>
         )
