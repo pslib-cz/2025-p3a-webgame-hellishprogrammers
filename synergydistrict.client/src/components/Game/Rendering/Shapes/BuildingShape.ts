@@ -1,5 +1,4 @@
 import type { BuildingCategory, BuildingTileType } from "../../../../types";
-import type { BuildingType } from "../../../../types/Game/Buildings";
 
 const BACKGROUND_COLOR_MAP: Record<string, string> = {
     extractional: "#1982C4",
