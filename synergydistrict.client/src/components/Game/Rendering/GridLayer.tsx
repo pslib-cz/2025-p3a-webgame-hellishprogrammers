@@ -1,6 +1,6 @@
 import { Image, Layer } from "react-konva";
-import useGameProperties from "../../../../hooks/providers/useGameProperties";
-import type { Position } from "../../../../types/Game/Grid";
+import useGameProperties from "../../../hooks/providers/useGameProperties";
+import type { Position } from "../../../types/Game/Grid";
 
 type GridLayerProp = {
     origin: Position;

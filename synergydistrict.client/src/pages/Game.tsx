@@ -1,11 +1,11 @@
 import { useState } from "react";
 import styles from "../styles/Game.module.css";
-import GameCanvas from "../components/Game/KonvaNew/GameCanvas";
+import GameCanvas from "../components/Game/Rendering/GameCanvas";
 import GameBar from "./Game/GameBar/GameBar";
 import { BuildingsBitmapProvider } from "../provider/BuildingsBitmapProvider";
 import { useGameOptions } from "../hooks/providers/useGameOptions";
 import type { MapBuilding, Position } from "../types/Game/Grid";
-import { CanPlaceBuilding, createEgdesForShape } from "../utils/PlacingUtils";
+import { CanPlaceBuilding, createEgdesForShape, rotateShape } from "../utils/PlacingUtils";
 import useGameVariables from "../hooks/providers/useGameVariables";
 import type { BuildingType } from "../types/Game/Buildings";
 
@@ -86,10 +86,24 @@ const Game = () => {
         setBuildingPreview(prewiewBuilding);
     };
 
+    const OnRotate = () => {
+        if (buildingPreview === null) return;
+
+        const newRotation = (buildingPreview.rotation + 1) % 4;
+        const newShape = rotateShape(buildingPreview.shape, 1);
+        const newEdges = createEgdesForShape(newShape);
+        setBuildingPreview({
+            ...buildingPreview,
+            rotation: newRotation,
+            shape: newShape,
+            edges: newEdges,
+        });
+    };
+
     return (
         <div className={styles.game}>
             <BuildingsBitmapProvider>
-                <GameCanvas disableDynamicLoading={!options.infiniteMap} onMapClick={OnMapClick} />
+                <GameCanvas disableDynamicLoading={!options.infiniteMap} onMapClick={OnMapClick} onContext={OnRotate} />
             </BuildingsBitmapProvider>
             <GameBar setBuilding={OnPlaceSelect} />
         </div>

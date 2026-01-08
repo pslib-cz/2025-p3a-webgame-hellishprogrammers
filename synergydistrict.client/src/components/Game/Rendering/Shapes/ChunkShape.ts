@@ -1,4 +1,4 @@
-import type { MapTile, Position } from "../../../types/Game/Grid";
+import type { MapTile, Position } from "../../../../types/Game/Grid";
 
 const BACKGROUND_COLOR_MAP: Record<string, string> = {
     water: "#5d8a9e",

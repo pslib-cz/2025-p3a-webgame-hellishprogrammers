@@ -1,7 +1,7 @@
 import { Image, Layer } from "react-konva";
 import type { MapTile, Position } from "../../../types/Game/Grid";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
-import type { PreparedChunkCanvas } from "../HTMLCanvas/ChunkShape";
+import type { PreparedChunkCanvas } from "./Shapes/ChunkShape";
 
 type MapLayerProps = {
     chunks: Record<string, MapTile[]>;

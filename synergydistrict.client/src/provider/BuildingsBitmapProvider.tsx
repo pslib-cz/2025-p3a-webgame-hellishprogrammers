@@ -1,153 +1,45 @@
 import { createContext, type FC, type PropsWithChildren, useEffect, useState } from "react";
 import { useGameData } from "../hooks/providers/useGameData";
 import useGameProperties from "../hooks/providers/useGameProperties";
-import type { BuildingTileType } from "../types";
 import useFont from "../hooks/useFont";
-
-type BuildingBitmapType = {
-    buildingId: number;
-    image: ImageBitmap;
-    width: number;
-    height: number;
-};
+import { rotateShape } from "../utils/PlacingUtils";
+import { createBuildingBitmap } from "../components/Game/Rendering/Shapes/BuildingShape";
 
 type BuildingsBitmapContextValue = {
-    buildingsBitmap: BuildingBitmapType[];
+    buildingsBitmap: Record<number, ImageBitmap[]>;
 };
 
-const BACKGROUND_COLOR_MAP: Record<string, string> = {
-    extractional: "#1982C4",
-    industrial: "#6A4C93",
-    commercial: "#FF595E",
-    residential: "#FFCA3A",
-    recreational: "#8AC926",
-};
-
-const OUTLINE_COLOR_MAP: Record<string, string> = {
-    tile: "#19191921",
-    building: "#191919",
-    // selected: "#FEFAE0",
-    // highlight: "#FEFAE0",
-};
-
-const ICON_COLOR = "#FEFAE0";
 
 export const BuildingsBitmapContext = createContext<BuildingsBitmapContextValue | null>(null);
 
 export const BuildingsBitmapProvider: FC<PropsWithChildren> = ({ children }) => {
-    const [buildingsBitmap, setBuildingsBitmap] = useState<BuildingBitmapType[]>([]);
+    const [buildingsBitmap, setBuildingsBitmap] = useState<Record<number, ImageBitmap[]>>([]);
     const { buildings } = useGameData();
     const { TILE_SIZE } = useGameProperties();
 
     const isFontLoaded = useFont("16px icons");
 
-    // Generating bitmap for each building (Once)
     useEffect(() => {
         if (!buildings || buildings.length === 0 || !isFontLoaded) return;
 
-        const newBitmaps: BuildingBitmapType[] = [];
+        const newBitmaps: Record<number, ImageBitmap[]> = {};
 
         buildings.forEach((building) => {
-            // Dimensions of building
-            const width = building.shape[0].length * TILE_SIZE;
-            const height = building.shape.length * TILE_SIZE;
-
-            // Constants
-            const iconOffset = TILE_SIZE / 2;
-            const strokeWidth = 1;
-            const borderOffset = strokeWidth / 2;
-
-            const canvas: OffscreenCanvas = new OffscreenCanvas(width, height);
-
-            const context = canvas.getContext("2d");
-            if (!context) {
-                return;
-            }
-
-            // The ends of lines are squared off
-            context.lineCap = "square";
-
-            // Drawing tiles
-            for (let y = 0; y < building.shape.length; y++) {
-                for (let x = 0; x < building.shape[y].length; x++) {
-                    const tile: BuildingTileType = building.shape[y][x];
-                    if (tile === "Empty") continue;
-
-                    // Relative position of tile in building
-                    const relX = x * TILE_SIZE;
-                    const relY = y * TILE_SIZE;
-
-                    // Draw tile
-                    context.fillStyle = BACKGROUND_COLOR_MAP[building.type.toLowerCase()];
-                    context.fillRect(relX, relY, TILE_SIZE, TILE_SIZE);
-
-                    // Draw tile border
-                    context.strokeStyle = OUTLINE_COLOR_MAP["tile"];
-                    context.lineWidth = strokeWidth;
-
-                    // Begins the path
-                    context.beginPath();
-
-                    context.moveTo(relX, relY);
-                    context.lineTo(relX + TILE_SIZE, relY); // UP
-                    context.lineTo(relX + TILE_SIZE, relY + TILE_SIZE); // RIGHT
-                    context.lineTo(relX, relY + TILE_SIZE); // DOWN
-                    context.lineTo(relX, relY); // LEFT
-
-                    // Draws the path
-                    context.stroke();
-
-                    // Drawing building border
-                    context.strokeStyle = OUTLINE_COLOR_MAP["building"];
-                    context.lineWidth = strokeWidth;
-
-                    context.beginPath();
-
-                    // UP
-                    if (y === 0 || building.shape[y - 1][x] === "Empty") {
-                        context.moveTo(relX + borderOffset, relY + borderOffset);
-                        context.lineTo(relX + TILE_SIZE - borderOffset, relY + borderOffset);
-                    }
-                    // RIGHT
-                    if (x === building.shape[y].length - 1 || building.shape[y][x + 1] === "Empty") {
-                        context.moveTo(relX + TILE_SIZE - borderOffset, relY + borderOffset);
-                        context.lineTo(relX + TILE_SIZE - borderOffset, relY + TILE_SIZE - borderOffset);
-                    }
-                    // DOWN
-                    if (y === building.shape.length - 1 || building.shape[y + 1][x] === "Empty") {
-                        context.moveTo(relX + TILE_SIZE - borderOffset, relY + TILE_SIZE - borderOffset);
-                        context.lineTo(relX + borderOffset, relY + TILE_SIZE - borderOffset);
-                    }
-                    // LEFT
-                    if (x === 0 || building.shape[y][x - 1] === "Empty") {
-                        context.moveTo(relX + borderOffset, relY + TILE_SIZE - borderOffset);
-                        context.lineTo(relX + borderOffset, relY + borderOffset);
-                    }
-
-                    context.stroke();
-
-                    // Draw icon
-                    if (tile === "Icon") {
-                        context.fillStyle = ICON_COLOR;
-                        context.textAlign = "center";
-                        context.textBaseline = "middle";
-                        context.font = `${(40 / 64) * TILE_SIZE}px icons`;
-                        context.fillText(building.iconKey.toLowerCase(), relX + iconOffset, relY + iconOffset);
-                    }
+            newBitmaps[building.buildingId] = [];
+            for (let rotation = 0; rotation < 4; rotation++) {
+                const shape = rotateShape(building.shape, rotation);
+                const canvas: OffscreenCanvas = new OffscreenCanvas(shape[0].length * TILE_SIZE, shape.length * TILE_SIZE);
+                const context = canvas.getContext("2d");
+                if (!context) {
+                    return;
                 }
+                const bitmap = createBuildingBitmap(shape, building.type, building.iconKey, TILE_SIZE);
+                newBitmaps[building.buildingId][rotation] = bitmap!;
             }
-
-            // Converting canvas to bitmap
-            newBitmaps.push({
-                buildingId: building.buildingId,
-                image: canvas.transferToImageBitmap(),
-                width: width,
-                height: height,
-            });
-        });
-
+        })
         setBuildingsBitmap(newBitmaps);
+
     }, [buildings, TILE_SIZE, isFontLoaded]);
 
-    return <BuildingsBitmapContext.Provider value={{ buildingsBitmap }}>{children}</BuildingsBitmapContext.Provider>;
+return <BuildingsBitmapContext.Provider value={{ buildingsBitmap }}>{children}</BuildingsBitmapContext.Provider>;
 };

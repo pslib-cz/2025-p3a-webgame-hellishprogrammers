@@ -1,8 +1,9 @@
-import type { FC } from "react";
-import type { MapBuilding } from "../../../../types/Game/Grid";
+import { use, type FC } from "react";
+import type { MapBuilding } from "../../../types/Game/Grid";
 import { Layer, Image } from "react-konva";
-import useGameProperties from "../../../../hooks/providers/useGameProperties";
-import { useBuildingsBitmap } from "../../../../hooks/providers/useBuildingsBitmap";
+import useGameProperties from "../../../hooks/providers/useGameProperties";
+import { useBuildingsBitmap } from "../../../hooks/providers/useBuildingsBitmap";
+import { useImageBitmap } from "../../../hooks/useImage";
 
 type BuildingsLayerProps = {
     buildings: MapBuilding[];
@@ -12,10 +13,12 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
     const { TILE_SIZE } = useGameProperties();
     const { buildingsBitmap } = useBuildingsBitmap();
 
+    const { bitmap: err, loading, error } = useImageBitmap("/images/err.jpg");
+
     return (
         <Layer listening={false}>
-            {buildings.map((building) => {
-                const bitmap = buildingsBitmap.find((x) => x.buildingId === building.building.buildingId);
+            {loading ? <></> : buildings.map((building) => {
+                const bitmap = buildingsBitmap[building.building.buildingId]?.[building.rotation] || err; 
 
                 if (!bitmap) return null;
                 return (
@@ -25,8 +28,9 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
                         y={building.position.y * TILE_SIZE}
                         width={bitmap.width}
                         height={bitmap.height}
-                        image={bitmap.image}
+                        image={bitmap!}
                         listening={false}
+                        //rotation={building.rotation * 90}
                     />
                 );
             })}
