@@ -15,6 +15,18 @@ import useGameVariables from "../../../hooks/providers/useGameVariables";
 import PreviewLayer from "./PreviewLayer";
 import { CanPlaceBuilding } from "../../../utils/PlacingUtils";
 
+const findIconOffset = (shape: MapBuilding["shape"]): Position => {
+    for (let y = 0; y < shape.length; y++) {
+        for (let x = 0; x < shape[y].length; x++) {
+            if (shape[y][x] === "Icon") {
+                return { x, y };
+            }
+        }
+    }
+
+    return { x: 0, y: 0 };
+};
+
 type GameCanvasProps = {
     disableDynamicLoading?: boolean;
     onMapClick: (position: Position) => void;
@@ -103,11 +115,17 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false , onMap
             return;
         }
 
-        setPreviewTile(tile);
+        const iconOffset = findIconOffset(previewBuilding.shape);
+        const origin: Position = {
+            x: tile.x - iconOffset.x,
+            y: tile.y - iconOffset.y,
+        };
+
+        setPreviewTile(origin);
         setIsPreviewPlaceable(
             CanPlaceBuilding(
                 previewBuilding.shape,
-                tile,
+                origin,
                 variables.placedBuildingsMappped,
                 variables.loadedMapTiles,
             ),
@@ -142,9 +160,20 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false , onMap
 
     const handleStageOnClick = (evt: Konva.KonvaEventObject<PointerEvent>) => {
         if (evt.evt.button != 0) return;
-        const tile = getTileFromPointer();
-        if (!tile) return;
-        onMapClick(tile);
+        const pointerTile = getTileFromPointer();
+        if (!pointerTile) return;
+
+        let placementTile: Position = pointerTile;
+
+        if (previewBuilding) {
+            const iconOffset = findIconOffset(previewBuilding.shape);
+            placementTile = {
+                x: pointerTile.x - iconOffset.x,
+                y: pointerTile.y - iconOffset.y,
+            };
+        }
+
+        onMapClick(placementTile);
     };
 
     const handleStageContextMenu = (evt: Konva.KonvaEventObject<PointerEvent>) => {
