@@ -5,15 +5,17 @@ import GameBar from "./Game/GameBar/GameBar";
 import { BuildingsBitmapProvider } from "../provider/BuildingsBitmapProvider";
 import { useGameOptions } from "../hooks/providers/useGameOptions";
 import type { MapBuilding, Position } from "../types/Game/Grid";
-import { CanPlaceBuilding, createEgdesForShape, rotateShape } from "../utils/PlacingUtils";
+import { CanPlaceBuilding, createEgdesForShape, isSufficientFunds, rotateShape } from "../utils/PlacingUtils";
 import useGameVariables from "../hooks/providers/useGameVariables";
 import type { BuildingType } from "../types/Game/Buildings";
+import { useGameData } from "../hooks/providers/useGameData";
 
 const Game = () => {
     const [selectedBuilding, setSelectedBuilding] = useState<BuildingType | null>(null);
     const [buildingPreview, setBuildingPreview] = useState<MapBuilding | null>(null);
     const { options } = useGameOptions();
     const { variables, setVariables } = useGameVariables();
+    const { synergies } = useGameData();
 
     const OnMapClick = (position: Position) => {
         if (selectedBuilding === null) return;
@@ -35,6 +37,10 @@ const Game = () => {
                 shape: buildingPreview!.shape,
                 isSelected: false,
             };
+
+            if (!isSufficientFunds(newBuilding, variables.placedBuildingsMappped, synergies, variables)) return;
+
+            console.log(newBuilding);
 
             setVariables((prev) => ({
                 ...prev,
