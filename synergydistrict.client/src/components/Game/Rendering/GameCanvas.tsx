@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type FC, use } from "react";
+import { useState, useEffect, useRef, type FC } from "react";
 import MapLayer from "./MapLayer";
 import { Stage } from "react-konva";
 import type Konva from "konva";

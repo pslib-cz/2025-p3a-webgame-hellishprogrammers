@@ -13,19 +13,20 @@ type GameBarProps = {
 
 const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
     const { variables, setVariables } = useGameVariables();
+    // console.log(variables)
     const { buildings, loading } = useGameData();
     const { TPS } = useGameProperties();
     const [activeBuilding, setActiveBuilding] = useState<BuildingType | null>(null);
 
     const formatTime = (totalSeconds: number) => {
-    const minutes = Math.floor(totalSeconds / 60)
-        .toString()
-        .padStart(2, "0");
-    const seconds = Math.floor(totalSeconds % 60)
-        .toString()
-        .padStart(2, "0");
-    return `${minutes}:${seconds}`;
-};
+        const minutes = Math.floor(totalSeconds / 60)
+            .toString()
+            .padStart(2, "0");
+        const seconds = Math.floor(totalSeconds % 60)
+            .toString()
+            .padStart(2, "0");
+        return `${minutes}:${seconds}`;
+    };
 
     return (
         <div className={styles.gameBar}>
@@ -67,7 +68,7 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
                                 OnClick={() => {
                                     const isSelected = activeBuilding?.buildingId === building.buildingId;
                                     const next = isSelected ? null : building;
-                                    
+
                                     setBuilding(next);
                                     setActiveBuilding(next);
                                 }}
@@ -79,13 +80,13 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
             </div>
             <div className={styles.row}>
                 <div className={`${styles.values} border--narrow`}>
-                    <ValuesBox iconKey="money" text={`${variables.moneyCurrent} (${variables.moneyPerTick}/t)`} />
+                    <ValuesBox iconKey="money" text={`${variables.moneyBalance} (${variables.money}/t)`} />
                 </div>
                 <div className={`${styles.values} border--narrow`}>
-                    <ValuesBox iconKey="people" text={`${variables.peopleCurrent}/${variables.peopleMax}`} />
-                    <ValuesBox iconKey="electricity" text={`${variables.energyCurrent}/${variables.energyMax}`} />
+                    <ValuesBox iconKey="people" text={`${variables.people - variables.peopleUsed}/${variables.people}`} />
+                    <ValuesBox iconKey="electricity" text={`${variables.energy - variables.energyUsed}/${variables.energy}`} />
                     <ValuesBox iconKey="industry" text={`${variables.industry}`} />
-                    <ValuesBox iconKey="happiness" text={`${variables.happiness}%`} />
+                    <ValuesBox iconKey="happiness" text={`${variables.happiness > 100 ? 100 : variables.happiness}%`} />
                 </div>
             </div>
         </div>

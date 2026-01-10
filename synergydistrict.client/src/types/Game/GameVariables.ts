@@ -2,12 +2,12 @@ import type { TimerSpeedType } from "..";
 import type { MapBuilding, MapTile } from "./Grid";
 
 export type GameVariablesValue = {
-    moneyCurrent: number;
-    moneyPerTick: number;
-    peopleCurrent: number;
-    peopleMax: number;
-    energyCurrent: number;
-    energyMax: number;
+    moneyBalance: number;
+    money: number;
+    peopleUsed: number;
+    people: number;
+    energyUsed: number;
+    energy: number;
     industry: number;
     happiness: number;
     timer: number;
@@ -20,12 +20,12 @@ export type GameVariablesValue = {
 };
 
 export const defaultGameVariables: GameVariablesValue = {
-    moneyCurrent: 0,
-    moneyPerTick: 0,
-    peopleCurrent: 0,
-    peopleMax: 0,
-    energyCurrent: 0,
-    energyMax: 0,
+    moneyBalance: 0,
+    money: 0,
+    peopleUsed: 0,
+    people: 0,
+    energyUsed: 0,
+    energy: 0,
     industry: 0,
     happiness: 0,
     timer: 0,

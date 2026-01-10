@@ -36,11 +36,19 @@ const Game = () => {
                 isSelected: false,
             };
 
-            setVariables({
-                ...variables,
-                placedBuildings: [...variables.placedBuildings, newBuilding],
+            setVariables((prev) => ({
+                ...prev,
+                ...selectedBuilding.baseProduction.reduce((acc, prod) => {
+                    const resourceKey = prod.type.toLowerCase() as keyof typeof prev;
+                    const currentValue = prev[resourceKey];
+                    if (typeof currentValue === "number") {
+                        acc[resourceKey] = currentValue + prod.value;
+                    }
+                    return acc;
+                }, {} as Record<string, number>),
+                placedBuildings: [...prev.placedBuildings, newBuilding],
                 placedBuildingsMappped: {
-                    ...variables.placedBuildingsMappped,
+                    ...prev.placedBuildingsMappped,
                     ...Object.fromEntries(
                         newBuilding.shape
                             .map((row, y) =>
@@ -58,7 +66,7 @@ const Game = () => {
                             .flat()
                     ),
                 },
-            });
+            }));
         }
     };
 

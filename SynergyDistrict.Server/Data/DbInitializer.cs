@@ -160,30 +160,6 @@ namespace SynergyDistrict.Server.Data
                         new BuildingProduction { Type = BuildingProductionType.People, Value = -3 },
                     ]
                 },
-                //new Building
-                //{
-                //    Name = "Germany",
-                //    Type = BuildingType.Industrial,
-                //    Description = "Arian paradise",
-                //    IconKey = "townhall",
-                //    Cost = 0,
-                //    Shape =
-                //    [
-                //        [BuildingTileType.Solid, BuildingTileType.Empty, BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Solid],
-                //        [BuildingTileType.Solid, BuildingTileType.Empty, BuildingTileType.Solid, BuildingTileType.Empty, BuildingTileType.Empty],
-                //        [BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Solid],
-                //        [BuildingTileType.Empty, BuildingTileType.Empty, BuildingTileType.Solid, BuildingTileType.Empty, BuildingTileType.Solid],
-                //        [BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Empty, BuildingTileType.Solid],
-                //    ],
-                //    BaseProduction =
-                //    [
-                //        new BuildingProduction { Type = BuildingProductionType.People, Value = 1000 },
-                //        new BuildingProduction { Type = BuildingProductionType.Money, Value = 1000 },
-                //        new BuildingProduction { Type = BuildingProductionType.Happiness, Value = 1000 },
-                //        new BuildingProduction { Type = BuildingProductionType.Industry, Value = 1000 },
-                //        new BuildingProduction { Type = BuildingProductionType.Energy, Value = 1000 },
-                //    ]
-                //}
             };
 
             context.Buildings.AddRange(buildings);

@@ -1,5 +1,5 @@
 import type { BuildingTileType } from "../types";
-import type { BuildingType } from "../types/Game/Buildings";
+// import type { BuildingType } from "../types/Game/Buildings";
 import type { Edge, MapBuilding, MapTile } from "../types/Game/Grid";
 
 export const CanPlaceBuilding = (shape: BuildingTileType[][], position: { x: number; y: number }, placedBuildingsMappped: Record<string, MapBuilding>, loadedMapTiles: Record<string, MapTile>): boolean => {
@@ -9,7 +9,7 @@ export const CanPlaceBuilding = (shape: BuildingTileType[][], position: { x: num
                 const tileX = position.x + x;
                 const tileY = position.y + y;
                 const key = `${tileX};${tileY}`;
-                console.log("Checking tile:", key);
+                // console.log("Checking tile:", key);
                 if (placedBuildingsMappped[key]) {
                     const building = placedBuildingsMappped[key];
                     const otherX = tileX - building.position.x;
@@ -99,7 +99,7 @@ export const rotateShape = (shape: BuildingTileType[][], rotation: number): Buil
     for (let i = 0; i < rotation; i++) {
         currentShape = rotateClockwise(currentShape);
     }
-    console.log(currentShape);
+    // console.log(currentShape);
 
     return currentShape;
 }
