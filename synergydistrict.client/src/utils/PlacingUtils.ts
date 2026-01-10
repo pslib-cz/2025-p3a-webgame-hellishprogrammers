@@ -1,5 +1,5 @@
 import type { BuildingTileType } from "../types";
-import type { BuildingSynergy, BuildingType, Production } from "../types/Game/Buildings";
+import type { BuildingSynergy, Production } from "../types/Game/Buildings";
 import type { GameVariablesValue } from "../types/Game/GameVariables";
 // import type { BuildingType } from "../types/Game/Buildings";
 import type { Edge, EdgeSide, MapBuilding, MapTile } from "../types/Game/Grid";
@@ -37,29 +37,22 @@ export const CanPlaceBuilding = (
     return true;
 };
 
-// Is enough values to build
-export const isSufficientFunds = (
+export const CalculateValues = (
     building: MapBuilding,
     placedBuildingsMappped: Record<string, MapBuilding>,
     synergies: BuildingSynergy[],
     variables: GameVariablesValue
-): boolean => {
+): GameVariablesValue | null => {
+    const result: GameVariablesValue = { ...variables };
     // Checking price is less or equal balance
-    if (building.building.cost > variables.moneyBalance) return false;
+    if (building.buildingType.cost > variables.moneyBalance) return null;
+
+    result.moneyBalance -= building.buildingType.cost;
 
     // Checking if final production is possitive or null
-    if (!IsProductionSumValid(building.building.baseProduction, variables)) return false;
+    if (!AddProductionSum(building.buildingType.baseProduction || [], result)) return null;
 
-    // Checking if energy and money usage won't be more than it can be
-    if (
-        building.building.baseProduction.some((x) => {
-            (x.type === "Energy" && x.value < 0 && variables.energy + x.value < variables.energyUsed) ||
-                (x.type === "Money" && x.value < 0 && variables.people + x.value < variables.peopleUsed);
-        })
-    ) {
-        return false;
-    }
-
+    // Checking synergies production
     for (const edge of building.edges) {
         let delX = 0;
         let delY = 0;
@@ -91,28 +84,47 @@ export const isSufficientFunds = (
         if (neighbor) {
             const activeSynergies = synergies.filter(
                 (s) =>
-                    (s.sourceBuildingId === building.building.buildingId &&
-                        s.targetBuildingId === neighbor.building.buildingId) ||
-                    (s.sourceBuildingId === neighbor.building.buildingId &&
-                        s.targetBuildingId === building.building.buildingId)
+                    (s.sourceBuildingId === building.buildingType.buildingId &&
+                        s.targetBuildingId === neighbor.buildingType.buildingId) ||
+                    (s.sourceBuildingId === neighbor.buildingType.buildingId &&
+                        s.targetBuildingId === building.buildingType.buildingId)
             );
 
             if (activeSynergies.length === 0) continue;
 
             for (const synergy of activeSynergies) {
-                if (!IsProductionSumValid(synergy.synergyProduction, variables)) return false;
+                if (!AddProductionSum(synergy.synergyProduction || [], result)) return null;
             }
         }
     }
-    return true;
+    return result;
 };
 
-// WARNING: Might be bug. When more than one production are negative
-const IsProductionSumValid = (products: Production[], variables: GameVariablesValue): boolean => {
+const AddProductionSum = (products: Production[], variables: GameVariablesValue): boolean => {
     for (const product of products) {
-        const resourceKey = product.type.toLowerCase() as keyof typeof variables;
+        const resourceKey = product.type.toLowerCase() as keyof GameVariablesValue;
         const currentValue = variables[resourceKey];
-        if (typeof currentValue === "number" && currentValue + product.value < 0) return false;
+
+        if (typeof currentValue === "number") {
+            const resultProduction = currentValue + product.value;
+            if (resultProduction < 0) return false;
+
+            if (resourceKey === "energy" && product.value < 0) {
+                if (variables.energyUsed - product.value > variables.energy) return false;
+
+                variables.energyUsed -= product.value;
+                continue;
+            }
+
+            if (resourceKey === "people" && product.value < 0) {
+                if (variables.peopleUsed - product.value > variables.people) return false;
+
+                variables.peopleUsed -= product.value;
+                continue;
+            }
+
+            (variables as any)[resourceKey] = resultProduction;
+        }
     }
     return true;
 };

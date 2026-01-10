@@ -5,7 +5,7 @@ import GameBar from "./Game/GameBar/GameBar";
 import { BuildingsBitmapProvider } from "../provider/BuildingsBitmapProvider";
 import { useGameOptions } from "../hooks/providers/useGameOptions";
 import type { MapBuilding, Position } from "../types/Game/Grid";
-import { CanPlaceBuilding, createEgdesForShape, isSufficientFunds, rotateShape } from "../utils/PlacingUtils";
+import { CanPlaceBuilding, createEgdesForShape, CalculateValues, rotateShape } from "../utils/PlacingUtils";
 import useGameVariables from "../hooks/providers/useGameVariables";
 import type { BuildingType } from "../types/Game/Buildings";
 import { useGameData } from "../hooks/providers/useGameData";
@@ -38,20 +38,13 @@ const Game = () => {
                 isSelected: false,
             };
 
-            if (!isSufficientFunds(newBuilding, variables.placedBuildingsMappped, synergies, variables)) return;
+            const newValues = CalculateValues(newBuilding, variables.placedBuildingsMappped, synergies, variables);
 
-            console.log(newBuilding);
+            if (!newValues) return;
 
             setVariables((prev) => ({
                 ...prev,
-                ...selectedBuilding.baseProduction.reduce((acc, prod) => {
-                    const resourceKey = prod.type.toLowerCase() as keyof typeof prev;
-                    const currentValue = prev[resourceKey];
-                    if (typeof currentValue === "number") {
-                        acc[resourceKey] = currentValue + prod.value;
-                    }
-                    return acc;
-                }, {} as Record<string, number>),
+                ...newValues,
                 placedBuildings: [...prev.placedBuildings, newBuilding],
                 placedBuildingsMappped: {
                     ...prev.placedBuildingsMappped,
@@ -117,7 +110,12 @@ const Game = () => {
     return (
         <div className={styles.game}>
             <BuildingsBitmapProvider>
-                <GameCanvas disableDynamicLoading={!options.infiniteMap} onMapClick={OnMapClick} onContext={OnRotate} previewBuilding={buildingPreview} />
+                <GameCanvas
+                    disableDynamicLoading={!options.infiniteMap}
+                    onMapClick={OnMapClick}
+                    onContext={OnRotate}
+                    previewBuilding={buildingPreview}
+                />
             </BuildingsBitmapProvider>
             <GameBar setBuilding={OnPlaceSelect} />
         </div>

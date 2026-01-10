@@ -20,7 +20,7 @@ export type GameVariablesValue = {
 };
 
 export const defaultGameVariables: GameVariablesValue = {
-    moneyBalance: 0,
+    moneyBalance: 750,
     money: 0,
     peopleUsed: 0,
     people: 0,
