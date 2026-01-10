@@ -12,6 +12,7 @@ import useChunkLoader from "../../../hooks/useChunkLoader";
 import type { MapTile, Position } from "../../../types/Game/Grid";
 import BuildingsLayer from "./BuildingsLayer";
 import useGameVariables from "../../../hooks/providers/useGameVariables";
+import GridLayer from "./GridLayer";
 
 type GameCanvasProps = {
     disableDynamicLoading?: boolean;
@@ -191,12 +192,6 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false , onMap
                     chunkBitmaps={chunkBitmaps}
                 />
                 <BuildingsLayer buildings={variables.placedBuildings} />
-                {/* <GridLayer
-                            origin={}
-                            chunkWidth={}
-                            chunkHeight={}
-                            gridImage={gridBitmap}
-                        /> */}
             </Stage>
             {(chunksLoading || !fontsLoaded) && <div className={styles.overlay}>Loading map...</div>}
             {chunkError && <div className={styles.overlay}>Error while loading map: {chunkError}</div>}
