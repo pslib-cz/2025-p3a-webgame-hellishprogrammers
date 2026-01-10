@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type FC } from "react";
+import { useState, useEffect, useRef, useCallback, type FC } from "react";
 import MapLayer from "./MapLayer";
 import { Stage } from "react-konva";
 import type Konva from "konva";
@@ -9,18 +9,20 @@ import { prepareGrid } from "./Shapes/GridShape";
 import useFont from "../../../hooks/useFont";
 import useStageTransform from "../../../hooks/useStateTransform";
 import useChunkLoader from "../../../hooks/useChunkLoader";
-import type { MapTile, Position } from "../../../types/Game/Grid";
+import type { MapBuilding, MapTile, Position } from "../../../types/Game/Grid";
 import BuildingsLayer from "./BuildingsLayer";
 import useGameVariables from "../../../hooks/providers/useGameVariables";
-import GridLayer from "./GridLayer";
+import PreviewLayer from "./PreviewLayer";
+import { CanPlaceBuilding } from "../../../utils/PlacingUtils";
 
 type GameCanvasProps = {
     disableDynamicLoading?: boolean;
     onMapClick: (position: Position) => void;
     onContext: () => void;
+    previewBuilding: MapBuilding | null;
 };
 
-const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false , onMapClick, onContext}) => {
+const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false , onMapClick, onContext, previewBuilding}) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const stageRef = useRef<Konva.Stage | null>(null);
@@ -63,6 +65,55 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false , onMap
         allowDynamicLoading: !disableDynamicLoading,
     });
 
+    const [chunkBitmaps, setChunkBitmaps] = useState<Record<string, PreparedChunkCanvas>>({});
+    const [previewTile, setPreviewTile] = useState<Position | null>(null);
+    const [isPointerOverStage, setIsPointerOverStage] = useState(false);
+    const [isPreviewPlaceable, setIsPreviewPlaceable] = useState(false);
+
+    const getTileFromPointer = useCallback((): Position | null => {
+        const stage = stageRef.current;
+        if (!stage) return null;
+
+        const pointer = stage.getPointerPosition();
+        if (!pointer) return null;
+
+        const scale = stage.scaleX();
+        const position = stage.position();
+
+        const worldX = (pointer.x - position.x) / scale;
+        const worldY = (pointer.y - position.y) / scale;
+
+        return {
+            x: Math.floor(worldX / TILE_SIZE),
+            y: Math.floor(worldY / TILE_SIZE),
+        };
+    }, [TILE_SIZE]);
+
+    const updatePreviewFromPointer = useCallback(() => {
+        if (!previewBuilding) {
+            setPreviewTile(null);
+            setIsPreviewPlaceable(false);
+            return;
+        }
+
+        const tile = getTileFromPointer();
+        if (!tile) {
+            setPreviewTile(null);
+            setIsPreviewPlaceable(false);
+            return;
+        }
+
+        setPreviewTile(tile);
+        setIsPreviewPlaceable(
+            CanPlaceBuilding(
+                previewBuilding.shape,
+                tile,
+                variables.placedBuildingsMappped,
+                variables.loadedMapTiles,
+            ),
+        );
+    }, [previewBuilding, getTileFromPointer, variables.placedBuildingsMappped, variables.loadedMapTiles]);
+
     useEffect(() => {
         setVariables((prev) => ({
             ...prev, loadedChunks, loadedMapTiles: Object.values(loadedChunks).flat().reduce((acc, tile) => {
@@ -70,23 +121,71 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false , onMap
                 return acc;
             }, {} as Record<string, MapTile>)
         }));
-    }, [loadedChunks]);
-    const [chunkBitmaps, setChunkBitmaps] = useState<Record<string, PreparedChunkCanvas>>({});
+    }, [loadedChunks, setVariables]);
+
+    useEffect(() => {
+        if (!isPointerOverStage) return;
+        updatePreviewFromPointer();
+    }, [stageScale, stagePosition, updatePreviewFromPointer, isPointerOverStage]);
+
+    useEffect(() => {
+        if (!previewBuilding) {
+            setPreviewTile(null);
+            setIsPreviewPlaceable(false);
+            return;
+        }
+
+        if (isPointerOverStage) {
+            updatePreviewFromPointer();
+        }
+    }, [previewBuilding, isPointerOverStage, updatePreviewFromPointer]);
 
     const handleStageOnClick = (evt: Konva.KonvaEventObject<PointerEvent>) => {
         if (evt.evt.button != 0) return;
-        const pointer = stageRef.current?.getPointerPosition();
-        if (!pointer) return;
-
-        const tileX = Math.floor((pointer.x - stagePosition.x) / (TILE_SIZE * stageScale));
-        const tileY = Math.floor((pointer.y - stagePosition.y) / (TILE_SIZE * stageScale));
-        onMapClick({ x: tileX, y: tileY });
+        const tile = getTileFromPointer();
+        if (!tile) return;
+        onMapClick(tile);
     };
 
     const handleStageContextMenu = (evt: Konva.KonvaEventObject<PointerEvent>) => {
         evt.evt.preventDefault();
         onContext();
     };
+
+    const handleStageMouseEnter = useCallback(() => {
+        setIsPointerOverStage(true);
+        updatePreviewFromPointer();
+    }, [updatePreviewFromPointer]);
+
+    const handleStageMouseMove = useCallback(() => {
+        if (!isPointerOverStage) {
+            setIsPointerOverStage(true);
+        }
+        updatePreviewFromPointer();
+    }, [isPointerOverStage, updatePreviewFromPointer]);
+
+    const handleStageMouseLeave = useCallback(() => {
+        setIsPointerOverStage(false);
+        setPreviewTile(null);
+        setIsPreviewPlaceable(false);
+    }, []);
+
+    const handleStageWheel = useCallback((event: Konva.KonvaEventObject<WheelEvent>) => {
+        handleWheel(event);
+        if (!isPointerOverStage) return;
+        requestAnimationFrame(() => updatePreviewFromPointer());
+    }, [handleWheel, updatePreviewFromPointer, isPointerOverStage]);
+
+    const handleStageDragMove = useCallback(() => {
+        if (!isPointerOverStage) return;
+        updatePreviewFromPointer();
+    }, [isPointerOverStage, updatePreviewFromPointer]);
+
+    const handleStageDragEnd = useCallback(() => {
+        handleDragEnd();
+        if (!isPointerOverStage) return;
+        requestAnimationFrame(() => updatePreviewFromPointer());
+    }, [handleDragEnd, updatePreviewFromPointer, isPointerOverStage]);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -173,12 +272,16 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false , onMap
                 width={dimensions.width}
                 height={dimensions.height}
                 draggable={true}
-                onWheel={handleWheel}
+                onWheel={handleStageWheel}
                 scaleX={stageScale}
                 scaleY={stageScale}
                 x={stagePosition.x}
                 y={stagePosition.y}
-                onDragEnd={handleDragEnd}
+                onMouseEnter={handleStageMouseEnter}
+                onMouseMove={handleStageMouseMove}
+                onMouseLeave={handleStageMouseLeave}
+                onDragMove={handleStageDragMove}
+                onDragEnd={handleStageDragEnd}
                 onClick={handleStageOnClick}
                 onContextMenu={handleStageContextMenu}
             >
@@ -192,6 +295,7 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false , onMap
                     chunkBitmaps={chunkBitmaps}
                 />
                 <BuildingsLayer buildings={variables.placedBuildings} />
+                <PreviewLayer previewBuilding={previewBuilding} position={previewTile} isPlaceable={isPreviewPlaceable} />
             </Stage>
             {(chunksLoading || !fontsLoaded) && <div className={styles.overlay}>Loading map...</div>}
             {chunkError && <div className={styles.overlay}>Error while loading map: {chunkError}</div>}

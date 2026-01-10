@@ -29,7 +29,7 @@ export type MapTile = {
 
 export type MapBuilding = {
     MapBuildingId: string;
-    building: BuildingType;
+    buildingType: BuildingType;
     position: Position;
     isSelected: boolean;
     rotation: number;
