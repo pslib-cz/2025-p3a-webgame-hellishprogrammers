@@ -18,7 +18,7 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
     return (
         <Layer listening={false}>
             {loading ? <></> : buildings.map((building) => {
-                const bitmap = buildingsBitmap[building.building.buildingId]?.[building.rotation] || err; 
+                const bitmap = buildingsBitmap[building.buildingType.buildingId]?.[building.rotation] || err; 
 
                 if (!bitmap) return null;
                 return (

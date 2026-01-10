@@ -27,7 +27,7 @@ const Game = () => {
             )
         ) {
             const newBuilding: MapBuilding = {
-                building: selectedBuilding,
+                buildingType: selectedBuilding,
                 MapBuildingId: crypto.randomUUID(),
                 position: position,
                 edges: buildingPreview!.edges,
@@ -82,7 +82,7 @@ const Game = () => {
         const edges = createEgdesForShape(shape);
 
         const prewiewBuilding: MapBuilding = {
-            building: building,
+            buildingType: building,
             MapBuildingId: "preview",
             position: { x: 0, y: 0 },
             edges: edges,
@@ -111,7 +111,7 @@ const Game = () => {
     return (
         <div className={styles.game}>
             <BuildingsBitmapProvider>
-                <GameCanvas disableDynamicLoading={!options.infiniteMap} onMapClick={OnMapClick} onContext={OnRotate} />
+                <GameCanvas disableDynamicLoading={!options.infiniteMap} onMapClick={OnMapClick} onContext={OnRotate} previewBuilding={buildingPreview} />
             </BuildingsBitmapProvider>
             <GameBar setBuilding={OnPlaceSelect} />
         </div>
