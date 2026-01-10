@@ -35,7 +35,11 @@ export const GameVariablesProvider: FC<PropsWithChildren> = ({ children }) => {
 
         const id = window.setInterval(() => {
             elapsedGameTicksRef.current += 1;
-            setVariables((prev) => ({ ...prev, timer: elapsedGameTicksRef.current }));
+            setVariables((prev) => ({
+                ...prev,
+                timer: elapsedGameTicksRef.current,
+                moneyBalance: prev.moneyBalance + Math.round(prev.money / TPS),
+            }));
         }, intervalMs);
 
         return () => window.clearInterval(id);
