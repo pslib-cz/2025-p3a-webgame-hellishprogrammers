@@ -28,6 +28,28 @@ const Game = () => {
         setBuildingPreview(null);
     }, [gameControl.isEnd]);
 
+    useEffect(() => {
+        if (selectedBuilding === null) {
+            setBuildingPreview(null);
+            return;
+        }
+
+        const shape = selectedBuilding.shape;
+        const edges = createEgdesForShape(shape);
+
+        const prewiewBuilding: MapBuilding = {
+            buildingType: selectedBuilding,
+            MapBuildingId: "preview",
+            position: { x: 0, y: 0 },
+            edges: edges,
+            rotation: 0,
+            shape: shape,
+            isSelected: false,
+        };
+
+        setBuildingPreview(prewiewBuilding);
+    }, [selectedBuilding]);
+
     const OnMapClick = (position: Position) => {
         if (selectedBuilding === null || gameControl.isEnd) return;
 
@@ -56,7 +78,6 @@ const Game = () => {
                 synergies,
                 GameResources
             );
-            console.log("New values after placing:", newValues);
             if (!newValues) return;
 
             setGameResources(newValues);
@@ -89,27 +110,8 @@ const Game = () => {
 
     const OnPlaceSelect = (building: BuildingType | null) => {
         if (gameControl.isEnd) return;
+
         setSelectedBuilding(building);
-
-        if (building === null) {
-            setBuildingPreview(null);
-            return;
-        }
-
-        const shape = building.shape;
-        const edges = createEgdesForShape(shape);
-
-        const prewiewBuilding: MapBuilding = {
-            buildingType: building,
-            MapBuildingId: "preview",
-            position: { x: 0, y: 0 },
-            edges: edges,
-            rotation: 0,
-            shape: shape,
-            isSelected: false,
-        };
-
-        setBuildingPreview(prewiewBuilding);
     };
 
     const OnRotate = () => {
