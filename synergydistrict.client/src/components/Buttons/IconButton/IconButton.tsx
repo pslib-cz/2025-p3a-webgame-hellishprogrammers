@@ -1,17 +1,16 @@
 import type { FC } from "react";
 import styles from "./IconButton.module.css";
 type IconButtonProps = {
-  canAfford: boolean;
-  isActive: boolean;
-  iconKey: string;
-  hasBorder?: boolean;
-  OnClick: () => void;
+    isActive: boolean;
+    iconKey: string;
+    hasBorder?: boolean;
+    OnClick: () => void;
 };
 
-export const IconButton: FC<IconButtonProps> = ({ isActive, OnClick, iconKey, canAfford }) => {
-  return (
-    <button disabled={!canAfford} onClick={OnClick} className={`${styles.button} ${isActive ? styles.active : ""}`}>
-      <span className={"icon"}>{iconKey}</span>
-    </button>
-  );
+export const IconButton: FC<IconButtonProps> = ({ isActive, OnClick, iconKey }) => {
+    return (
+        <button onClick={OnClick} className={`${styles.button} ${isActive ? styles.active : ""}`}>
+            <span className={"icon"}>{iconKey}</span>
+        </button>
+    );
 };

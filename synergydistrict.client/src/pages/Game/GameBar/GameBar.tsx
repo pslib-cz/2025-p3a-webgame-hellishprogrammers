@@ -33,7 +33,6 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
                 affordability[building.buildingId] = CanAfford(building, GameResources);
             });
 
-            if (activeBuilding && !affordability[activeBuilding.buildingId]) setActiveBuilding(null);
             setBuildingAffordability(affordability);
         } else {
             setBuildingAffordability({});
@@ -58,19 +57,16 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
                         OnClick={() => setGameControl((v) => ({ ...v, timerSpeed: "pause" }))}
                         isActive={gameControl.timerSpeed === "pause"}
                         iconKey="pause"
-                        canAfford={true}
                     />
                     <IconButton
                         OnClick={() => setGameControl((v) => ({ ...v, timerSpeed: "play" }))}
                         isActive={gameControl.timerSpeed === "play"}
                         iconKey="play"
-                        canAfford={true}
                     />
                     <IconButton
                         OnClick={() => setGameControl((v) => ({ ...v, timerSpeed: "fastforward" }))}
                         isActive={gameControl.timerSpeed === "fastforward"}
                         iconKey="fastforward"
-                        canAfford={true}
                     />
                 </div>
                 <div className="border--narrow">
@@ -78,7 +74,6 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
                         OnClick={() => setGameControl((v) => ({ ...v, isSound: !v.isSound }))}
                         isActive={gameControl.isSound}
                         iconKey={gameControl.isSound ? "volumeon" : "volumeoff"}
-                        canAfford={true}
                     />
                 </div>
                 <div className={`${styles.timer} border--narrow`}>
@@ -104,7 +99,6 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
                                 }}
                                 isActive={activeBuilding?.buildingId === building.buildingId}
                                 iconKey={building.iconKey}
-                                canAfford={buildingAffordability[building.buildingId]}
                             />
                         </div>
                     ))}
