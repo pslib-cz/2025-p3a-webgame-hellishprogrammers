@@ -10,7 +10,7 @@ type ShowInfoProps = {
 const ShowInfo: FC<ShowInfoProps> = ({ left, right, gameStyle = false }) => {
     return (
         <>
-            <div className={`${gameStyle ? styles.showGameInfo : styles.showInfo } border`}>
+            <div className={gameStyle ? styles.showGameInfo : styles.showInfo }>
                 <div className={`${gameStyle ? styles.showGameInfo__left :styles.showInfo__left} border`}>{left}</div>
                 <div className={gameStyle ? styles.showGameInfo__right : styles.showInfo__right}>{right}</div>
             </div>
