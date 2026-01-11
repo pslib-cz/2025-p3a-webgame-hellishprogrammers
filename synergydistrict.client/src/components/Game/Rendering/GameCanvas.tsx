@@ -11,10 +11,10 @@ import useStageTransform from "../../../hooks/useStateTransform";
 import useChunkLoader from "../../../hooks/useChunkLoader";
 import type { MapBuilding, MapTile, Position } from "../../../types/Game/Grid";
 import BuildingsLayer from "./BuildingsLayer";
-import useGameVariables from "../../../hooks/providers/useGameVariables";
 import PreviewLayer from "./PreviewLayer";
 import { CanPlaceBuilding } from "../../../utils/PlacingUtils";
 import { useGameOptions } from "../../../hooks/providers/useGameOptions";
+import useGameMapData from "../../../hooks/providers/useMapData";
 
 const findIconOffset = (shape: MapBuilding["shape"]): Position => {
   for (let y = 0; y < shape.length; y++) {
@@ -61,7 +61,7 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
     maxScale: MAX_SCALE,
   });
 
-  const { variables, setVariables } = useGameVariables();
+  const { GameMapData, setGameMapData } = useGameMapData();
 
   const {
     loadedChunks,
@@ -128,20 +128,20 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
       CanPlaceBuilding(
         previewBuilding.shape,
         origin,
-        variables.placedBuildingsMappped,
-        variables.loadedMapTiles,
+        GameMapData.placedBuildingsMappped,
+        GameMapData.loadedMapTiles,
       ),
     );
-  }, [previewBuilding, getTileFromPointer, variables.placedBuildingsMappped, variables.loadedMapTiles]);
+  }, [previewBuilding, getTileFromPointer, GameMapData.placedBuildingsMappped, GameMapData.loadedMapTiles]);
 
   useEffect(() => {
-    setVariables((prev) => ({
+    setGameMapData((prev) => ({
       ...prev, loadedChunks, loadedMapTiles: Object.values(loadedChunks).flat().reduce((acc, tile) => {
         acc[`${tile.position.x};${tile.position.y}`] = tile;
         return acc;
       }, {} as Record<string, MapTile>)
     }));
-  }, [loadedChunks, setVariables]);
+  }, [loadedChunks, setGameMapData]);
 
   useEffect(() => {
     if (!isPointerOverStage) return;
@@ -325,7 +325,7 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
           height={dimensions.height}
           chunkBitmaps={chunkBitmaps}
         />
-        <BuildingsLayer buildings={variables.placedBuildings} />
+        <BuildingsLayer buildings={GameMapData.placedBuildings} />
         <PreviewLayer previewBuilding={previewBuilding} position={previewTile} isPlaceable={isPreviewPlaceable} />
       </Stage>
       {(chunksLoading || !fontsLoaded) && <div className={styles.overlay}>Loading map...</div>}

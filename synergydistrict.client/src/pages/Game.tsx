@@ -6,15 +6,17 @@ import { BuildingsBitmapProvider } from "../provider/BuildingsBitmapProvider";
 import { useGameOptions } from "../hooks/providers/useGameOptions";
 import type { MapBuilding, Position } from "../types/Game/Grid";
 import { CanPlaceBuilding, createEgdesForShape, CalculateValues, rotateShape, CanAfford } from "../utils/PlacingUtils";
-import useGameVariables from "../hooks/providers/useGameVariables";
 import type { BuildingType } from "../types/Game/Buildings";
 import { useGameData } from "../hooks/providers/useGameData";
+import useGameMapData from "../hooks/providers/useMapData";
+import useGameResources from "../hooks/providers/useGameResources";
 
 const Game = () => {
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingType | null>(null);
   const [buildingPreview, setBuildingPreview] = useState<MapBuilding | null>(null);
   const { options } = useGameOptions();
-  const { variables, setVariables } = useGameVariables();
+  const { GameMapData, setGameMapData } = useGameMapData();
+  const { GameResources, setGameResources} = useGameResources();
   const { synergies } = useGameData();
 
   const OnMapClick = (position: Position) => {
@@ -24,11 +26,11 @@ const Game = () => {
       CanPlaceBuilding(
         buildingPreview!.shape,
         position,
-        variables.placedBuildingsMappped,
-        variables.loadedMapTiles
+        GameMapData.placedBuildingsMappped,
+        GameMapData.loadedMapTiles
       )
       &&
-      CanAfford(buildingPreview!.buildingType, variables)
+      CanAfford(buildingPreview!.buildingType, GameResources)
     ) {
       const newBuilding: MapBuilding = {
         buildingType: selectedBuilding,
@@ -40,13 +42,14 @@ const Game = () => {
         isSelected: false,
       };
 
-      const newValues = CalculateValues(newBuilding, variables.placedBuildingsMappped, synergies, variables);
-
+      const newValues = CalculateValues(newBuilding, GameMapData.placedBuildingsMappped, synergies, GameResources);
+      console.log("New values after placing:", newValues);
       if (!newValues) return;
 
-      setVariables((prev) => ({
+      setGameResources(newValues);
+
+      setGameMapData((prev) => ({
         ...prev,
-        ...newValues,
         placedBuildings: [...prev.placedBuildings, newBuilding],
         placedBuildingsMappped: {
           ...prev.placedBuildingsMappped,

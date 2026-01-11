@@ -4,6 +4,7 @@ type IconButtonProps = {
   canAfford: boolean;
   isActive: boolean;
   iconKey: string;
+  hasBorder?: boolean;
   OnClick: () => void;
 };
 

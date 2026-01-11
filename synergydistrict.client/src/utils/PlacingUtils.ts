@@ -1,6 +1,6 @@
 import type { BuildingTileType } from "../types";
 import type { BuildingSynergy, BuildingType, Production } from "../types/Game/Buildings";
-import type { GameVariablesValue } from "../types/Game/GameVariables";
+import type { GameResources } from "../types/Game/GameResources";
 // import type { BuildingType } from "../types/Game/Buildings";
 import type { Edge, EdgeSide, MapBuilding, MapTile } from "../types/Game/Grid";
 
@@ -37,7 +37,8 @@ export const CanPlaceBuilding = (
   return true;
 };
 
-export const CanAfford = (building: BuildingType, variables: GameVariablesValue) => {
+export const CanAfford = (building: BuildingType, variables: GameResources) => {
+  console.log("production: ", building.baseProduction);
   // Checking price is less or equal balance
   if (building.cost > variables.moneyBalance) return false;
 
@@ -50,11 +51,12 @@ export const CalculateValues = (
   building: MapBuilding,
   placedBuildingsMappped: Record<string, MapBuilding>,
   synergies: BuildingSynergy[],
-  variables: GameVariablesValue
-): GameVariablesValue | null => {
-  const result: GameVariablesValue = { ...variables };
+  variables: GameResources
+): GameResources | null => {
+  const result: GameResources = { ...variables };
   result.moneyBalance -= building.buildingType.cost;
-
+  if(!CanAddProdution(building.buildingType.baseProduction || [], result)) return null;
+  if (!AddProductionSum(building.buildingType.baseProduction || [], result)) return null;
   // Checking synergies production
   for (const edge of building.edges) {
     let delX = 0;
@@ -101,10 +103,9 @@ export const CalculateValues = (
   return result;
 };
 
-const CanAddProdution = (products: Production[], variables: GameVariablesValue) => {
+const CanAddProdution = (products: Production[], variables: GameResources) => {
   for (const product of products) {
-    console.log("Checking for product")
-    const resourceKey = product.type.toLowerCase() as keyof GameVariablesValue;
+    const resourceKey = product.type.toLowerCase() as keyof GameResources;
     const currentValue = variables[resourceKey];
 
     if (typeof currentValue === "number") {
@@ -122,14 +123,14 @@ const CanAddProdution = (products: Production[], variables: GameVariablesValue) 
         continue;
       }
     }
-    return true;
   }
+  return true;
 }
 
-const AddProductionSum = (products: Production[], variables: GameVariablesValue): boolean => {
+const AddProductionSum = (products: Production[], variables: GameResources): boolean => {
   if (!CanAddProdution(products, variables)) return false;
   for (const product of products) {
-    const resourceKey = product.type.toLowerCase() as keyof GameVariablesValue;
+    const resourceKey = product.type.toLowerCase() as keyof GameResources;
     const currentValue = variables[resourceKey];
 
     if (typeof currentValue === "number") {
