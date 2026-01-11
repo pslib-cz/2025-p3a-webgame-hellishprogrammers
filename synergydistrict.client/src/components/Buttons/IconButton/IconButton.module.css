@@ -13,3 +13,7 @@
     background-color: var(--text);
     color: var(--background);
 }
+
+.button:disabled{
+  opacity: 0.2;
+}
