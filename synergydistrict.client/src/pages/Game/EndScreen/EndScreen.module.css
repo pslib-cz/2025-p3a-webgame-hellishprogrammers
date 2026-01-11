@@ -1,0 +1,49 @@
+.endScreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    padding: 6rem 4rem;
+    background-color: var(--background);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.title {
+    font-size: 2.5rem;
+}
+
+.box {
+    border: 2px solid var(--text, #fefae0);
+    display: grid;
+    grid-template-columns: repeat(2, auto) 1fr;
+    align-items: stretch;
+}
+
+.box p {
+    margin: 0;
+}
+
+.box > * {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.box > *:not(:nth-child(3n + 1)) {
+    border-left: 2px solid var(--text, #fefae0);
+}
+
+.right {
+    padding: 1rem;
+    text-align: right;
+}
+
+.buttons {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 1.5rem;
+}

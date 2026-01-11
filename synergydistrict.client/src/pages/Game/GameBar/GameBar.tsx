@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FC } from "react";
+import { useEffect, useState, type FC } from "react";
 import { IconButton } from "../../../components/Buttons/IconButton/IconButton";
 import { useGameData } from "../../../hooks/providers/useGameData";
 import styles from "./GameBar.module.css";
@@ -18,7 +18,6 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
   const { gameControl, setGameControl} = useGameControl();
   const { GameResources } = useGameResources();
   const { time } = useGameTime();
-  // console.log(variables)
   const { buildings, loading } = useGameData();
   const { TPS } = useGameProperties();
   const [activeBuilding, setActiveBuilding] = useState<BuildingType | null>(null);

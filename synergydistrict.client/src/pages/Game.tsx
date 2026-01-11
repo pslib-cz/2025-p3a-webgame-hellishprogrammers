@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "../styles/Game.module.css";
 import GameCanvas from "../components/Game/Rendering/GameCanvas";
 import GameBar from "./Game/GameBar/GameBar";
@@ -10,108 +10,121 @@ import type { BuildingType } from "../types/Game/Buildings";
 import { useGameData } from "../hooks/providers/useGameData";
 import useGameMapData from "../hooks/providers/useMapData";
 import useGameResources from "../hooks/providers/useGameResources";
-import HouseDocs from "./Game/BuildingDocs/BuildingDocs";
+import EndScreen from "./Game/EndScreen/EndScreen";
+import useGameControl from "../hooks/providers/useGameControl";
 
 const Game = () => {
-  const [selectedBuilding, setSelectedBuilding] = useState<BuildingType | null>(null);
-  const [buildingPreview, setBuildingPreview] = useState<MapBuilding | null>(null);
-  const { options } = useGameOptions();
-  const { GameMapData, setGameMapData } = useGameMapData();
-  const { GameResources, setGameResources} = useGameResources();
-  const { synergies } = useGameData();
+    const [selectedBuilding, setSelectedBuilding] = useState<BuildingType | null>(null);
+    const [buildingPreview, setBuildingPreview] = useState<MapBuilding | null>(null);
+    const { options } = useGameOptions();
+    const { GameMapData, setGameMapData } = useGameMapData();
+    const { GameResources, setGameResources } = useGameResources();
+    const { synergies } = useGameData();
+    const { gameControl } = useGameControl();
 
-  const OnMapClick = (position: Position) => {
-    if (selectedBuilding === null) return;
+    useEffect(() => {
+        if (!gameControl.isEnd) return;
+        setSelectedBuilding(null);
+        setBuildingPreview(null);
+    }, [gameControl.isEnd]);
 
-    if (
-      CanPlaceBuilding(
-        buildingPreview!.shape,
-        position,
-        GameMapData.placedBuildingsMappped,
-        GameMapData.loadedMapTiles
-      )
-      &&
-      CanAfford(buildingPreview!.buildingType, GameResources)
-    ) {
-      const newBuilding: MapBuilding = {
-        buildingType: selectedBuilding,
-        MapBuildingId: crypto.randomUUID(),
-        position: position,
-        edges: buildingPreview!.edges,
-        rotation: buildingPreview!.rotation,
-        shape: buildingPreview!.shape,
-        isSelected: false,
-      };
+    const OnMapClick = (position: Position) => {
+        if (selectedBuilding === null || gameControl.isEnd) return;
 
-      const newValues = CalculateValues(newBuilding, GameMapData.placedBuildingsMappped, synergies, GameResources);
-      console.log("New values after placing:", newValues);
-      if (!newValues) return;
+        if (
+            CanPlaceBuilding(
+                buildingPreview!.shape,
+                position,
+                GameMapData.placedBuildingsMappped,
+                GameMapData.loadedMapTiles
+            ) &&
+            CanAfford(buildingPreview!.buildingType, GameResources)
+        ) {
+            const newBuilding: MapBuilding = {
+                buildingType: selectedBuilding,
+                MapBuildingId: crypto.randomUUID(),
+                position: position,
+                edges: buildingPreview!.edges,
+                rotation: buildingPreview!.rotation,
+                shape: buildingPreview!.shape,
+                isSelected: false,
+            };
 
-      setGameResources(newValues);
+            const newValues = CalculateValues(
+                newBuilding,
+                GameMapData.placedBuildingsMappped,
+                synergies,
+                GameResources
+            );
+            console.log("New values after placing:", newValues);
+            if (!newValues) return;
 
-      setGameMapData((prev) => ({
-        ...prev,
-        placedBuildings: [...prev.placedBuildings, newBuilding],
-        placedBuildingsMappped: {
-          ...prev.placedBuildingsMappped,
-          ...Object.fromEntries(
-            newBuilding.shape
-              .map((row, y) =>
-                row
-                  .map((tile, x) =>
-                    tile !== "Empty"
-                      ? [
-                        `${newBuilding.position.x + x};${newBuilding.position.y + y}`,
-                        newBuilding,
-                      ]
-                      : null
-                  )
-                  .filter((entry): entry is [string, MapBuilding] => entry !== null)
-              )
-              .flat()
-          ),
-        },
-      }));
-    }
-  };
+            setGameResources(newValues);
 
-  const OnPlaceSelect = (building: BuildingType | null) => {
-    setSelectedBuilding(building);
-
-    if (building === null) {
-      setBuildingPreview(null);
-      return;
-    }
-
-    const shape = building.shape;
-    const edges = createEgdesForShape(shape);
-
-    const prewiewBuilding: MapBuilding = {
-      buildingType: building,
-      MapBuildingId: "preview",
-      position: { x: 0, y: 0 },
-      edges: edges,
-      rotation: 0,
-      shape: shape,
-      isSelected: false,
+            setGameMapData((prev) => ({
+                ...prev,
+                placedBuildings: [...prev.placedBuildings, newBuilding],
+                placedBuildingsMappped: {
+                    ...prev.placedBuildingsMappped,
+                    ...Object.fromEntries(
+                        newBuilding.shape
+                            .map((row, y) =>
+                                row
+                                    .map((tile, x) =>
+                                        tile !== "Empty"
+                                            ? [
+                                                  `${newBuilding.position.x + x};${newBuilding.position.y + y}`,
+                                                  newBuilding,
+                                              ]
+                                            : null
+                                    )
+                                    .filter((entry): entry is [string, MapBuilding] => entry !== null)
+                            )
+                            .flat()
+                    ),
+                },
+            }));
+        }
     };
 
-    setBuildingPreview(prewiewBuilding);
-  };
+    const OnPlaceSelect = (building: BuildingType | null) => {
+        if (gameControl.isEnd) return;
+        setSelectedBuilding(building);
 
-  const OnRotate = () => {
-    if (buildingPreview === null) return;
+        if (building === null) {
+            setBuildingPreview(null);
+            return;
+        }
 
-    const newRotation = (buildingPreview.rotation + 1) % 4;
-    const newShape = rotateShape(buildingPreview.shape, 1);
-    const newEdges = createEgdesForShape(newShape);
-    setBuildingPreview({
-      ...buildingPreview,
-      rotation: newRotation,
-      shape: newShape,
-      edges: newEdges,
-    });
-  };
+        const shape = building.shape;
+        const edges = createEgdesForShape(shape);
+
+        const prewiewBuilding: MapBuilding = {
+            buildingType: building,
+            MapBuildingId: "preview",
+            position: { x: 0, y: 0 },
+            edges: edges,
+            rotation: 0,
+            shape: shape,
+            isSelected: false,
+        };
+
+        setBuildingPreview(prewiewBuilding);
+    };
+
+    const OnRotate = () => {
+        if (buildingPreview === null || gameControl.isEnd) return;
+
+        const newRotation = (buildingPreview.rotation + 1) % 4;
+        const newShape = rotateShape(buildingPreview.shape, 1);
+        const newEdges = createEgdesForShape(newShape);
+        setBuildingPreview({
+            ...buildingPreview,
+            rotation: newRotation,
+            shape: newShape,
+            edges: newEdges,
+        });
+    };
 
     return (
         <div className={styles.game}>
@@ -124,7 +137,7 @@ const Game = () => {
                 />
             </BuildingsBitmapProvider>
             <GameBar setBuilding={OnPlaceSelect} />
-            {/* <HouseDocs building={selectedBuilding} /> */}
+            <EndScreen />
         </div>
     );
 };

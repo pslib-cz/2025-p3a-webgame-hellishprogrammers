@@ -18,7 +18,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
                 <h2>{building.name}</h2>
                 <span className="icon">{building.iconKey}</span>
             </div>
-            <p>{building?.description}</p>
+            <p>{building.description}</p>
             <ProductionListing title="Cost">
                 <ValuesBox iconKey="money" text={building.cost.toString()} />
             </ProductionListing>

@@ -17,5 +17,5 @@ export const defaultGameResources: GameResources = {
     energyUsed: 0,
     energy: 0,
     industry: 0,
-    happiness: 0,
+    happiness: 100,
 };
