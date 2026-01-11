@@ -1,21 +1,22 @@
 import type { FC, ReactElement } from "react";
+import styles from "./ProductionListing.module.css";
+import type { ValuesBoxProps } from "../ValuesBox/ValuesBox";
 
 type ProductionListingProps = {
-    title:string;
-    children:ReactElement
-}
+    title: string;
+    children: ReactElement<ValuesBoxProps> | ReactElement<ValuesBoxProps>[];
+};
 
-export const ProductionListing:FC<ProductionListingProps> = ({ title, children }) => {
-
-        return (
-            <>
-                <header>
-                    <h1>{title}</h1>
-                </header>
-                <main>
-                    {children}
-                </main>
-            </>
-        )
-}
+export const ProductionListing: FC<ProductionListingProps> = ({ title, children }) => {
+    return (
+        <div className={styles.productionListing}>
+            <div className={styles.title}>
+                <p>{title}</p>
+            </div>
+            <div className={styles.productionBox}>
+                {children}
+            </div>
+        </div>
+    );
+};
 export default ProductionListing;

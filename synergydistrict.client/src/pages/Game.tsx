@@ -10,6 +10,7 @@ import type { BuildingType } from "../types/Game/Buildings";
 import { useGameData } from "../hooks/providers/useGameData";
 import useGameMapData from "../hooks/providers/useMapData";
 import useGameResources from "../hooks/providers/useGameResources";
+import HouseDocs from "./Game/BuildingDocs/BuildingDocs";
 
 const Game = () => {
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingType | null>(null);
@@ -112,19 +113,20 @@ const Game = () => {
     });
   };
 
-  return (
-    <div className={styles.game}>
-      <BuildingsBitmapProvider>
-        <GameCanvas
-          disableDynamicLoading={!options.infiniteMap}
-          onMapClick={OnMapClick}
-          onContext={OnRotate}
-          previewBuilding={buildingPreview}
-        />
-      </BuildingsBitmapProvider>
-      <GameBar setBuilding={OnPlaceSelect} />
-    </div>
-  );
+    return (
+        <div className={styles.game}>
+            <BuildingsBitmapProvider>
+                <GameCanvas
+                    disableDynamicLoading={!options.infiniteMap}
+                    onMapClick={OnMapClick}
+                    onContext={OnRotate}
+                    previewBuilding={buildingPreview}
+                />
+            </BuildingsBitmapProvider>
+            <GameBar setBuilding={OnPlaceSelect} />
+            {/* <HouseDocs building={selectedBuilding} /> */}
+        </div>
+    );
 };
 
 export default Game;
