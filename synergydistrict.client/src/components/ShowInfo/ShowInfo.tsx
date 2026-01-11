@@ -4,7 +4,7 @@ import styles from "./ShowInfo.module.css";
 type ShowInfoProps = {
     left: ReactElement;
     right: ReactElement;
-    gameStyle: boolean;
+    gameStyle?: boolean;
 };
 
 const ShowInfo: FC<ShowInfoProps> = ({ left, right, gameStyle = false }) => {
