@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import styles from "./ValuesBox.module.css";
 
-type ValuesBoxProps = {
+export type ValuesBoxProps = {
     iconKey: string;
     text: string;
 };

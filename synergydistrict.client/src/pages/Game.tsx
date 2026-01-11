@@ -9,6 +9,7 @@ import { CanPlaceBuilding, createEgdesForShape, CalculateValues, rotateShape } f
 import useGameVariables from "../hooks/providers/useGameVariables";
 import type { BuildingType } from "../types/Game/Buildings";
 import { useGameData } from "../hooks/providers/useGameData";
+import HouseDocs from "./Game/BuildingDocs/BuildingDocs";
 
 const Game = () => {
     const [selectedBuilding, setSelectedBuilding] = useState<BuildingType | null>(null);
@@ -118,6 +119,7 @@ const Game = () => {
                 />
             </BuildingsBitmapProvider>
             <GameBar setBuilding={OnPlaceSelect} />
+            {/* <HouseDocs building={selectedBuilding} /> */}
         </div>
     );
 };

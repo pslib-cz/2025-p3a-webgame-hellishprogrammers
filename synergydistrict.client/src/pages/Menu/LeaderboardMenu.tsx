@@ -1,8 +1,11 @@
 import Construction from "../../components/Construction";
-import HouseDocs from "../Game/HouseDocs/HouseDocs";
+import { useGameData } from "../../hooks/providers/useGameData";
+import BuildingDocs from "../Game/BuildingDocs/BuildingDocs";
 
 const LeaderboardMenu = () => {
-    return <HouseDocs BuildingId={2}/>;
+    const { buildings } = useGameData();
+
+    return <BuildingDocs building={buildings[0]} />;
 };
 
 export default LeaderboardMenu;

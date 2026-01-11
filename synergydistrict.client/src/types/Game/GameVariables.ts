@@ -27,7 +27,7 @@ export const defaultGameVariables: GameVariablesValue = {
     energyUsed: 0,
     energy: 0,
     industry: 0,
-    happiness: 0,
+    happiness: 100,
     timer: 0,
     timerSpeed: "play",
     isSound: true,
