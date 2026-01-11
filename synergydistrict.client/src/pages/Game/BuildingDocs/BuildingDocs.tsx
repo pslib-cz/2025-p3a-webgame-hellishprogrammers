@@ -15,24 +15,27 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
     return (
         <div className={styles.buildingDocs}>
             <div className={styles.title}>
-                <h2>{building.name}</h2>
-                <span className="icon">{building.iconKey}</span>
+                <h2>{building.name.toUpperCase()}_</h2>
+                <span className={`${styles.icon} icon`}>{building.iconKey}</span>
             </div>
             <p>{building?.description}</p>
             <ProductionListing title="Cost">
                 <ValuesBox iconKey="money" text={building.cost.toString()} />
             </ProductionListing>
+            <div className={styles.infoContainer}>
             {building.baseProduction.map((product) => (
                 <ShowInfo
+                    gameStyle={true} 
                     key={`${product.type}${product.value}`}
                     left={
-                        <div className="icon">
+                        <div className={`${styles.icon} icon`} >
                             {product.type.toLowerCase() == "energy" ? "electricity" : product.type.toLowerCase()}
                         </div>
                     }
                     right={<>{product.value}</>}
                 />
             ))}
+            </div>
         </div>
     );
 };

@@ -1,0 +1,15 @@
+.title{
+    background-color: var(--text);
+    color: var(--background);
+    height: 40px;
+}
+.titleContent{
+    padding: .5rem 1rem;
+    margin: 0;
+}
+
+.productionBox{
+    display: flex;
+    justify-content: end;
+    padding: .5rem 0.5rem;
+}
