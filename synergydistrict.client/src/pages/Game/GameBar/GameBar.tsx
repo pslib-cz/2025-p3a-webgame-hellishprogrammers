@@ -9,17 +9,19 @@ import { CanAfford } from "../../../utils/PlacingUtils";
 import useGameControl from "../../../hooks/providers/useGameControl";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import useGameTime from "../../../hooks/providers/useGameTime";
+import { useGameOptions } from "../../../hooks/providers/useGameOptions";
 
 type GameBarProps = {
   setBuilding: (x: BuildingType | null) => void;
 };
 
 const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
-  const { gameControl, setGameControl} = useGameControl();
+  const { gameControl, setGameControl } = useGameControl();
   const { GameResources } = useGameResources();
   const { time } = useGameTime();
   const { buildings, loading } = useGameData();
   const { TPS } = useGameProperties();
+  const { options } = useGameOptions();
   const [activeBuilding, setActiveBuilding] = useState<BuildingType | null>(null);
   const [buildingAffordability, setBuildingAffordability] = useState<Record<string, boolean>>({});
 
@@ -79,14 +81,14 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
           />
         </div>
         <div className={`${styles.timer} border--narrow`}>
-          <h3>{formatTime(time.timer / TPS)}</h3>
+          <h3>{formatTime((options.gameDuration * 60) - (time.timer / TPS))}</h3>
         </div>
       </div>
       <div className={styles.row}>
         {!loading &&
           buildings &&
           buildings!.map((building) => (
-            <div key={building.buildingId} className="border--narrow" style={{opacity: buildingAffordability[building.buildingId] ? 1 : 0.2}}>
+            <div key={building.buildingId} className="border--narrow" style={{ opacity: buildingAffordability[building.buildingId] ? 1 : 0.2 }}>
               <IconButton
                 OnClick={() => {
                   const isSelected = activeBuilding?.buildingId === building.buildingId;

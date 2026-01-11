@@ -9,9 +9,9 @@ type ProductionListingProps = {
 
 export const ProductionListing: FC<ProductionListingProps> = ({ title, children }) => {
     return (
-        <div className={styles.productionListing}>
+        <div className={`${styles.productionListingn} border`}>
             <div className={styles.title}>
-                <p>{title}</p>
+                <p className={styles.titleContent}>{title}</p>
             </div>
             <div className={styles.productionBox}>
                 {children}

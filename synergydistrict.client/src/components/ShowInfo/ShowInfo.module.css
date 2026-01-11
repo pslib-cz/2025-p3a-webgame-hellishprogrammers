@@ -2,13 +2,25 @@
     display: flex;
     align-items: stretch;
 }
-
+.showGameInfo{
+    display: flex;
+    width: 200px;
+    height: 40px;
+    border: 4px solid var(--text, #fefae0);
+}
 .showInfo__left {
     width: 12.5rem;
     display: flex;
     background: var(--text);
     color: var(--background);
     padding: 1rem;
+}
+.showGameInfo__left{
+    font-size: 1.5rem;
+    color: var(--background);
+    background-color: var(--text);
+    width: fit-content;
+    align-content: center;
 }
 
 .showInfo__left > * {
@@ -21,4 +33,12 @@
 
 .showInfo__right {
     flex-grow: 1;
+    
+}
+.showGameInfo__right{
+    display: flex;
+    flex-grow: 1;
+    justify-content: end;
+    align-items: center;
+    padding: 0 1rem;
 }
