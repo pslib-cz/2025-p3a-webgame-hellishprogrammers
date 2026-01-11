@@ -58,7 +58,7 @@ namespace SynergyDistrict.Server.Controllers
                 })
                 .ToList();
 
-             return Ok(new GameDataDTO { Buildings = buildings, Synergies = synergies });
+            return Ok(new GameDataDTO { Buildings = buildings, Synergies = synergies });
         }
     }
 }
