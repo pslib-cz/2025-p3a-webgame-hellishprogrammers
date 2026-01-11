@@ -38,7 +38,6 @@ export const CanPlaceBuilding = (
 };
 
 export const CanAfford = (building: BuildingType, variables: GameResources) => {
-  console.log("production: ", building.baseProduction);
   // Checking price is less or equal balance
   if (building.cost > variables.moneyBalance) return false;
 
