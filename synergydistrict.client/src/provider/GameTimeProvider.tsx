@@ -2,6 +2,7 @@ import { createContext, useEffect, useRef, useState, type PropsWithChildren } fr
 import { defaultGameTime, type GameTimeType } from "../types/Game/GameTime";
 import useGameProperties from "../hooks/providers/useGameProperties";
 import useGameControl from "../hooks/providers/useGameControl";
+import { useGameOptions } from "../hooks/providers/useGameOptions";
 
 type GameTimeContextValue = {
     time: GameTimeType;
@@ -11,10 +12,20 @@ type GameTimeContextValue = {
 export const GameTimeContext = createContext<GameTimeContextValue | null>(null);
 
 export const GameTimeProvider: React.FC<PropsWithChildren> = ({ children }) => {
-    const { gameControl } = useGameControl();
+    const { gameControl, setGameControl } = useGameControl();
+    const { options } = useGameOptions();
     const [time, setTime] = useState<GameTimeType>(defaultGameTime);
     const { TPS } = useGameProperties();
     const elapsedGameTicksRef = useRef(0);
+
+    useEffect(() => {
+        if (!gameControl.isEnd && options.gameDuration * 60 - time.timer / TPS <= 0) {
+            setGameControl((prev) => ({
+                ...prev,
+                isEnd: true,
+            }));
+        }
+    }, [time.timer]);
 
     useEffect(() => {
         const speed = gameControl.timerSpeed;
@@ -37,7 +48,5 @@ export const GameTimeProvider: React.FC<PropsWithChildren> = ({ children }) => {
         return () => window.clearInterval(id);
     }, [gameControl.timerSpeed, TPS]);
 
-    return (
-        <GameTimeContext.Provider value={{ time, setTime }}>{children}</GameTimeContext.Provider>
-    );
+    return <GameTimeContext.Provider value={{ time, setTime }}>{children}</GameTimeContext.Provider>;
 };

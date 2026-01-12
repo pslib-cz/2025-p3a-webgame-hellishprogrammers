@@ -84,6 +84,7 @@ const Game = () => {
                     ),
                 },
             }));
+            if (!CanAfford(buildingPreview!.buildingType, newValues)) setBuildingPreview(null);
         }
     };
 
@@ -137,9 +138,9 @@ const Game = () => {
                     previewBuilding={buildingPreview}
                 />
             </BuildingsBitmapProvider>
-            <GameBar setBuilding={OnPlaceSelect} />
-            <EndScreen />
+            {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}
             {!gameControl.isEnd && selectedBuilding && <BuildingDocs building={selectedBuilding} />}
+            {gameControl.isEnd && <EndScreen />}
         </div>
     );
 };
