@@ -1,13 +1,11 @@
 import type { TimerSpeedType } from "..";
 
 export type GameControl = {
-    timerSpeed: TimerSpeedType;
-    isSound: boolean;
-    isEnd: boolean;
+  timerSpeed: TimerSpeedType;
+  isSound: boolean;
 };
 
 export const defaultGameControl: GameControl = {
-    timerSpeed: "play",
-    isSound: true,
-    isEnd: false,
+  timerSpeed: "play",
+  isSound: true,
 };
