@@ -1,4 +1,10 @@
+.inputValue {
+    display: flex;
+    border-left: none;
+}
+
 .inputValue input {
+    flex-grow: 1;
     padding: 1rem;
 
     background: transparent;
