@@ -1,7 +1,14 @@
 .buildingDocs{
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 6rem;
+    width: 20rem;
+    padding: 2rem;
+    background-color: var(--background);
     display: flex;
     flex-direction: column;
-    gap: .75rem;
+    gap: 1rem;
 }
 .icon{
     font-size: 1.5rem;
