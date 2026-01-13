@@ -8,7 +8,7 @@ button {
   background: transparent;
   color: inherit;
   border: none;
-  text-align: left;
+  cursor: pointer;
 }
 
 .linkActive,

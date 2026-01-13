@@ -5,10 +5,6 @@ import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import styles from "./EndScreen.module.css";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import useGameControl from "../../../hooks/providers/useGameControl";
-import { defaultGameControl } from "../../../types/Game/GameControl";
-import { defaultGameResources } from "../../../types/Game/GameResources";
-import useGameTime from "../../../hooks/providers/useGameTime";
-import { defaultGameTime } from "../../../types/Game/GameTime";
 
 const getRank = (score: number) => {
   if (score < 5000) return "F - INTERN";
@@ -19,15 +15,11 @@ const getRank = (score: number) => {
 };
 
 const EndScreen: FC = () => {
-  const { setGameControl } = useGameControl();
-  const { setGameResources } = useGameResources();
-  const { time, setTime } = useGameTime();
+    const { setGameControl } = useGameControl();
 
-  if (!time.isEnd) return;
-
-  useEffect(() => {
-    setGameControl((prev) => ({ ...prev, timerSpeed: "pause" }));
-  }, [])
+    useEffect(() => {
+        setGameControl((prev) => ({ ...prev, timerSpeed: "pause" }));
+    }, []);
 
   const { GameResources } = useGameResources();
 
@@ -42,14 +34,12 @@ const EndScreen: FC = () => {
 
   const score = Math.round(subtotal * multiplier);
 
-  const handlePlayAgain = () => {
-    setGameControl(defaultGameControl);
-    setGameResources(defaultGameResources);
-    setTime(defaultGameTime);
-  };
-  const handleExit = () => {
-    // remove data from session storage
-  };
+    const handlePlayAgain = () => {
+        window.location.reload();
+    };
+    const handleExit = () => {
+        // remove data from session storage
+    };
 
   return (
     <div className={styles.endScreen}>
