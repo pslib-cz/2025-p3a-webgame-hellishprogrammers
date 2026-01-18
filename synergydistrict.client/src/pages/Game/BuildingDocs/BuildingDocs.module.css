@@ -19,6 +19,10 @@
     justify-content: space-between;
 }
 .infoContainer{
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: .75rem;
+}
+.infoContainer > :nth-child(odd):last-child {
+  grid-column: 1 / -1;
 }

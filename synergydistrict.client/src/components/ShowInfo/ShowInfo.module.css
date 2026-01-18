@@ -4,7 +4,7 @@
 }
 .showGameInfo{
     display: flex;
-    width: 200px;
+    min-width: 50%;
     height: 40px;
     border: 4px solid var(--text, #fefae0);
 }
