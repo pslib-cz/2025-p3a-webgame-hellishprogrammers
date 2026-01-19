@@ -136,10 +136,10 @@ const Game = () => {
                     onMapClick={OnMapClick}
                     onContext={OnRotate}
                     previewBuilding={buildingPreview}
-                />
+                    />
+                    {!gameControl.isEnd && selectedBuilding && <BuildingDocs building={selectedBuilding} />}
             </BuildingsBitmapProvider>
             {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}
-            {!gameControl.isEnd && selectedBuilding && <BuildingDocs building={selectedBuilding} />}
             {gameControl.isEnd && <EndScreen />}
         </div>
     );

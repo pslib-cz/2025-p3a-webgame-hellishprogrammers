@@ -1,15 +1,28 @@
-import type { FC } from "react";
+import { type FC, useEffect, useRef } from "react";
 import ProductionListing from "../../../components/Game/ProductionListing/ProductionListing";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import type { BuildingType } from "../../../types/Game/Buildings";
 import styles from "./BuildingDocs.module.css";
+import { useBuildingsBitmap } from "../../../hooks/providers/useBuildingsBitmap";
+import EndScreen from "../EndScreen/EndScreen";
+
+
 
 type BuildingDocsProps = {
     building: BuildingType;
 };
 
 const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
+    const {buildingsBitmap} = useBuildingsBitmap(); 
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    useEffect(() => {
+        const canvas = canvasRef.current
+        const context = canvas?.getContext("2d") 
+        context?.drawImage(buildingsBitmap[building.buildingId]?.[1],0,0)       
+},[canvasRef]) 
+    
+
     return (
         <div className={styles.buildingDocs}>
             <div className={styles.title}>
@@ -34,6 +47,10 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
                     />
                 ))}
             </div>
+            <ProductionListing title="Shape">
+                <canvas ref={canvasRef}>
+                </canvas>
+            </ProductionListing>
         </div>
     );
 };
