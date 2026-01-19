@@ -36,7 +36,7 @@ const InputValue: FC<InputValueProps> = ({ text, inputType, value, onChange }) =
             case "number":
                 return "10_";
             case "text":
-                return "Nate Higgers";
+                return "placeholder";
         }
     };
 

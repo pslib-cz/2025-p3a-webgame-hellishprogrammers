@@ -326,10 +326,7 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
                     height={dimensions.height}
                     chunkBitmaps={chunkBitmaps}
                 />
-                {/* <GridLayer origin={{
-          x: 0,
-          y: 0
-        }} chunkWidth={16} chunkHeight={16} gridImage={gridBitmapRef.current} /> */}
+                <GridLayer gridImage={gridBitmapRef.current} />
                 <BuildingsLayer buildings={GameMapData.placedBuildings} />
                 <PreviewLayer
                     previewBuilding={previewBuilding}

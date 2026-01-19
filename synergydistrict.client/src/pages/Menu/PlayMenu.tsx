@@ -39,12 +39,12 @@ const PlayMenu = () => {
           selectedIndex={options.infiniteMap ? 0 : 1}
           onChange={(index) => setOptions({ ...options, infiniteMap: index === 0 })}
         />
-        <InputValue
+        {!options.infiniteMap ? <InputValue
           text="Map size"
           inputType="number"
           value={options.mapSize || ""}
           onChange={(val) => setOptions({ ...options, mapSize: Number(val) })}
-        />
+        /> : <></>}
       </div>
       <div className={`h2 ${styles.right}`}>
         <TextButton text="start" linkTo="/game" />
