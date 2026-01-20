@@ -22,10 +22,12 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
         const bitmap = buildingsBitmap[building.buildingId]?.[0];
         context?.clearRect(0,0, canvas?.width ,canvas?.height)
         if(bitmap.height > bitmap.width){
-            context?.drawImage(buildingsBitmap[building.buildingId]?.[1],0,0)
+            context?.drawImage(buildingsBitmap[building.buildingId]?.[1],
+                ((canvas.width - bitmap.height) / 2),
+                ((canvas.height - bitmap.width) / 2))
         }
         else{
-            context?.drawImage(bitmap,0,0)
+            context?.drawImage(bitmap,((canvas.width - bitmap.width) / 2),((canvas.height - bitmap.height) / 2))
         }    
 },[canvasRef, building]) 
     
@@ -55,9 +57,11 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
                 ))}
             </div>
             <ProductionListing title="Shape">
-                <canvas ref={canvasRef}>
-                </canvas>
+                <canvas ref={canvasRef} />
             </ProductionListing>
+            <div>
+                <h2 className={styles.title}>Synergy</h2>
+            </div>
         </div>
     );
 };
