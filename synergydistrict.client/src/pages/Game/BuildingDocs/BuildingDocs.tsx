@@ -5,7 +5,6 @@ import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import type { BuildingType } from "../../../types/Game/Buildings";
 import styles from "./BuildingDocs.module.css";
 import { useBuildingsBitmap } from "../../../hooks/providers/useBuildingsBitmap";
-import EndScreen from "../EndScreen/EndScreen";
 
 
 
