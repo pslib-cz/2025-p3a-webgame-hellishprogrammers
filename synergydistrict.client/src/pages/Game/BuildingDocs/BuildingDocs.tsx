@@ -17,10 +17,17 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
     const {buildingsBitmap} = useBuildingsBitmap(); 
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     useEffect(() => {
-        const canvas = canvasRef.current
+        const canvas = canvasRef.current!
         const context = canvas?.getContext("2d") 
-        context?.drawImage(buildingsBitmap[building.buildingId]?.[1],0,0)       
-},[canvasRef]) 
+        const bitmap = buildingsBitmap[building.buildingId]?.[0];
+        context?.clearRect(0,0, canvas?.width ,canvas?.height)
+        if(bitmap.height > bitmap.width){
+            context?.drawImage(buildingsBitmap[building.buildingId]?.[1],0,0)
+        }
+        else{
+            context?.drawImage(bitmap,0,0)
+        }    
+},[canvasRef, building]) 
     
 
     return (
