@@ -22,20 +22,21 @@ function App() {
             <div className="container">
                 <GameOptionsProvider>
                     <SettingsProvider>
-                        <BrowserRouter>
-                            <Routes>
-                                <Route path="/" element={<Navigate to={"/menu"} />} />
-                                <Route path="/menu" element={<Menu />}>
-                                    <Route path="" element={<MainMenu />} />
-                                    <Route path="play" element={<PlayMenu />} />
-                                    <Route path="leaderboard" element={<LeaderboardMenu />} />
-                                    <Route path="statistics" element={<StatisticsMenu />} />
-                                    <Route path="settings" element={<SettingsMenu />} />
-                                </Route>
-                                <Route path="/game" element={
-                                    <GameControlProvider>
-                                        <GameMapDataProvider>
-                                            <GamePropertiesProvider>
+                        <GamePropertiesProvider>
+                            <BrowserRouter>
+                                <Routes>
+                                    <Route path="/" element={<Navigate to={"/menu"} />} />
+                                    <Route path="/menu" element={<Menu />}>
+                                        <Route path="" element={<MainMenu />} />
+                                        <Route path="play" element={<PlayMenu />} />
+                                        <Route path="leaderboard" element={<LeaderboardMenu />} />
+                                        <Route path="statistics" element={<StatisticsMenu />} />
+                                        <Route path="settings" element={<SettingsMenu />} />
+                                    </Route>
+                                    <Route path="/game" element={
+                                        <GameControlProvider>
+                                            <GameMapDataProvider>
+
                                                 <GameTimeProvider>
                                                     <GameResourcesProvider>
                                                         <GameDataProvider>
@@ -43,12 +44,12 @@ function App() {
                                                         </GameDataProvider>
                                                     </GameResourcesProvider>
                                                 </GameTimeProvider>
-                                            </GamePropertiesProvider>
-                                        </GameMapDataProvider>
-                                    </GameControlProvider>
-                                } />
-                            </Routes>
-                        </BrowserRouter>
+                                            </GameMapDataProvider>
+                                        </GameControlProvider>
+                                    } />
+                                </Routes>
+                            </BrowserRouter>
+                        </GamePropertiesProvider>
                     </SettingsProvider>
                 </GameOptionsProvider>
             </div>

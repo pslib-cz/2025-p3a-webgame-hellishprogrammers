@@ -6,9 +6,11 @@ import { useGameOptions } from "../../hooks/providers/useGameOptions";
 import styles from "/src/styles/Menu.module.css";
 import { stringToSeed } from "../../utils/optionsUtils";
 import { useState } from "react";
+import useGameProperties from "../../hooks/providers/useGameProperties";
 
 const PlayMenu = () => {
   const { options, setOptions } = useGameOptions();
+  const { setGameProperties } = useGameProperties();
   const [seedString, setSeedString] = useState<string>(options.seed.toString())
 
   return (
@@ -43,7 +45,14 @@ const PlayMenu = () => {
           text="Map size"
           inputType="number"
           value={options.mapSize || ""}
-          onChange={(val) => setOptions({ ...options, mapSize: Number(val) })}
+          onChange={(val) => {
+            const numericValue = Number(val);
+            if (!Number.isFinite(numericValue)) return;
+            if (numericValue < 128) {
+              setOptions({ ...options, mapSize: numericValue });
+              setGameProperties((prev) => ({ ...prev, CHUNK_SIZE: numericValue }));
+            }
+          }}
         /> : <></>}
       </div>
       <div className={`h2 ${styles.right}`}>
