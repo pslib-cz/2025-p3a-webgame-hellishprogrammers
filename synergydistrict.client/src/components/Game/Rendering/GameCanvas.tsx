@@ -64,7 +64,7 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
     } = useChunkLoader({
         seed: options.seed,
         chunkSize: CHUNK_SIZE,
-        renderDistanceChunks: RENDER_DISTANCE_CHUNKS,
+        renderDistanceChunks: disableDynamicLoading ? 0 : RENDER_DISTANCE_CHUNKS,
         maxLoadedChunks: MAX_LOADED_CHUNKS,
         tileSize: TILE_SIZE,
         stageScale,
