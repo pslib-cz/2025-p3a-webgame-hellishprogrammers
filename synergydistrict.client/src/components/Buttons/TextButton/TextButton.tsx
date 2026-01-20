@@ -8,15 +8,17 @@ type TextButtonProps = {
     linkTo?: string;
     onClick?: () => void;
     isActive?: boolean;
+    bacgroundColor?: string;
 };
 
-export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActive = false }) => {
+export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActive = false, bacgroundColor }) => {
     const renderContext = () => {
         if (!linkTo) {
             return (
                 <button
                     onClick={onClick}
                     className={`${styles.link} ${styles.linkUppercase} ${isActive ? styles.linkActive : ""}`}
+                    style={{backgroundColor:`${isActive ? bacgroundColor : ""}`}}
                 >
                     <ToggleableText text={text} isActive={isActive} />
                 </button>
