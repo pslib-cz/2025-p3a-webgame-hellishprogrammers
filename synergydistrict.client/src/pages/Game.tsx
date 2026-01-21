@@ -31,7 +31,7 @@ const Game = () => {
     }, [gameControl.isEnd]);
 
     const OnMapClick = (position: Position) => {
-        if (activeBuildingType === null || gameControl.isEnd) return;
+        if (activeBuildingType === null || buildingPreview === null || gameControl.isEnd) return;
 
         if (
             CanPlaceBuilding(
@@ -141,18 +141,18 @@ const Game = () => {
                     onContext={OnRotate}
                     previewBuilding={buildingPreview}
                     onBuildingClick={(building: MapBuilding) => {
-                        if (selectedBuilding){
+                        if (selectedBuilding) {
                             selectedBuilding.isSelected = false;
-                            if (selectedBuilding.MapBuildingId === building.MapBuildingId){
+                            if (selectedBuilding.MapBuildingId === building.MapBuildingId) {
                                 setSelectedBuilding(null);
                                 return;
                             }
-                        } 
-                        building.isSelected = true; 
-                        setSelectedBuilding(building)
+                        }
+                        building.isSelected = true;
+                        setSelectedBuilding(building);
                     }}
-                    />
-                    {!gameControl.isEnd && activeBuildingType && <BuildingDocs building={activeBuildingType} />}
+                />
+                {!gameControl.isEnd && activeBuildingType && <BuildingDocs building={activeBuildingType} />}
             </BuildingsBitmapProvider>
             {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}
             {gameControl.isEnd && <EndScreen />}
