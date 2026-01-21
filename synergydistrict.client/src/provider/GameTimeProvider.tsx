@@ -3,6 +3,7 @@ import { defaultGameTime, type GameTimeType } from "../types/Game/GameTime";
 import useGameProperties from "../hooks/providers/useGameProperties";
 import useGameControl from "../hooks/providers/useGameControl";
 import { useGameOptions } from "../hooks/providers/useGameOptions";
+import { loadStoredState, saveStoredState } from "../utils/stateStorage";
 
 type GameTimeContextValue = {
     time: GameTimeType;
@@ -14,9 +15,19 @@ export const GameTimeContext = createContext<GameTimeContextValue | null>(null);
 export const GameTimeProvider: React.FC<PropsWithChildren> = ({ children }) => {
     const { gameControl, setGameControl } = useGameControl();
     const { options } = useGameOptions();
-    const [time, setTime] = useState<GameTimeType>(defaultGameTime);
+    const [time, setTime] = useState<GameTimeType>(() =>
+        loadStoredState<GameTimeType>("gameTime", defaultGameTime)
+    );
     const { TPS } = useGameProperties();
     const elapsedGameTicksRef = useRef(0);
+
+    useEffect(() => {
+        elapsedGameTicksRef.current = time.timer;
+    }, [time.timer]);
+
+    useEffect(() => {
+        saveStoredState("gameTime", time);
+    }, [time]);
 
     useEffect(() => {
         if (!gameControl.isEnd && options.gameDuration * 60 - time.timer / TPS <= 0) {

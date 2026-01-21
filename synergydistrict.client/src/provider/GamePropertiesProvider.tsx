@@ -1,5 +1,6 @@
 import {
     createContext,
+    useEffect,
     useMemo,
     useState,
     type Dispatch,
@@ -8,6 +9,7 @@ import {
     type SetStateAction,
 } from "react";
 import { defaultGameProperties, type GamePropertiesValue } from "../types/Game/GameProperties";
+import { loadStoredState, saveStoredState } from "../utils/stateStorage";
 
 export type GamePropertiesContextValue = GamePropertiesValue & {
     setGameProperties: Dispatch<SetStateAction<GamePropertiesValue>>;
@@ -16,7 +18,13 @@ export type GamePropertiesContextValue = GamePropertiesValue & {
 export const GamePropertiesContext = createContext<GamePropertiesContextValue | null>(null);
 
 export const GamePropertiesProvider: FC<PropsWithChildren> = ({ children }) => {
-    const [properties, setGameProperties] = useState<GamePropertiesValue>(() => ({ ...defaultGameProperties }));
+    const [properties, setGameProperties] = useState<GamePropertiesValue>(() =>
+        loadStoredState<GamePropertiesValue>("gameProperties", defaultGameProperties)
+    );
+
+    useEffect(() => {
+        saveStoredState("gameProperties", properties);
+    }, [properties]);
 
     const value = useMemo<GamePropertiesContextValue>(
         () => ({ ...properties, setGameProperties }),

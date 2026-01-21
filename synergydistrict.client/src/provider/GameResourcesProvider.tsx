@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { defaultGameResources, type GameResources } from "../types/Game/GameResources";
 import useGameTime from "../hooks/providers/useGameTime";
 import useGameProperties from "../hooks/providers/useGameProperties";
+import { loadStoredState, saveStoredState } from "../utils/stateStorage";
 
 type GameResourcesContextValue = {
     GameResources: GameResources;
@@ -11,9 +12,15 @@ type GameResourcesContextValue = {
 export const GameResourcesContext = createContext<GameResourcesContextValue | null>(null);
 
 export const GameResourcesProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-    const [GameResources, setGameResources] = useState<GameResources>(defaultGameResources);
+    const [GameResources, setGameResources] = useState<GameResources>(() =>
+        loadStoredState<GameResources>("gameResources", defaultGameResources)
+    );
     const {time} = useGameTime();
     const {TPS} = useGameProperties();
+
+    useEffect(() => {
+        saveStoredState("gameResources", GameResources);
+    }, [GameResources]);
 
     useEffect(() => {
         if (TPS === 0) return; // avoid division by zero
