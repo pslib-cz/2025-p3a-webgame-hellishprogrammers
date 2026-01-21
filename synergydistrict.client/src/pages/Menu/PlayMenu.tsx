@@ -5,13 +5,29 @@ import ToggleButton from "../../components/Buttons/ToggleButton/ToggleButton";
 import { useGameOptions } from "../../hooks/providers/useGameOptions";
 import styles from "/src/styles/Menu.module.css";
 import { stringToSeed } from "../../utils/optionsUtils";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import useGameProperties from "../../hooks/providers/useGameProperties";
+import { defaultGameProperties } from "../../types/Game/GameProperties";
+import { clearStoredState } from "../../utils/stateStorage";
+
+const SESSION_RESET_KEYS = [
+  "gameControl",
+  "gameMapData",
+  "gameProperties",
+  "gameResources",
+  "gameTime",
+  "buildings",
+  "synergies",
+];
 
 const PlayMenu = () => {
   const { options, setOptions } = useGameOptions();
   const { setGameProperties } = useGameProperties();
-  const [seedString, setSeedString] = useState<string>(options.seed.toString())
+  const [seedString, setSeedString] = useState<string>(options.seed.toString());
+  const handleStart = useCallback(() => {
+    setGameProperties(() => ({ ...defaultGameProperties }));
+    clearStoredState(SESSION_RESET_KEYS);
+  }, [setGameProperties]);
 
   return (
     <>
@@ -56,7 +72,7 @@ const PlayMenu = () => {
         /> : <></>}
       </div>
       <div className={`h2 ${styles.right}`}>
-        <TextButton text="start" linkTo="/game" />
+        <TextButton text="start" linkTo="/game" onClick={handleStart} />
       </div>
     </>
   );

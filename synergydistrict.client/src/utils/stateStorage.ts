@@ -47,3 +47,19 @@ export const saveStoredState = (key: string, value: unknown, scope: StorageScope
         // ignore storage failures
     }
 };
+
+export const clearStoredState = (keys: string | string[], scope: StorageScope = "session"): void => {
+    const storage = getStorage(scope);
+    if (!storage) {
+        return;
+    }
+
+    const normalizedKeys = Array.isArray(keys) ? keys : [keys];
+    normalizedKeys.forEach((key) => {
+        try {
+            storage.removeItem(key);
+        } catch {
+            // ignore storage failures
+        }
+    });
+};
