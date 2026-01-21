@@ -15,7 +15,8 @@ import useGameControl from "../hooks/providers/useGameControl";
 import BuildingDocs from "./Game/BuildingDocs/BuildingDocs";
 
 const Game = () => {
-    const [selectedBuilding, setSelectedBuilding] = useState<BuildingType | null>(null);
+    const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
+    const [ selectedBuilding, setSelectedBuilding ] = useState<MapBuilding | null>(null);
     const [buildingPreview, setBuildingPreview] = useState<MapBuilding | null>(null);
     const { options } = useGameOptions();
     const { GameMapData, setGameMapData } = useGameMapData();
@@ -25,12 +26,12 @@ const Game = () => {
 
     useEffect(() => {
         if (!gameControl.isEnd) return;
-        setSelectedBuilding(null);
+        setActiveBuildingType(null);
         setBuildingPreview(null);
     }, [gameControl.isEnd]);
 
     const OnMapClick = (position: Position) => {
-        if (selectedBuilding === null || gameControl.isEnd) return;
+        if (activeBuildingType === null || gameControl.isEnd) return;
 
         if (
             CanPlaceBuilding(
@@ -42,7 +43,7 @@ const Game = () => {
             CanAfford(buildingPreview!.buildingType, GameResources)
         ) {
             const newBuilding: MapBuilding = {
-                buildingType: selectedBuilding,
+                buildingType: activeBuildingType,
                 MapBuildingId: crypto.randomUUID(),
                 position: position,
                 edges: buildingPreview!.edges,
@@ -91,7 +92,7 @@ const Game = () => {
     const OnPlaceSelect = (building: BuildingType | null) => {
         if (gameControl.isEnd) return;
 
-        setSelectedBuilding(building);
+        setActiveBuildingType(building);
 
         if (building === null || !CanAfford(building, GameResources)) {
             setBuildingPreview(null);
@@ -136,8 +137,19 @@ const Game = () => {
                     onMapClick={OnMapClick}
                     onContext={OnRotate}
                     previewBuilding={buildingPreview}
+                    onBuildingClick={(building: MapBuilding) => {
+                        if (selectedBuilding){
+                            selectedBuilding.isSelected = false;
+                            if (selectedBuilding.MapBuildingId === building.MapBuildingId){
+                                setSelectedBuilding(null);
+                                return;
+                            }
+                        } 
+                        building.isSelected = true; 
+                        setSelectedBuilding(building)
+                    }}
                     />
-                    {!gameControl.isEnd && selectedBuilding && <BuildingDocs building={selectedBuilding} />}
+                    {!gameControl.isEnd && activeBuildingType && <BuildingDocs building={activeBuildingType} />}
             </BuildingsBitmapProvider>
             {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}
             {gameControl.isEnd && <EndScreen />}

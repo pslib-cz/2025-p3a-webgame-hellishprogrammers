@@ -33,10 +33,11 @@ type GameCanvasProps = {
     disableDynamicLoading?: boolean;
     onMapClick: (position: Position) => void;
     onContext: () => void;
+    onBuildingClick: (building: MapBuilding) => void;
     previewBuilding: MapBuilding | null;
 };
 
-const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapClick, onContext, previewBuilding }) => {
+const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapClick, onContext, previewBuilding, onBuildingClick }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const stageRef = useRef<Konva.Stage | null>(null);
@@ -164,6 +165,12 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
         if (!pointerTile) return;
 
         let placementTile: Position = pointerTile;
+
+        const building = GameMapData.placedBuildingsMappped[`${pointerTile.x};${pointerTile.y}`];
+        if (building) {
+            onBuildingClick(building);
+            return;
+        }
 
         if (previewBuilding) {
             const iconOffset = findIconOffset(previewBuilding.shape);
