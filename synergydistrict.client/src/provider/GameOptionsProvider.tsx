@@ -1,4 +1,5 @@
 import { useState, useCallback, type FC, type PropsWithChildren, createContext } from "react";
+import { loadStoredState, saveStoredState } from "../utils/stateStorage";
 import { defaultGameOptions, type GameOptions } from "../types/Menu/GameOptions";
 
 type GameOptionsContextValue = {
@@ -14,18 +15,14 @@ export const GameOptionsProvider: FC<PropsWithChildren> = ({ children }) => {
       return defaultGameOptions;
     }
 
-    const storedValue = sessionStorage.getItem("gameOptions");
-    if (!storedValue) {
-      return defaultGameOptions;
+    const storedOptions = loadStoredState<GameOptions>("gameOptions", defaultGameOptions);
+
+    const storage = window.sessionStorage;
+    if (!storage.getItem("gameOptions")) {
+      saveStoredState("gameOptions", storedOptions);
     }
 
-    try {
-      const parsedValue = JSON.parse(storedValue) as GameOptions;
-      return { ...defaultGameOptions, ...parsedValue };
-    } catch (error) {
-      console.warn("Failed to parse stored game options", error);
-      return defaultGameOptions;
-    }
+    return storedOptions;
   });
 
   const setOptions = useCallback((value: GameOptions) => {
@@ -35,7 +32,7 @@ export const GameOptionsProvider: FC<PropsWithChildren> = ({ children }) => {
       return;
     }
 
-    sessionStorage.setItem("gameOptions", JSON.stringify(value));
+    saveStoredState("gameOptions", value);
   }, []);
 
   return <GameOptionsContext.Provider value={{ options, setOptions }}>{children}</GameOptionsContext.Provider>;
