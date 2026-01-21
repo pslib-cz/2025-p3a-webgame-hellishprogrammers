@@ -2,13 +2,13 @@ import type { BuildingTileType } from "../types";
 import type { BuildingSynergy, BuildingType, Production } from "../types/Game/Buildings";
 import type { GameResources } from "../types/Game/GameResources";
 // import type { BuildingType } from "../types/Game/Buildings";
-import type { Edge, EdgeSide, MapBuilding, MapTile } from "../types/Game/Grid";
+import type { Edge, EdgeSide, MapBuilding, MapTile, Position } from "../types/Game/Grid";
 
 export const CanPlaceBuilding = (
     shape: BuildingTileType[][],
     position: { x: number; y: number },
     placedBuildingsMappped: Record<string, MapBuilding>,
-    loadedMapTiles: Record<string, MapTile>
+    loadedMapTiles: Record<string, MapTile>,
 ): boolean => {
     for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
@@ -46,47 +46,51 @@ export const CanAfford = (building: BuildingType, variables: GameResources) => {
     return true;
 };
 
+type CalculateValuesResult = {
+    newValues: GameResources;
+    newSynergiesBuildings: MapBuilding[];
+};
+
 export const CalculateValues = (
     building: MapBuilding,
     placedBuildingsMappped: Record<string, MapBuilding>,
     synergies: BuildingSynergy[],
-    variables: GameResources
-): GameResources | null => {
-    const result: GameResources = { ...variables };
+    variables: GameResources,
+): CalculateValuesResult | null => {
+    const result: CalculateValuesResult = { newValues: { ...variables }, newSynergiesBuildings: [] };
 
-    result.moneyBalance -= building.buildingType.cost;
+    result.newValues.moneyBalance -= building.buildingType.cost;
 
-    // if (!CanAddProdution(building.buildingType.baseProduction || [], result)) return null;
-    if (!AddProductionSum(building.buildingType.baseProduction || [], result)) return null;
+    if (!AddProductionSum(building.buildingType.baseProduction || [], result.newValues)) return null;
 
     // Checking synergies production
     for (const edge of building.edges) {
         let delX = 0;
         let delY = 0;
-        let side: EdgeSide;
+        let neighborEdgeSide: EdgeSide;
         switch (edge.side) {
             case "top":
                 delY = -1;
-                side = "bottom";
+                neighborEdgeSide = "bottom";
                 break;
             case "bottom":
                 delY = 1;
-                side = "top";
+                neighborEdgeSide = "top";
                 break;
             case "left":
                 delX = -1;
-                side = "right";
+                neighborEdgeSide = "right";
                 break;
             case "right":
                 delX = 1;
-                side = "left";
+                neighborEdgeSide = "left";
                 break;
         }
 
-        const neighborKey = `${building.position.x + edge.position.x + delX};${
-            building.position.y + edge.position.y + delY
-        }`;
-        const neighbor = placedBuildingsMappped[neighborKey];
+        const neighborPosX = building.position.x + edge.position.x + delX;
+        const neighborPosY = building.position.y + edge.position.y + delY;
+
+        const neighbor = placedBuildingsMappped[`${neighborPosX};${neighborPosY}`];
 
         if (neighbor) {
             const activeSynergies = synergies.filter(
@@ -94,12 +98,51 @@ export const CalculateValues = (
                     (s.sourceBuildingId === building.buildingType.buildingId &&
                         s.targetBuildingId === neighbor.buildingType.buildingId) ||
                     (s.sourceBuildingId === neighbor.buildingType.buildingId &&
-                        s.targetBuildingId === building.buildingType.buildingId)
+                        s.targetBuildingId === building.buildingType.buildingId),
             );
 
             if (activeSynergies.length === 0) continue;
             for (const synergy of activeSynergies) {
-                if (!AddProductionSum(synergy.synergyProduction || [], result)) return null;
+                // Adding synergy production to values
+                if (!AddProductionSum(synergy.synergyProductions || [], result.newValues)) return null;
+
+                // Adding synergy to target building
+                let target: MapBuilding;
+                let source: MapBuilding;
+                let edgePosition: Position;
+                let edgeSide: EdgeSide;
+
+                if (synergy.targetBuildingId === building.buildingType.buildingId) {
+                    target = building;
+                    source = neighbor;
+
+                    edgePosition = edge.position;
+                    edgeSide = edge.side;
+                } else {
+                    target = neighbor;
+                    source = building;
+
+                    edgePosition = { x: neighborPosX, y: neighborPosY };
+                    edgeSide = neighborEdgeSide;
+                }
+
+                // New target edges
+                const newEdges = target.edges.map((e) => {
+                    if (e.position === edgePosition && e.side === edgeSide) {
+                        return {
+                            ...e,
+                            activeSynergies: {
+                                // activeSynergyId: `${source.MapBuildingId}:${target.MapBuildingId}`,
+                                activeSynergyId: crypto.randomUUID(),
+                                targetBuilding: target,
+                                synergyProductions: synergy.synergyProductions,
+                            },
+                        };
+                    }
+                    return e;
+                });
+
+                result.newSynergiesBuildings.push({ ...target, edges: newEdges });
             }
         }
     }
@@ -137,7 +180,7 @@ const AddProductionSum = (products: Production[], variables: GameResources): boo
 
         if (typeof currentValue === "number") {
             const resultProduction = currentValue + product.value;
-            
+
             if (resourceKey === "energy" && product.value < 0) {
                 variables.energyUsed -= product.value;
                 continue;

@@ -3,7 +3,7 @@ import type { BuildingTileType, BuildingCategory, StatsType } from "..";
 export type BuildingSynergy = {
     sourceBuildingId: number;
     targetBuildingId: number;
-    synergyProduction: Production[];
+    synergyProductions: Production[];
 };
 
 export type Production = {

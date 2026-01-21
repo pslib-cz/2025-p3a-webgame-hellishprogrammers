@@ -12,10 +12,12 @@ import useChunkLoader from "../../../hooks/useChunkLoader";
 import type { MapBuilding, MapTile, Position } from "../../../types/Game/Grid";
 import BuildingsLayer from "./BuildingsLayer";
 import PreviewLayer from "./PreviewLayer";
-import { CanPlaceBuilding } from "../../../utils/PlacingUtils";
+import { CalculateValues, CanPlaceBuilding } from "../../../utils/PlacingUtils";
 import { useGameOptions } from "../../../hooks/providers/useGameOptions";
 import useGameMapData from "../../../hooks/providers/useMapData";
 import GridLayer from "./GridLayer";
+import { useGameData } from "../../../hooks/providers/useGameData";
+import useGameResources from "../../../hooks/providers/useGameResources";
 
 const findIconOffset = (shape: MapBuilding["shape"]): Position => {
     for (let y = 0; y < shape.length; y++) {
@@ -56,6 +58,8 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
     });
 
     const { GameMapData, setGameMapData } = useGameMapData();
+    const { synergies } = useGameData();
+    const { GameResources } = useGameResources();
 
     const {
         loadedChunks,
@@ -123,8 +127,9 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
                 previewBuilding.shape,
                 origin,
                 GameMapData.placedBuildingsMappped,
-                GameMapData.loadedMapTiles
-            )
+                GameMapData.loadedMapTiles,
+            ) &&
+                CalculateValues(previewBuilding, GameMapData.placedBuildingsMappped, synergies, GameResources) !== null,
         );
     }, [previewBuilding, getTileFromPointer, GameMapData.placedBuildingsMappped, GameMapData.loadedMapTiles]);
 
@@ -134,10 +139,13 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
             loadedChunks,
             loadedMapTiles: Object.values(loadedChunks)
                 .flat()
-                .reduce((acc, tile) => {
-                    acc[`${tile.position.x};${tile.position.y}`] = tile;
-                    return acc;
-                }, {} as Record<string, MapTile>),
+                .reduce(
+                    (acc, tile) => {
+                        acc[`${tile.position.x};${tile.position.y}`] = tile;
+                        return acc;
+                    },
+                    {} as Record<string, MapTile>,
+                ),
         }));
     }, [loadedChunks, setGameMapData]);
 
@@ -205,7 +213,7 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
             if (!isPointerOverStage) return;
             requestAnimationFrame(() => updatePreviewFromPointer());
         },
-        [handleWheel, updatePreviewFromPointer, isPointerOverStage]
+        [handleWheel, updatePreviewFromPointer, isPointerOverStage],
     );
 
     const handleStageDragMove = useCallback(() => {

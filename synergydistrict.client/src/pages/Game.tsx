@@ -30,16 +30,15 @@ const Game = () => {
     }, [gameControl.isEnd]);
 
     const OnMapClick = (position: Position) => {
-        if (selectedBuilding === null || gameControl.isEnd) return;
+        if (selectedBuilding === null || buildingPreview === null || gameControl.isEnd) return;
 
         if (
             CanPlaceBuilding(
                 buildingPreview!.shape,
                 position,
                 GameMapData.placedBuildingsMappped,
-                GameMapData.loadedMapTiles
-            ) &&
-            CanAfford(buildingPreview!.buildingType, GameResources)
+                GameMapData.loadedMapTiles,
+            )
         ) {
             const newBuilding: MapBuilding = {
                 buildingType: selectedBuilding,
@@ -55,36 +54,40 @@ const Game = () => {
                 newBuilding,
                 GameMapData.placedBuildingsMappped,
                 synergies,
-                GameResources
+                GameResources,
             );
             if (!newValues) return;
 
-            setGameResources(newValues);
+            setGameResources(newValues.newValues);
+
+            const newBuildings = [...GameMapData.placedBuildings, newBuilding].map((b) => {
+                const changedBuilding = newValues.newSynergiesBuildings.find(
+                    (bi) => bi.MapBuildingId === b.MapBuildingId,
+                );
+                return changedBuilding ? changedBuilding : b;
+            });
+
+            const buildingsToUpdate = [newBuilding, ...newValues.newSynergiesBuildings];
 
             setGameMapData((prev) => ({
                 ...prev,
-                placedBuildings: [...prev.placedBuildings, newBuilding],
+                placedBuildings: newBuildings,
                 placedBuildingsMappped: {
                     ...prev.placedBuildingsMappped,
                     ...Object.fromEntries(
-                        newBuilding.shape
-                            .map((row, y) =>
+                        buildingsToUpdate.flatMap((b) =>
+                            b.shape.flatMap((row, y) =>
                                 row
                                     .map((tile, x) =>
-                                        tile !== "Empty"
-                                            ? [
-                                                  `${newBuilding.position.x + x};${newBuilding.position.y + y}`,
-                                                  newBuilding,
-                                              ]
-                                            : null
+                                        tile !== "Empty" ? [`${b.position.x + x};${b.position.y + y}`, b] : null,
                                     )
-                                    .filter((entry): entry is [string, MapBuilding] => entry !== null)
-                            )
-                            .flat()
+                                    .filter((entry): entry is [string, MapBuilding] => entry !== null),
+                            ),
+                        ),
                     ),
                 },
             }));
-            if (!CanAfford(buildingPreview!.buildingType, newValues)) setBuildingPreview(null);
+            if (!CanAfford(buildingPreview!.buildingType, newValues.newValues)) setBuildingPreview(null);
         }
     };
 
@@ -136,8 +139,8 @@ const Game = () => {
                     onMapClick={OnMapClick}
                     onContext={OnRotate}
                     previewBuilding={buildingPreview}
-                    />
-                    {!gameControl.isEnd && selectedBuilding && <BuildingDocs building={selectedBuilding} />}
+                />
+                {!gameControl.isEnd && selectedBuilding && <BuildingDocs building={selectedBuilding} />}
             </BuildingsBitmapProvider>
             {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}
             {gameControl.isEnd && <EndScreen />}

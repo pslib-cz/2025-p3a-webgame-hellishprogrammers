@@ -38,7 +38,7 @@ export type MapBuilding = {
 };
 
 export type ActiveSynergies = {
-    activeSynergyId: number;
-    targetBuildingId: number;
-    synergyProduction: Production[];
+    activeSynergyId: string;
+    targetBuilding: MapBuilding;
+    synergyProductions: Production[];
 };
