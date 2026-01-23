@@ -32,7 +32,7 @@ const rebuildPlacedBuildingsMap = (placedBuildings: MapBuilding[]): Record<strin
 export const GameMapDataProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [GameMapData, setGameMapData] = useState<GameMapData>(() => {
         const stored = loadStoredState<GameMapData>("gameMapData", defaultGameMapData);
-        const sanitizedPlacedBuildings = (stored.placedBuildings ?? []).map((storedBuilding) => ({
+        const sanitizedPlacedBuildings = stored.placedBuildings.map((storedBuilding) => ({
             ...storedBuilding,
             isSelected: false,
         }));

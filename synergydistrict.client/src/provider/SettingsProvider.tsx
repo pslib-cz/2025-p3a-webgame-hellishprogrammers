@@ -5,13 +5,13 @@ import { loadStoredState, saveStoredState } from "../utils/stateStorage";
 export const SettingsContext = createContext<SettingsProviderValue | null>(null);
 
 export const SettingsProvider: FC<PropsWithChildren> = ({ children }) => {
-    const [options, setOptions] = useState<Settings>(() =>
+    const [gameSettings, setGameSettings] = useState<Settings>(() =>
         loadStoredState<Settings>("settings", defaultSettings, "local")
     );
 
     useEffect(() => {
-        saveStoredState("settings", options, "local");
-    }, [options]);
+        saveStoredState("settings", gameSettings, "local");
+    }, [gameSettings]);
 
-    return <SettingsContext.Provider value={{ options, setOptions }}>{children}</SettingsContext.Provider>;
+    return <SettingsContext.Provider value={{ gameSettings, setGameSettings }}>{children}</SettingsContext.Provider>;
 };

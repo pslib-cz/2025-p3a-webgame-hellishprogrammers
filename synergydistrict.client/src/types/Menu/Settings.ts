@@ -1,6 +1,6 @@
 export type SettingsProviderValue = {
-    options: Settings;
-    setOptions: (x: Settings) => void;
+    gameSettings: Settings;
+    setGameSettings: (x: Settings) => void;
 };
 
 export type Settings = {
