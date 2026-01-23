@@ -10,6 +10,7 @@ import useGameControl from "../../../hooks/providers/useGameControl";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import useGameTime from "../../../hooks/providers/useGameTime";
 import { useGameOptions } from "../../../hooks/providers/useGameOptions";
+import { useSettings } from "../../../hooks/providers/useSettings";
 
 type GameBarProps = {
     setBuilding: (x: BuildingType | null) => void;
@@ -17,6 +18,7 @@ type GameBarProps = {
 
 const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
     const { gameControl, setGameControl } = useGameControl();
+    const { gameSettings, setGameSettings } = useSettings();
     const { GameResources } = useGameResources();
     const { time } = useGameTime();
     const { buildings, loading } = useGameData();
@@ -71,9 +73,9 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
                 </div>
                 <div className="border--narrow">
                     <IconButton
-                        OnClick={() => setGameControl((v) => ({ ...v, isSound: !v.isSound }))}
-                        isActive={gameControl.isSound}
-                        iconKey={gameControl.isSound ? "volumeon" : "volumeoff"}
+                        OnClick={() => setGameSettings({ ...gameSettings, isMusic: !gameSettings.isMusic })}
+                        isActive={gameSettings.isMusic}
+                        iconKey={gameSettings.isMusic ? "volumeon" : "volumeoff"}
                     />
                 </div>
                 <div className={`${styles.timer} border--narrow`}>
