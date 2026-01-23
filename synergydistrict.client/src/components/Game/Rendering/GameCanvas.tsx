@@ -169,16 +169,16 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
 
     const handleStageOnClick = (evt: Konva.KonvaEventObject<PointerEvent>) => {
         if (evt.evt.button != 0) return;
+        
+        // If the click was on a building (Image element), let BuildingsLayer handle it
+        if (evt.target && evt.target !== evt.currentTarget) {
+            return;
+        }
+        
         const pointerTile = getTileFromPointer();
         if (!pointerTile) return;
 
         let placementTile: Position = pointerTile;
-
-        const building = GameMapData.placedBuildingsMappped[`${pointerTile.x};${pointerTile.y}`];
-        if (building) {
-            onBuildingClick(building);
-            return;
-        }
 
         if (previewBuilding) {
             const iconOffset = findIconOffset(previewBuilding.shape);
@@ -342,7 +342,7 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
                     chunkBitmaps={chunkBitmaps}
                 />
                 <GridLayer gridImage={gridBitmapRef.current} />
-                <BuildingsLayer buildings={GameMapData.placedBuildings} />
+                <BuildingsLayer buildings={GameMapData.placedBuildings} onBuildingClick={onBuildingClick} />
                 <PreviewLayer
                     previewBuilding={previewBuilding}
                     position={previewTile}

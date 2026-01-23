@@ -7,18 +7,19 @@ import { useImageBitmap } from "../../../hooks/useImage";
 
 type BuildingsLayerProps = {
     buildings: MapBuilding[];
+    onBuildingClick: (building: MapBuilding) => void;
 };
 
 const SELECTION_OUTLINE_COLOR = "#FEFAE0";
 
-const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
+const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, onBuildingClick }) => {
     const { TILE_SIZE } = useGameProperties();
     const { buildingsBitmap } = useBuildingsBitmap();
 
     const { bitmap: err, loading, error } = useImageBitmap("/images/err.jpg");
 
     return (
-        <Layer listening={false}>
+        <Layer listening={true}>
             {loading ? <></> : buildings.map((building) => {
                 const bitmap = buildingsBitmap[building.buildingType.buildingId]?.[building.rotation] || err;
 
@@ -39,6 +40,8 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
                             width={width}
                             height={height}
                             image={bitmap!}
+                            onClick={() => onBuildingClick(building)}
+                            onTap={() => onBuildingClick(building)}
                         />
                         {building.isSelected ? (
                             <Shape
