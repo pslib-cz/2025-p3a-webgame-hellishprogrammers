@@ -180,6 +180,18 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
 
         let placementTile: Position = pointerTile;
 
+        const building = GameMapData.placedBuildingsMappped[`${pointerTile.x};${pointerTile.y}`];
+        if (building) {
+            const relX = pointerTile.x - building.position.x;
+            const relY = pointerTile.y - building.position.y;
+            if (relX >= 0 && relY >= 0 && relY < building.shape.length && relX < building.shape[relY].length) {
+                if (building.shape[relY][relX] !== "Empty") {
+                    onBuildingClick(building);
+                    return;
+                }
+            }
+        }
+
         if (previewBuilding) {
             const iconOffset = findIconOffset(previewBuilding.shape);
             placementTile = {
@@ -342,7 +354,7 @@ const GameCanvas: FC<GameCanvasProps> = ({ disableDynamicLoading = false, onMapC
                     chunkBitmaps={chunkBitmaps}
                 />
                 <GridLayer gridImage={gridBitmapRef.current} />
-                <BuildingsLayer buildings={GameMapData.placedBuildings} onBuildingClick={onBuildingClick} />
+                <BuildingsLayer buildings={GameMapData.placedBuildings} />
                 <PreviewLayer
                     previewBuilding={previewBuilding}
                     position={previewTile}
