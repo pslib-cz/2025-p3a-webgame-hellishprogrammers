@@ -27,3 +27,6 @@
     -webkit-appearance: none;
     margin: 0;
 }
+.inputValue input[type="number"] {
+    -moz-appearance: textfield;
+}
