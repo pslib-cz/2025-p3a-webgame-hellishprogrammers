@@ -13,6 +13,7 @@ import useGameResources from "../hooks/providers/useGameResources";
 import EndScreen from "./Game/EndScreen/EndScreen";
 import useGameControl from "../hooks/providers/useGameControl";
 import BuildingDocs from "./Game/BuildingDocs/BuildingDocs";
+import BuildingDetails from "./Game/BuildingDetails/BuildingDetails";
 
 const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
@@ -154,6 +155,9 @@ const Game = () => {
                 />
                 {!gameControl.isEnd && activeBuildingType && <BuildingDocs building={activeBuildingType} />}
             </BuildingsBitmapProvider>
+            {!gameControl.isEnd && selectedBuilding && (
+                <BuildingDetails building={selectedBuilding} CloseBar={() => setSelectedBuilding(null)} />
+            )}
             {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}
             {gameControl.isEnd && <EndScreen />}
         </div>

@@ -1,0 +1,27 @@
+.buildingDetails {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 6rem;
+    width: 20rem;
+    padding: 2rem;
+    background-color: var(--background);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.title h2 {
+    margin: 0;
+    text-transform: uppercase;
+}
+.title [class^="icon-"] {
+    font-size: 1.5rem;
+    padding: .5rem;
+    margin: -.5rem;
+}

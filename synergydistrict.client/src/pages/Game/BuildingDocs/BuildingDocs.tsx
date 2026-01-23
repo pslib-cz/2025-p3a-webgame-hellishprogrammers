@@ -6,30 +6,28 @@ import type { BuildingType } from "../../../types/Game/Buildings";
 import styles from "./BuildingDocs.module.css";
 import { useBuildingsBitmap } from "../../../hooks/providers/useBuildingsBitmap";
 
-
-
 type BuildingDocsProps = {
     building: BuildingType;
 };
 
 const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
-    const {buildingsBitmap} = useBuildingsBitmap(); 
+    const { buildingsBitmap } = useBuildingsBitmap();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     useEffect(() => {
-        const canvas = canvasRef.current!
-        const context = canvas?.getContext("2d") 
+        const canvas = canvasRef.current!;
+        const context = canvas?.getContext("2d");
         const bitmap = buildingsBitmap[building.buildingId]?.[0];
-        context?.clearRect(0,0, canvas?.width ,canvas?.height)
-        if(bitmap.height > bitmap.width){
-            context?.drawImage(buildingsBitmap[building.buildingId]?.[1],
-                ((canvas.width - bitmap.height) / 2),
-                ((canvas.height - bitmap.width) / 2))
+        context?.clearRect(0, 0, canvas?.width, canvas?.height);
+        if (bitmap.height > bitmap.width) {
+            context?.drawImage(
+                buildingsBitmap[building.buildingId]?.[1],
+                (canvas.width - bitmap.height) / 2,
+                (canvas.height - bitmap.width) / 2,
+            );
+        } else {
+            context?.drawImage(bitmap, (canvas.width - bitmap.width) / 2, (canvas.height - bitmap.height) / 2);
         }
-        else{
-            context?.drawImage(bitmap,((canvas.width - bitmap.width) / 2),((canvas.height - bitmap.height) / 2))
-        }    
-},[canvasRef, building]) 
-    
+    }, [canvasRef, building]);
 
     return (
         <div className={styles.buildingDocs}>
