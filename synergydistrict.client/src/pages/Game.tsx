@@ -14,6 +14,23 @@ import EndScreen from "./Game/EndScreen/EndScreen";
 import useGameControl from "../hooks/providers/useGameControl";
 import BuildingDocs from "./Game/BuildingDocs/BuildingDocs";
 
+const buildPlacedBuildingsMap = (buildings: MapBuilding[]): Record<string, MapBuilding> => {
+    const mapped: Record<string, MapBuilding> = {};
+
+    for (const building of buildings) {
+        for (let y = 0; y < building.shape.length; y++) {
+            const row = building.shape[y];
+            for (let x = 0; x < row.length; x++) {
+                if (row[x] === "Empty") continue;
+                const key = `${building.position.x + x};${building.position.y + y}`;
+                mapped[key] = building;
+            }
+        }
+    }
+
+    return mapped;
+};
+
 const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
     const [selectedBuilding, setSelectedBuilding] = useState<MapBuilding | null>(null);
@@ -73,20 +90,7 @@ const Game = () => {
             setGameMapData((prev) => ({
                 ...prev,
                 placedBuildings: newBuildings,
-                placedBuildingsMappped: {
-                    ...prev.placedBuildingsMappped,
-                    ...Object.fromEntries(
-                        buildingsToUpdate.flatMap((b) =>
-                            b.shape.flatMap((row, y) =>
-                                row
-                                    .map((tile, x) =>
-                                        tile !== "Empty" ? [`${b.position.x + x};${b.position.y + y}`, b] : null,
-                                    )
-                                    .filter((entry): entry is [string, MapBuilding] => entry !== null),
-                            ),
-                        ),
-                    ),
-                },
+                placedBuildingsMappped: buildPlacedBuildingsMap(newBuildings),
             }));
             if (!CanAfford(buildingPreview!.buildingType, newValues.newValues)) setBuildingPreview(null);
         }
