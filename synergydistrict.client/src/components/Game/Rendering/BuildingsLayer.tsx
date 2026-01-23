@@ -1,5 +1,5 @@
-import { use, type FC } from "react";
-import type { MapBuilding, Position } from "../../../types/Game/Grid";
+import type { FC } from "react";
+import type { MapBuilding } from "../../../types/Game/Grid";
 import { Layer, Image, Group, Shape } from "react-konva";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
 import { useBuildingsBitmap } from "../../../hooks/providers/useBuildingsBitmap";
@@ -15,7 +15,7 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
     const { TILE_SIZE } = useGameProperties();
     const { buildingsBitmap } = useBuildingsBitmap();
 
-    const { bitmap: err, loading, error } = useImageBitmap("/images/err.jpg");
+    const { bitmap: err, loading } = useImageBitmap("/images/err.jpg");
 
     return (
         <Layer listening={false}>
@@ -28,7 +28,6 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
                 const width = building.shape[0].length * TILE_SIZE;
                 const height = building.shape.length * TILE_SIZE;
                 const outlineStrokeWidth = Math.max(2, TILE_SIZE / 12);
-                const outlineOffset = outlineStrokeWidth / 2;
                 const tiles = building.shape;
 
                 return (
