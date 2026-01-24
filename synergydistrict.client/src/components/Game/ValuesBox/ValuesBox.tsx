@@ -1,4 +1,4 @@
-import type { FC, ReactElement } from "react";
+import type { FC } from "react";
 import styles from "./ValuesBox.module.css";
 
 export type ValuesBoxProps = {

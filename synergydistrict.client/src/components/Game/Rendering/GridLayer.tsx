@@ -1,6 +1,5 @@
 import { Image, Layer } from "react-konva";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
-import type { Position } from "../../../types/Game/Grid";
 import useGameMapData from "../../../hooks/providers/useMapData";
 
 type GridLayerProp = {
@@ -19,7 +18,7 @@ const GridLayer: React.FC<GridLayerProp> = ({ gridImage }) => {
 
     const gridImages = [];
 
-    for (const [chunkKey, chunkData] of Object.entries(GameMapData.loadedChunks)) {
+    for (const [chunkKey] of Object.entries(GameMapData.loadedChunks)) {
         const [chunkX, chunkY] = chunkKey.split(";").map(Number);
         gridImages.push(
             <Image

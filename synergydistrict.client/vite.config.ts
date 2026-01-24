@@ -7,30 +7,38 @@ import path from 'path';
 import child_process from 'child_process';
 import { env } from 'process';
 
-const baseFolder =
-  env.APPDATA !== undefined && env.APPDATA !== ''
-    ? `${env.APPDATA}/ASP.NET/https`
-    : `${env.HOME}/.aspnet/https`;
+// Only set up HTTPS for dev server, not for production builds
+const isDev = process.argv.includes('--mode') ? process.argv.includes('development') : !process.argv.includes('build');
 
-const certificateName = "synergydistrict.client";
-const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
-const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
+let certFilePath = '';
+let keyFilePath = '';
 
-if (!fs.existsSync(baseFolder)) {
-  fs.mkdirSync(baseFolder, { recursive: true });
-}
+if (isDev) {
+  const baseFolder =
+    env.APPDATA !== undefined && env.APPDATA !== ''
+      ? `${env.APPDATA}/ASP.NET/https`
+      : `${env.HOME}/.aspnet/https`;
 
-if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
-  if (0 !== child_process.spawnSync('dotnet', [
-    'dev-certs',
-    'https',
-    '--export-path',
-    certFilePath,
-    '--format',
-    'Pem',
-    '--no-password',
-  ], { stdio: 'inherit', }).status) {
-    throw new Error("Could not create certificate.");
+  const certificateName = "synergydistrict.client";
+  certFilePath = path.join(baseFolder, `${certificateName}.pem`);
+  keyFilePath = path.join(baseFolder, `${certificateName}.key`);
+
+  if (!fs.existsSync(baseFolder)) {
+    fs.mkdirSync(baseFolder, { recursive: true });
+  }
+
+  if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
+    if (0 !== child_process.spawnSync('dotnet', [
+      'dev-certs',
+      'https',
+      '--export-path',
+      certFilePath,
+      '--format',
+      'Pem',
+      '--no-password',
+    ], { stdio: 'inherit', }).status) {
+      throw new Error("Could not create certificate.");
+    }
   }
 }
 
@@ -45,7 +53,7 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  server: {
+  server: isDev ? {
     proxy: {
       '^/api': {
         target,
@@ -57,5 +65,5 @@ export default defineConfig({
       key: fs.readFileSync(keyFilePath),
       cert: fs.readFileSync(certFilePath),
     }
-  }
+  } : undefined
 })
