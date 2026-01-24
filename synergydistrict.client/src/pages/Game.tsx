@@ -136,25 +136,20 @@ const Game = () => {
     };
 
     const OnBuildingClick = (building: MapBuilding | null) => {
-        // if (selectedBuilding) {
-        //     selectedBuilding.isSelected = false;
-        //     if (selectedBuilding.MapBuildingId === building.MapBuildingId) {
-        //         setSelectedBuilding(null);
-        //         return;
-        //     }
-        // }
-        // building.isSelected = true;
-        // setSelectedBuilding(building);
-
         const newBuildings: MapBuilding[] = GameMapData.placedBuildings.map((b) => {
+            // deselect selected building
             if (b.isSelected) b.isSelected = false;
+            // select the building on which user clicks
             if (building && b.MapBuildingId === building.MapBuildingId) b.isSelected = true;
+            // deselect if the building is already selected
             if (selectedBuilding && b.MapBuildingId === selectedBuilding.MapBuildingId) b.isSelected = false;
 
             return b;
         });
 
-        setSelectedBuilding(prev => prev && building && prev.MapBuildingId === building.MapBuildingId ? null : building);
+        setSelectedBuilding((prev) =>
+            prev && building && prev.MapBuildingId === building.MapBuildingId ? null : building,
+        );
 
         setGameMapData((prev) => ({
             ...prev,
@@ -176,7 +171,7 @@ const Game = () => {
                 {!gameControl.isEnd && activeBuildingType && <BuildingDocs building={activeBuildingType} />}
             </BuildingsBitmapProvider>
             {!gameControl.isEnd && selectedBuilding && (
-                <BuildingDetails building={selectedBuilding} CloseBar={() => setSelectedBuilding(null)} />
+                <BuildingDetails building={selectedBuilding} CloseBar={() => OnBuildingClick(null)} />
             )}
             {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}
             {gameControl.isEnd && <EndScreen />}
