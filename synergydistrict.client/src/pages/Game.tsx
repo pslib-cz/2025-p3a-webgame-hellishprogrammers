@@ -86,8 +86,6 @@ const Game = () => {
                 return changedBuilding ? changedBuilding : b;
             });
 
-            const buildingsToUpdate = [newBuilding, ...newValues.newSynergiesBuildings];
-
             setGameMapData((prev) => ({
                 ...prev,
                 placedBuildings: newBuildings,
@@ -137,6 +135,34 @@ const Game = () => {
         });
     };
 
+    const OnBuildingClick = (building: MapBuilding | null) => {
+        // if (selectedBuilding) {
+        //     selectedBuilding.isSelected = false;
+        //     if (selectedBuilding.MapBuildingId === building.MapBuildingId) {
+        //         setSelectedBuilding(null);
+        //         return;
+        //     }
+        // }
+        // building.isSelected = true;
+        // setSelectedBuilding(building);
+
+        const newBuildings: MapBuilding[] = GameMapData.placedBuildings.map((b) => {
+            if (b.isSelected) b.isSelected = false;
+            if (building && b.MapBuildingId === building.MapBuildingId) b.isSelected = true;
+            if (selectedBuilding && b.MapBuildingId === selectedBuilding.MapBuildingId) b.isSelected = false;
+
+            return b;
+        });
+
+        setSelectedBuilding(prev => prev && building && prev.MapBuildingId === building.MapBuildingId ? null : building);
+
+        setGameMapData((prev) => ({
+            ...prev,
+            placedBuildings: newBuildings,
+            placedBuildingsMappped: buildPlacedBuildingsMap(newBuildings),
+        }));
+    };
+
     return (
         <div className={styles.game}>
             <BuildingsBitmapProvider>
@@ -145,17 +171,7 @@ const Game = () => {
                     onMapClick={OnMapClick}
                     onContext={OnRotate}
                     previewBuilding={buildingPreview}
-                    onBuildingClick={(building: MapBuilding) => {
-                        if (selectedBuilding) {
-                            selectedBuilding.isSelected = false;
-                            if (selectedBuilding.MapBuildingId === building.MapBuildingId) {
-                                setSelectedBuilding(null);
-                                return;
-                            }
-                        }
-                        building.isSelected = true;
-                        setSelectedBuilding(building);
-                    }}
+                    onBuildingClick={OnBuildingClick}
                 />
                 {!gameControl.isEnd && activeBuildingType && <BuildingDocs building={activeBuildingType} />}
             </BuildingsBitmapProvider>
