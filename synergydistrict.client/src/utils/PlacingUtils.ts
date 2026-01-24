@@ -59,6 +59,8 @@ export const CalculateValues = (
 ): CalculateValuesResult | null => {
     const result: CalculateValuesResult = { newValues: { ...variables }, newSynergiesBuildings: [] };
 
+    const modifiedBuildings: Record<string, MapBuilding> = {};
+
     result.newValues.moneyBalance -= building.buildingType.cost;
 
     if (!AddProductionSum(building.buildingType.baseProduction || [], result.newValues)) return null;
@@ -116,36 +118,44 @@ export const CalculateValues = (
                     target = building;
                     source = neighbor;
 
-                    edgePosition = edge.position;
-                    edgeSide = edge.side;
+                    edgePosition = {
+                        x: neighborPosX - neighbor.position.x,
+                        y: neighborPosY - neighbor.position.y,
+                    };
+                    edgeSide = neighborEdgeSide;
                 } else {
                     target = neighbor;
                     source = building;
 
-                    edgePosition = { x: neighborPosX, y: neighborPosY };
-                    edgeSide = neighborEdgeSide;
+                    edgePosition = edge.position;
+                    edgeSide = edge.side;
                 }
 
-                // New target edges
-                const newEdges = target.edges.map((e) => {
-                    if (e.position === edgePosition && e.side === edgeSide) {
+                const currentSource = modifiedBuildings[source.MapBuildingId] || source;
+
+                // New source edges
+                const newEdges = currentSource.edges.map((e) => {
+                    if (e.position.x === edgePosition.x && e.position.y === edgePosition.y && e.side === edgeSide) {
                         return {
                             ...e,
-                            activeSynergies: {
+                            synergy: {
                                 // activeSynergyId: `${source.MapBuildingId}:${target.MapBuildingId}`,
                                 activeSynergyId: crypto.randomUUID(),
                                 targetBuilding: target,
                                 synergyProductions: synergy.synergyProductions,
                             },
-                        };
+                        } as Edge;
                     }
                     return e;
                 });
 
-                result.newSynergiesBuildings.push({ ...target, edges: newEdges });
+                modifiedBuildings[source.MapBuildingId] = { ...currentSource, edges: newEdges };
             }
         }
     }
+
+    result.newSynergiesBuildings = Object.values(modifiedBuildings);
+
     return result;
 };
 
