@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import styles from "../styles/Game.module.css";
 import GameCanvas from "../components/Game/Rendering/GameCanvas";
 import GameBar from "./Game/GameBar/GameBar";
@@ -14,6 +14,16 @@ import EndScreen from "./Game/EndScreen/EndScreen";
 import useGameControl from "../hooks/providers/useGameControl";
 import BuildingDocs from "./Game/BuildingDocs/BuildingDocs";
 import BuildingDetails from "./Game/BuildingDetails/BuildingDetails";
+import { useSettings } from "../hooks/providers/useSettings";
+
+const GAME_MUSIC_TRACKS = [
+    "/audio/game-music/01.mp3",
+    "/audio/game-music/02.mp3",
+    "/audio/game-music/03.mp3",
+    "/audio/game-music/04.mp3",
+    "/audio/game-music/05.mp3",
+    "/audio/game-music/06.mp3",
+];
 
 const buildPlacedBuildingsMap = (buildings: MapBuilding[]): Record<string, MapBuilding> => {
     const mapped: Record<string, MapBuilding> = {};
@@ -36,11 +46,81 @@ const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
     const [selectedBuilding, setSelectedBuilding] = useState<MapBuilding | null>(null);
     const [buildingPreview, setBuildingPreview] = useState<MapBuilding | null>(null);
+    const [currentTrack, setCurrentTrack] = useState<string>("");
     const { options } = useGameOptions();
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
     const { synergies } = useGameData();
     const { gameControl } = useGameControl();
+    const { gameSettings } = useSettings();
+    const gameMusicRef = useRef<HTMLAudioElement | null>(null);
+    const playedTracksRef = useRef<number[]>([]);
+    const timeoutRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        // Game music player
+        const playRandomTrack = () => {
+            // If all tracks have been played, reset the list
+            if (playedTracksRef.current.length === GAME_MUSIC_TRACKS.length) {
+                playedTracksRef.current = [];
+            }
+
+            // Get available tracks that haven't been played yet
+            const availableTracks = GAME_MUSIC_TRACKS.map((_, index) => index).filter(
+                (index) => !playedTracksRef.current.includes(index)
+            );
+
+            // Pick a random track from available ones
+            const randomIndex = availableTracks[Math.floor(Math.random() * availableTracks.length)];
+            playedTracksRef.current.push(randomIndex);
+
+            const trackPath = GAME_MUSIC_TRACKS[randomIndex];
+            const trackName = trackPath.split('/').pop()?.replace('.mp3', '') || 'Unknown';
+            setCurrentTrack(trackName);
+
+            if (gameMusicRef.current) {
+                gameMusicRef.current.src = GAME_MUSIC_TRACKS[randomIndex];
+                if (gameSettings.isMusic) {
+                    gameMusicRef.current.play().catch(err => console.log("Game music play failed:", err));
+                }
+            }
+        };
+
+        const handleSongEnd = () => {
+            setCurrentTrack("");
+            // Wait 10 seconds before playing the next track
+            timeoutRef.current = setTimeout(playRandomTrack, 10000);
+        };
+
+        // Create audio element and set up event listener
+        gameMusicRef.current = new Audio();
+        gameMusicRef.current.volume = 0.3;
+        gameMusicRef.current.addEventListener("ended", handleSongEnd);
+
+        // Start playing first track
+        playRandomTrack();
+
+        return () => {
+            if (gameMusicRef.current) {
+                gameMusicRef.current.removeEventListener("ended", handleSongEnd);
+                gameMusicRef.current.pause();
+            }
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [gameSettings.isMusic]);
+
+    useEffect(() => {
+        // Handle music toggle
+        if (gameMusicRef.current) {
+            if (gameSettings.isMusic) {
+                gameMusicRef.current.play().catch(err => console.log("Game music play failed:", err));
+            } else {
+                gameMusicRef.current.pause();
+            }
+        }
+    }, [gameSettings.isMusic]);
 
     useEffect(() => {
         if (!gameControl.isEnd) return;
@@ -170,6 +250,11 @@ const Game = () => {
                 />
                 {!gameControl.isEnd && activeBuildingType && <BuildingDocs building={activeBuildingType} />}
             </BuildingsBitmapProvider>
+            {!gameControl.isEnd && currentTrack && (
+                <div className={styles.nowPlaying}>
+                    Now Playing: {currentTrack}
+                </div>
+            )}
             {!gameControl.isEnd && selectedBuilding && (
                 <BuildingDetails building={selectedBuilding} CloseBar={() => OnBuildingClick(null)} />
             )}

@@ -1,5 +1,6 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./styles/App.css";
+import Splash from "./pages/Splash";
 import Menu from "./pages/Menu";
 import LeaderboardMenu from "./pages/Menu/LeaderboardMenu";
 import MainMenu from "./pages/Menu/MainMenu";
@@ -25,7 +26,7 @@ function App() {
                         <GamePropertiesProvider>
                             <BrowserRouter>
                                 <Routes>
-                                    <Route path="/" element={<Navigate to={"/menu"} />} />
+                                    <Route path="/" element={<Splash />} />
                                     <Route path="/menu" element={<Menu />}>
                                         <Route path="" element={<MainMenu />} />
                                         <Route path="play" element={<PlayMenu />} />
