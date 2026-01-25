@@ -16,14 +16,9 @@ import BuildingDocs from "./Game/BuildingDocs/BuildingDocs";
 import BuildingDetails from "./Game/BuildingDetails/BuildingDetails";
 import { useSettings } from "../hooks/providers/useSettings";
 
-const GAME_MUSIC_TRACKS = [
-    "/audio/game-music/01.mp3",
-    "/audio/game-music/02.mp3",
-    "/audio/game-music/03.mp3",
-    "/audio/game-music/04.mp3",
-    "/audio/game-music/05.mp3",
-    "/audio/game-music/06.mp3",
-];
+// Dynamically load all music files from game-music folder
+const musicFiles = import.meta.glob('/public/audio/game-music/*.mp3', { eager: true, as: 'url' });
+const GAME_MUSIC_TRACKS = Object.keys(musicFiles).map(path => path.replace('/public', ''));
 
 const buildPlacedBuildingsMap = (buildings: MapBuilding[]): Record<string, MapBuilding> => {
     const mapped: Record<string, MapBuilding> = {};
