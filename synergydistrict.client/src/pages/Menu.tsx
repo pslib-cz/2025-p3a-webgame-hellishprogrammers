@@ -3,45 +3,19 @@ import underscore from "/src/styles/FlashingUnderscore.module.css";
 import TextButton from "../components/Buttons/TextButton/TextButton";
 import { NavLink, Outlet } from "react-router-dom";
 import { IconClose } from "../components/Icons";
-import { useEffect, useRef } from "react";
 import { useSettings } from "../hooks/providers/useSettings";
+import useMusic from "../hooks/useMusic";
 
 const Menu = () => {
     const { gameSettings } = useSettings();
-    const menuMusicRef = useRef<HTMLAudioElement | null>(null);
-    const timeoutRef = useRef<number | null>(null);
-
-    useEffect(() => {
-        // Create menu music with 10 second delay between plays
-        const playMenuMusic = () => {
-            if (menuMusicRef.current && gameSettings.isMusic) {
-                menuMusicRef.current.play().catch(err => console.log("Menu music play failed:", err));
-            }
-        };
-
-        const handleSongEnd = () => {
-            // Wait 10 seconds before playing again
-            timeoutRef.current = setTimeout(playMenuMusic, 10000);
-        };
-
-        menuMusicRef.current = new Audio("/audio/menu_music.mp3");
-        menuMusicRef.current.volume = 0.3;
-        menuMusicRef.current.addEventListener("ended", handleSongEnd);
-
-        if (gameSettings.isMusic) {
-            menuMusicRef.current.play().catch(err => console.log("Menu music play failed:", err));
-        }
-
-        return () => {
-            if (menuMusicRef.current) {
-                menuMusicRef.current.removeEventListener("ended", handleSongEnd);
-                menuMusicRef.current.pause();
-            }
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-            }
-        };
-    }, [gameSettings.isMusic]);
+    
+    useMusic({
+        songsPath: ["/audio/menu_music.mp3"],
+        volume: 0.3,
+        timeBetweenSongs: 10000,
+        isEnabled: gameSettings.isMusic,
+        mode: 'single'
+    });
 
     return (
         <div className={styles.menu}>
