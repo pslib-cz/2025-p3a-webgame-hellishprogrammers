@@ -11,11 +11,11 @@
   --text: #fefae0;
   --background: #191919;
 
-  --primary: #1982c4;
-  --secundary: #6a4c93;
-  --tercial: #ff595e;
-  --resident: #ffca3a;
-  --leisure: #8ac926;
+  --residential: #1982c4;
+  --commercial: #6a4c93;
+  --industrial: #ff595e;
+  --extractional: #ffca3a;
+  --recreational: #8ac926;
 
   --water-light: #598392;
   --water--dark: #124559;

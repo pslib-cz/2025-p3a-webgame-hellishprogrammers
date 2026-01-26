@@ -1,10 +1,13 @@
-import { type FC, useEffect, useRef } from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 import ProductionListing from "../../../components/Game/ProductionListing/ProductionListing";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import type { BuildingType } from "../../../types/Game/Buildings";
 import styles from "./BuildingDocs.module.css";
 import { useBuildingsBitmap } from "../../../hooks/providers/useBuildingsBitmap";
+import TextButton from "../../../components/Buttons/TextButton/TextButton";
+import { Text } from "konva/lib/shapes/Text";
+import type { BuildingCategory } from "../../../types";
 
 type BuildingDocsProps = {
     building: BuildingType;
@@ -13,6 +16,7 @@ type BuildingDocsProps = {
 const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
     const { buildingsBitmap } = useBuildingsBitmap();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const [currnetButton,setCurrnetButton] = useState<BuildingCategory>("Residential")
     useEffect(() => {
         const canvas = canvasRef.current!;
         const context = canvas?.getContext("2d");
@@ -58,6 +62,8 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
             </ProductionListing>
             <div>
                 <h2 className={styles.title}>Synergy</h2>
+                <TextButton  isActive={true}  text="Residential" bacgroundColor="--primary"></TextButton>
+                
             </div>
         </div>
     );

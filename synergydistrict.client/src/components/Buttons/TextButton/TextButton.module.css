@@ -18,7 +18,8 @@ button {
 }
 
 .linkActive,
-.link:hover {
+.link:hover
+{
   background: var(--text);
   color: var(--background);
 }
