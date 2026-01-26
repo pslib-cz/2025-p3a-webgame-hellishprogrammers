@@ -9,7 +9,6 @@ import useMusic from "../hooks/useMusic";
 const Menu = () => {
     const { gameSettings } = useSettings();
     
-    // Use the consolidated useMusic hook for menu music
     useMusic({
         songsPath: ["/audio/menu_music.mp3"],
         volume: 0.3,

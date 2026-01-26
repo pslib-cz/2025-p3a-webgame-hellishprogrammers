@@ -107,6 +107,10 @@ const useMusic = (musicOptions: MusicOptions) => {
         }
 
         return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.removeEventListener("ended", handleSongEnd);
+            }
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current);
             }
