@@ -17,8 +17,8 @@ export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActiv
             return (
                 <button
                     onClick={onClick}
-                    className={`${styles.link} ${styles.linkUppercase} ${isActive ? styles.linkActive : ""}`}
-                    style={{backgroundColor:`${isActive ? bacgroundColor : ""}`}}
+                    className={`${styles.link} ${styles.linkUppercase} ${isActive && !bacgroundColor ? styles.linkActive : ""}`}
+                    style={{backgroundColor:`${isActive ? `var(${bacgroundColor})` : ""}`}}
                 >
                     <ToggleableText text={text} isActive={isActive} />
                 </button>
