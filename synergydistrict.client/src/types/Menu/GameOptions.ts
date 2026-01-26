@@ -11,6 +11,6 @@ export type GameOptions = {
 export const defaultGameOptions: GameOptions = {
   gameMode: "timePresure",
   gameDuration: 10,
-  infiniteMap: true,
+  infiniteMap: false,
   seed: Math.floor(Math.random() * 1000000)
 };
