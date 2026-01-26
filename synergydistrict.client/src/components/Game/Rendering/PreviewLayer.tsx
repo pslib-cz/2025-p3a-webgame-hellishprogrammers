@@ -11,7 +11,6 @@ type PreviewLayerProps = {
 };
 
 const PreviewLayer: React.FC<PreviewLayerProps> = ({ previewBuilding, position, isPlaceable }) => {
-
     const bitmaps = useBuildingsBitmap();
     const fallback = useImageBitmap("/images/err.jpg");
     const { TILE_SIZE } = useGameProperties();
@@ -20,8 +19,8 @@ const PreviewLayer: React.FC<PreviewLayerProps> = ({ previewBuilding, position, 
         return null;
     }
 
-    const shapeWidth = previewBuilding.shape[0]?.length ?? 0;
-    const shapeHeight = previewBuilding.shape.length;
+    const shapeWidth = previewBuilding.buildingType.shape[0]?.length ?? 0;
+    const shapeHeight = previewBuilding.buildingType.shape.length;
 
     if (shapeWidth === 0 || shapeHeight === 0) {
         return null;
@@ -39,14 +38,17 @@ const PreviewLayer: React.FC<PreviewLayerProps> = ({ previewBuilding, position, 
     const xPx = position.x * TILE_SIZE;
     const yPx = position.y * TILE_SIZE;
 
-    const occupiedTiles = previewBuilding.shape.reduce<{ x: number; y: number; key: string; }[]>((acc, row, rowIdx) => {
-        row.forEach((tile, colIdx) => {
-            if (tile !== "Empty") {
-                acc.push({ x: colIdx, y: rowIdx, key: `${rowIdx}-${colIdx}` });
-            }
-        });
-        return acc;
-    }, []);
+    const occupiedTiles = previewBuilding.buildingType.shape.reduce<{ x: number; y: number; key: string }[]>(
+        (acc, row, rowIdx) => {
+            row.forEach((tile, colIdx) => {
+                if (tile !== "Empty") {
+                    acc.push({ x: colIdx, y: rowIdx, key: `${rowIdx}-${colIdx}` });
+                }
+            });
+            return acc;
+        },
+        [],
+    );
 
     return (
         <>
@@ -60,7 +62,7 @@ const PreviewLayer: React.FC<PreviewLayerProps> = ({ previewBuilding, position, 
                     opacity={isPlaceable ? 0.55 : 0.2}
                     listening={false}
                 />
-                {!isPlaceable && (
+                {!isPlaceable &&
                     occupiedTiles.map((tile) => (
                         <Rect
                             key={tile.key}
@@ -71,12 +73,10 @@ const PreviewLayer: React.FC<PreviewLayerProps> = ({ previewBuilding, position, 
                             fill="rgba(220, 38, 38, 0.45)"
                             listening={false}
                         />
-                    ))
-                )}
+                    ))}
             </Layer>
         </>
     );
-
-}
+};
 
 export default PreviewLayer;

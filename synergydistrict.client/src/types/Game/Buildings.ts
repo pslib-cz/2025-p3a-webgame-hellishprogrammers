@@ -1,4 +1,5 @@
 import type { BuildingTileType, BuildingCategory, StatsType } from "..";
+import type { EdgeSide, Position } from "./Grid";
 
 export type BuildingSynergy = {
     sourceBuildingId: number;
@@ -11,6 +12,11 @@ export type Production = {
     value: number;
 };
 
+export type Edge = {
+    position: Position;
+    side: EdgeSide;
+};
+
 export type BuildingType = {
     buildingId: number;
     name: string;
@@ -20,4 +26,5 @@ export type BuildingType = {
     cost: number;
     shape: BuildingTileType[][];
     baseProduction: Production[];
+    edges: Edge[];
 };
