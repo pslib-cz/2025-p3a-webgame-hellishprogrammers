@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { useState, type FC } from "react";
 import styles from "./BuildingDetails.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
 import type { ActiveSynergies, MapBuilding } from "../../../types/Game/Grid";
@@ -9,7 +9,7 @@ import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameMapData from "../../../hooks/providers/useMapData";
 import type { BuildingType, Production } from "../../../types/Game/Buildings";
 import TextButton from "../../../components/Buttons/TextButton/TextButton";
-import { buildPlacedBuildingsMap } from "../../../utils/PlacingUtils";
+import { buildPlacedBuildingsMap, DeleteProductionSum } from "../../../utils/PlacingUtils";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import type { GameResources } from "../../../types/Game/GameResources";
 
@@ -20,7 +20,9 @@ type BuildingDetailsProps = {
 
 const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const { GameMapData, setGameMapData } = useGameMapData();
-    // const { GameResources, setGameResources } = useGameResources();
+    const { GameResources, setGameResources } = useGameResources();
+    const [isDeletable, setIsDeletable] = useState<boolean>(true);
+    const [isUpgradable, setIsUpgradable] = useState<boolean>(true);
 
     const getGroupedSynergies = (
         direction: "incoming" | "outgoing",
@@ -106,26 +108,32 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
         console.log("UPGRADE");
     };
 
-    const deleteBuilding = () => {
-        // const newResources = { ...GameResources } as GameResources;
+    const deleteBuilding = (price: number) => {
+        const newResources = { ...GameResources } as GameResources;
 
-        // const tempBuilding: BuildingType = {...building.buildingType, cost: 50, baseProduction: }
-        // // buildingProduction.forEach(product => {
-        // //     if ()
-        // //     newResources[product.type.toLowerCase() as keyof GameResources] -= product.value;
-        // // })
-        // const newBuilding = GameMapData.placedBuildings.filter((b) => b.MapBuildingId !== building.MapBuildingId);
-        // const newSynergies = GameMapData.activeSynergies.filter(
-        //     (s) => s.sourceBuildingId !== building.MapBuildingId && s.targetBuildingId !== building.MapBuildingId,
-        // );
-        // CloseBar();
-        // // setGameResources();
-        // setGameMapData((prev) => ({
-        //     ...prev,
-        //     placedBuildings: newBuilding,
-        //     placedBuildingsMappped: buildPlacedBuildingsMap(newBuilding),
-        //     activeSynergies: newSynergies,
-        // }));
+        const canDelete =
+            newResources.moneyBalance - price > 0 &&
+            DeleteProductionSum(building.buildingType.baseProduction, newResources) &&
+            DeleteProductionSum(totalIncomingProduction, newResources);
+
+        setIsDeletable(canDelete);
+
+        if (!canDelete) return;
+
+        newResources.moneyBalance -= price;
+        const newBuilding = GameMapData.placedBuildings.filter((b) => b.MapBuildingId !== building.MapBuildingId);
+        const newSynergies = GameMapData.activeSynergies.filter(
+            (s) => s.sourceBuildingId !== building.MapBuildingId && s.targetBuildingId !== building.MapBuildingId,
+        );
+
+        CloseBar();
+        setGameResources(newResources);
+        setGameMapData((prev) => ({
+            ...prev,
+            placedBuildings: newBuilding,
+            placedBuildingsMappped: buildPlacedBuildingsMap(newBuilding),
+            activeSynergies: newSynergies,
+        }));
     };
 
     return (
@@ -183,12 +191,16 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                 <ShowInfo gameStyle={true} left={<div className={`${styles.icon} icon`}>people</div>} right={<>2</>} />
             </div>
             <div className={styles.buttons}>
-                <TextButton text="upgrade" onClick={upgradeBuilding}>
-                    <ValuesBox iconKey="money" text={"150"} />
-                </TextButton>
-                <TextButton text="demolish" onClick={deleteBuilding}>
-                    <ValuesBox iconKey="money" text={"50"} />
-                </TextButton>
+                <div className={styles.button} style={{ opacity: isUpgradable ? 1 : 0.2 }}>
+                    <TextButton text="upgrade" onClick={upgradeBuilding}>
+                        <ValuesBox iconKey="money" text={"150"} />
+                    </TextButton>
+                </div>
+                <div className={styles.button} style={{ opacity: isDeletable ? 1 : 0.2 }}>
+                    <TextButton text="demolish" onClick={() => deleteBuilding(50)}>
+                        <ValuesBox iconKey="money" text={"50"} />
+                    </TextButton>
+                </div>
             </div>
         </div>
     );

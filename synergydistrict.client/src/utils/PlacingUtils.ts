@@ -185,22 +185,45 @@ export const AddProductionSum = (products: Production[], variables: GameResource
     return true;
 };
 
-export const DeleteProductionSum = (products: Production[], variables: GameResources): boolean => {
-    if (!CanAddProdution(products, variables)) return false;
+export const CanDeleteProdution = (products: Production[], variables: GameResources) => {
     for (const product of products) {
         const resourceKey = product.type.toLowerCase() as keyof GameResources;
         const currentValue = variables[resourceKey];
 
         if (typeof currentValue === "number") {
-            const resultProduction = currentValue + product.value;
+            const resultProduction = currentValue - product.value;
+            if (resultProduction < 0) return false;
 
-            if (resourceKey === "energy" && product.value < 0) {
-                variables.energyUsed -= product.value;
+            if (resourceKey === "energy" && product.value > 0) {
+                if (variables.energy - product.value < variables.energyUsed) return false;
                 continue;
             }
 
             if (resourceKey === "people" && product.value < 0) {
-                variables.peopleUsed -= product.value;
+                if (variables.people - product.value < variables.peopleUsed) return false;
+                continue;
+            }
+        }
+    }
+    return true;
+};
+
+export const DeleteProductionSum = (products: Production[], variables: GameResources): boolean => {
+    if (!CanDeleteProdution(products, variables)) return false;
+    for (const product of products) {
+        const resourceKey = product.type.toLowerCase() as keyof GameResources;
+        const currentValue = variables[resourceKey];
+
+        if (typeof currentValue === "number") {
+            const resultProduction = currentValue - product.value;
+
+            if (resourceKey === "energy" && product.value < 0) {
+                variables.energyUsed += product.value;
+                continue;
+            }
+
+            if (resourceKey === "people" && product.value < 0) {
+                variables.peopleUsed += product.value;
                 continue;
             }
 
