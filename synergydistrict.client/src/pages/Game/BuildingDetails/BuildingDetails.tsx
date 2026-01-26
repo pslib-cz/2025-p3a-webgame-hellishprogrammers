@@ -7,6 +7,7 @@ import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import ProductionListing from "../../../components/Game/ProductionListing/ProductionListing";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameMapData from "../../../hooks/providers/useMapData";
+import type { Production } from "../../../types/Game/Buildings";
 
 type BuildingDetailsProps = {
     building: MapBuilding;
@@ -37,6 +38,36 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
             [] as { source: MapBuilding; synergy: ActiveSynergies; count: number }[],
         );
 
+    const incomingProduction = incomingSynergies
+        .flatMap((s) =>
+            s.synergy.synergyProductions.map((p) => ({
+                type: p.type,
+                value: p.value * s.count,
+            })),
+        )
+        .reduce((accumulator, currentValue) => {
+            const existing = accumulator.find((x) => x.type === currentValue.type);
+            if (existing) {
+                existing.value += currentValue.value;
+            } else {
+                accumulator.push({ ...currentValue });
+            }
+            return accumulator;
+        }, [] as Production[]);
+
+    console.log(incomingProduction);
+
+    const buildingProduction = building.buildingType.baseProduction.map((product) => ({ ...product }));
+
+    incomingProduction.forEach((boost) => {
+        const existing = buildingProduction.find((p) => p.type === boost.type);
+        if (existing) {
+            existing.value += boost.value;
+        } else {
+            buildingProduction.push({ ...boost });
+        }
+    });
+
     return (
         <div className={styles.buildingDetails}>
             <div className={styles.title}>
@@ -45,9 +76,9 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                     <IconClose />
                 </button>
             </div>
-            <p>Level 1 (Efficiency: 120%)</p>
+            <p>Level 1 (Efficiency: 100%)</p>
             <div className={styles.infoContainer}>
-                {building.buildingType.baseProduction.map((product) => (
+                {buildingProduction.map((product) => (
                     <ShowInfo
                         gameStyle={true}
                         key={`${product.type}${product.value}`}
