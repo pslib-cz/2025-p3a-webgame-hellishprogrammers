@@ -24,6 +24,7 @@ const PlayMenu = () => {
     const { options, setOptions } = useGameOptions();
     const { setGameProperties } = useGameProperties();
     const [seedString, setSeedString] = useState<string>(options.seed.toString());
+    const [ hasInfMapChanged, setHasInfMapChanged ] = useState(false);
     const handleStart = useCallback(() => {
         setGameProperties(() => ({
             ...defaultGameProperties,
@@ -61,7 +62,10 @@ const PlayMenu = () => {
                     text="Infinite map"
                     options={["ON", "OFF"]}
                     selectedIndex={options.infiniteMap ? 0 : 1}
-                    onChange={(index) => setOptions({ ...options, infiniteMap: index === 0 })}
+                    onChange={(index) => {
+                        setOptions({ ...options, infiniteMap: index === 0 });
+                        setHasInfMapChanged(true);
+                    }}
                 />
                 {!options.infiniteMap ? (
                     <InputValue
@@ -75,7 +79,7 @@ const PlayMenu = () => {
                                 setOptions({ ...options, mapSize: numericValue });
                             }
                         }}
-                        animationDelay={false}
+                        animationDelay={!hasInfMapChanged}
                     />
                 ) : (
                     <></>
