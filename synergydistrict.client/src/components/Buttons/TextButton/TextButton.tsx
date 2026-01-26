@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { type FC, type ReactElement } from "react";
 import { NavLink } from "react-router-dom";
 import styles from "./TextButton.module.css";
 import ToggleableText from "../../ToggleableText";
@@ -9,18 +9,20 @@ type TextButtonProps = {
     onClick?: () => void;
     isActive?: boolean;
     bacgroundColor?: string;
+    children?: ReactElement;
 };
 
-export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActive = false, bacgroundColor }) => {
+export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActive = false, bacgroundColor, children }) => {
     const renderContext = () => {
         if (!linkTo) {
             return (
                 <button
                     onClick={onClick}
-                    className={`${styles.link} ${styles.linkUppercase} ${isActive && !bacgroundColor ? styles.linkActive : ""}`}
+                    className={`${styles.link} ${styles.linkUppercase} ${isActive && !bacgroundColor ? styles.linkActive : ""} ${children ? styles.row : ""}`}
                     style={{backgroundColor:`${isActive ? `var(${bacgroundColor})` : ""}`}}
                 >
                     <ToggleableText text={text} isActive={isActive} />
+                    {children}
                 </button>
             );
         } else {

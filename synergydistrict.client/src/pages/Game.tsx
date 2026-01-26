@@ -5,7 +5,14 @@ import GameBar from "./Game/GameBar/GameBar";
 import { BuildingsBitmapProvider } from "../provider/BuildingsBitmapProvider";
 import { useGameOptions } from "../hooks/providers/useGameOptions";
 import type { MapBuilding, Position } from "../types/Game/Grid";
-import { CanPlaceBuilding, createEgdesForShape, CalculateValues, rotateShape, CanAfford } from "../utils/PlacingUtils";
+import {
+    CanPlaceBuilding,
+    createEgdesForShape,
+    CalculateValues,
+    rotateShape,
+    CanAfford,
+    buildPlacedBuildingsMap,
+} from "../utils/PlacingUtils";
 import type { BuildingType } from "../types/Game/Buildings";
 import { useGameData } from "../hooks/providers/useGameData";
 import useGameMapData from "../hooks/providers/useMapData";
@@ -17,25 +24,8 @@ import BuildingDetails from "./Game/BuildingDetails/BuildingDetails";
 import { useSettings } from "../hooks/providers/useSettings";
 
 // Dynamically load all music files from game-music folder
-const musicFiles = import.meta.glob('/public/audio/game-music/*.mp3', { eager: true, as: 'url' });
-const GAME_MUSIC_TRACKS = Object.keys(musicFiles).map(path => path.replace('/public', ''));
-
-const buildPlacedBuildingsMap = (buildings: MapBuilding[]): Record<string, MapBuilding> => {
-    const mapped: Record<string, MapBuilding> = {};
-
-    for (const building of buildings) {
-        for (let y = 0; y < building.shape.length; y++) {
-            const row = building.shape[y];
-            for (let x = 0; x < row.length; x++) {
-                if (row[x] === "Empty") continue;
-                const key = `${building.position.x + x};${building.position.y + y}`;
-                mapped[key] = building;
-            }
-        }
-    }
-
-    return mapped;
-};
+const musicFiles = import.meta.glob("/public/audio/game-music/*.mp3", { eager: true, as: "url" });
+const GAME_MUSIC_TRACKS = Object.keys(musicFiles).map((path) => path.replace("/public", ""));
 
 const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
@@ -62,7 +52,7 @@ const Game = () => {
 
             // Get available tracks that haven't been played yet
             const availableTracks = GAME_MUSIC_TRACKS.map((_, index) => index).filter(
-                (index) => !playedTracksRef.current.includes(index)
+                (index) => !playedTracksRef.current.includes(index),
             );
 
             // Pick a random track from available ones
@@ -70,13 +60,13 @@ const Game = () => {
             playedTracksRef.current.push(randomIndex);
 
             const trackPath = GAME_MUSIC_TRACKS[randomIndex];
-            const trackName = trackPath.split('/').pop()?.replace('.mp3', '') || 'Unknown';
+            const trackName = trackPath.split("/").pop()?.replace(".mp3", "") || "Unknown";
             setCurrentTrack(trackName);
 
             if (gameMusicRef.current) {
                 gameMusicRef.current.src = GAME_MUSIC_TRACKS[randomIndex];
                 if (gameSettings.isMusic) {
-                    gameMusicRef.current.play().catch(err => console.log("Game music play failed:", err));
+                    gameMusicRef.current.play().catch((err) => console.log("Game music play failed:", err));
                 }
             }
         };
@@ -110,7 +100,7 @@ const Game = () => {
         // Handle music toggle
         if (gameMusicRef.current) {
             if (gameSettings.isMusic) {
-                gameMusicRef.current.play().catch(err => console.log("Game music play failed:", err));
+                gameMusicRef.current.play().catch((err) => console.log("Game music play failed:", err));
             } else {
                 gameMusicRef.current.pause();
             }
@@ -140,6 +130,7 @@ const Game = () => {
                 position: position,
                 edges: buildingPreview!.edges,
                 rotation: buildingPreview!.rotation,
+                level: 1,
                 shape: buildingPreview!.shape,
                 isSelected: false,
             };
@@ -189,6 +180,7 @@ const Game = () => {
             position: { x: 0, y: 0 },
             edges: edges,
             rotation: 0,
+            level: 1,
             shape: shape,
             isSelected: false,
         };
@@ -245,11 +237,7 @@ const Game = () => {
                 />
                 {!gameControl.isEnd && activeBuildingType && <BuildingDocs building={activeBuildingType} />}
             </BuildingsBitmapProvider>
-            {!gameControl.isEnd && currentTrack && (
-                <div className={styles.nowPlaying}>
-                    Now Playing: {currentTrack}
-                </div>
-            )}
+            {!gameControl.isEnd && currentTrack && <div className={styles.nowPlaying}>Now Playing: {currentTrack}</div>}
             {!gameControl.isEnd && selectedBuilding && (
                 <BuildingDetails building={selectedBuilding} CloseBar={() => OnBuildingClick(null)} />
             )}

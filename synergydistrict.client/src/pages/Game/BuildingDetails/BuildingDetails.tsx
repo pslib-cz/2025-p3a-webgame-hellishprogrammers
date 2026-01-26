@@ -7,6 +7,9 @@ import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import ProductionListing from "../../../components/Game/ProductionListing/ProductionListing";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameMapData from "../../../hooks/providers/useMapData";
+import type { Production } from "../../../types/Game/Buildings";
+import TextButton from "../../../components/Buttons/TextButton/TextButton";
+import { buildPlacedBuildingsMap } from "../../../utils/PlacingUtils";
 
 type BuildingDetailsProps = {
     building: MapBuilding;
@@ -14,7 +17,7 @@ type BuildingDetailsProps = {
 };
 
 const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
-    const { GameMapData } = useGameMapData();
+    const { GameMapData, setGameMapData } = useGameMapData();
     const incomingSynergies = GameMapData.placedBuildings
         .flatMap((otherBuilding) =>
             otherBuilding.edges
@@ -37,17 +40,59 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
             [] as { source: MapBuilding; synergy: ActiveSynergies; count: number }[],
         );
 
+    const incomingProduction = incomingSynergies
+        .flatMap((s) =>
+            s.synergy.synergyProductions.map((p) => ({
+                type: p.type,
+                value: p.value * s.count,
+            })),
+        )
+        .reduce((accumulator, currentValue) => {
+            const existing = accumulator.find((x) => x.type === currentValue.type);
+            if (existing) {
+                existing.value += currentValue.value;
+            } else {
+                accumulator.push({ ...currentValue });
+            }
+            return accumulator;
+        }, [] as Production[]);
+
+    const buildingProduction = building.buildingType.baseProduction.map((product) => ({ ...product }));
+
+    incomingProduction.forEach((boost) => {
+        const existing = buildingProduction.find((p) => p.type === boost.type);
+        if (existing) {
+            existing.value += boost.value;
+        } else {
+            buildingProduction.push({ ...boost });
+        }
+    });
+
+    const upgradeBuilding = () => {
+        console.log("UPGRADE");
+    };
+
+    const deleteBuilding = () => {
+        const newBuilding = GameMapData.placedBuildings.filter((b) => b.MapBuildingId !== building.MapBuildingId);
+        CloseBar();
+        setGameMapData((prev) => ({
+            ...prev,
+            placedBuildings: newBuilding,
+            placedBuildingsMappped: buildPlacedBuildingsMap(newBuilding),
+        }));
+    };
+
     return (
         <div className={styles.buildingDetails}>
-            <div className={styles.title}>
+            <div className={styles.row}>
                 <h2 className={underscore.parent}>{building.buildingType.name}</h2>
-                <button onClick={() => CloseBar()}>
+                <button onClick={() => CloseBar()} className={styles.close}>
                     <IconClose />
                 </button>
             </div>
-            <p>Level 1 (Efficiency: 120%)</p>
+            <p>Level {building.level} (Efficiency: 100%)</p>
             <div className={styles.infoContainer}>
-                {building.buildingType.baseProduction.map((product) => (
+                {buildingProduction.map((product) => (
                     <ShowInfo
                         gameStyle={true}
                         key={`${product.type}${product.value}`}
@@ -76,6 +121,26 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                         ))}
                     </ProductionListing>
                 ))}
+            </div>
+            <div className={styles.row}>
+                <h3>Preview</h3>
+                <h3>Lvl {building.level + 1}</h3>
+            </div>
+            <div className={styles.infoContainer}>
+                <ShowInfo
+                    gameStyle={true}
+                    left={<div className={`${styles.icon} icon`}>industry</div>}
+                    right={<>5</>}
+                />
+                <ShowInfo gameStyle={true} left={<div className={`${styles.icon} icon`}>people</div>} right={<>2</>} />
+            </div>
+            <div className={styles.buttons}>
+                <TextButton text="upgrade" onClick={upgradeBuilding}>
+                    <ValuesBox iconKey="money" text={"150"} />
+                </TextButton>
+                <TextButton text="demolish" onClick={deleteBuilding}>
+                    <ValuesBox iconKey="money" text={"50"} />
+                </TextButton>
             </div>
         </div>
     );

@@ -1,3 +1,10 @@
+/* Animation configuration */
+:root {
+  --menu-animation-duration: 0.3s;
+  --menu-animation-base-delay: 0.1s;
+  --menu-animation-step-delay: 0.1s;
+}
+
 .menu {
   display: grid;
   grid-template-rows: 100%;
@@ -51,8 +58,8 @@
   font-size: 2rem;
   margin-bottom: 1.5rem;
   opacity: 0;
-  animation: fadeInUp 0.6s ease-out forwards;
-  animation-delay: 0.1s;
+  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
+  animation-delay: var(--menu-animation-base-delay);
 }
 .closeButton a {
   line-height: 0;
@@ -116,84 +123,84 @@
 
 .menu h1 {
   opacity: 0;
-  animation: fadeInUp 0.6s ease-out forwards;
-  animation-delay: 0.1s;
+  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
+  animation-delay: var(--menu-animation-base-delay);
 }
 
 .menu menu li {
   opacity: 0;
-  animation: fadeInUp 0.6s ease-out forwards;
+  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
 }
 
 .menu menu li:nth-child(1) {
-  animation-delay: 0.4s;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 1.5);
 }
 
 .menu menu li:nth-child(2) {
-  animation-delay: 0.7s;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 3);
 }
 
 .menu menu li:nth-child(3) {
-  animation-delay: 1s;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 4.5);
 }
 
 .menu menu li:nth-child(4) {
-  animation-delay: 1.3s;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 6);
 }
 
 .closeButton {
   opacity: 0;
-  animation: fadeInUp 0.6s ease-out forwards;
-  animation-delay: 0.1s;
+  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
+  animation-delay: var(--menu-animation-base-delay);
 }
 
 .menuContent {
   opacity: 0;
-  animation: fadeInUp 0.6s ease-out forwards;
-  animation-delay: 0.5s;
+  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 2);
 }
 
 /* Animate child elements inside menuContent */
 .menuContent > * {
   opacity: 0;
-  animation: fadeInUp 0.6s ease-out forwards;
+  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
 }
 
 .menuContent > *:nth-child(1) {
-  animation-delay: 0.7s;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 3);
 }
 
 .menuContent > *:nth-child(2) {
-  animation-delay: 0.9s;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 4);
 }
 
 .menuContent > *:nth-child(3) {
-  animation-delay: 1.1s;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 5);
 }
 
 .menuContent > *:nth-child(4) {
-  animation-delay: 1.3s;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 6);
 }
 
 .menuContent > *:nth-child(5) {
-  animation-delay: 1.5s;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 7);
 }
 
 .menuContent > *:nth-child(6) {
-  animation-delay: 1.7s;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 8);
 }
 
 .menuContent > *:nth-child(7) {
-  animation-delay: 1.9s;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 9);
 }
 
 .menuContent > *:nth-child(8) {
-  animation-delay: 2.1s;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 10);
 }
 
 /* Animate buttons in the right section */
 .right {
   opacity: 0;
-  animation: fadeInUp 0.6s ease-out forwards;
-  animation-delay: 2.3s;
+  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
+  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 11);
 }

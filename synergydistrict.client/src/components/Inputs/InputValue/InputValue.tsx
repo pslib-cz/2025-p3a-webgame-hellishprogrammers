@@ -8,9 +8,10 @@ type InputValueProps = {
     inputType: InputTypes;
     value?: string | number;
     onChange?: (value: string) => void;
+    animationDelay?: boolean;
 };
 
-const InputValue: FC<InputValueProps> = ({ text, inputType, value, onChange }) => {
+const InputValue: FC<InputValueProps> = ({ text, inputType, value, onChange, animationDelay }) => {
     const inputId = useId();
 
     const left = () => {
@@ -40,7 +41,7 @@ const InputValue: FC<InputValueProps> = ({ text, inputType, value, onChange }) =
         }
     };
 
-    return <ShowInfo left={left()} right={right()} />;
+    return <ShowInfo left={left()} right={right()} animationDelay={animationDelay} />;
 };
 
 export default InputValue;

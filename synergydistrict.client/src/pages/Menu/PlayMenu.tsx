@@ -75,6 +75,7 @@ const PlayMenu = () => {
                                 setOptions({ ...options, mapSize: numericValue });
                             }
                         }}
+                        animationDelay={false}
                     />
                 ) : (
                     <></>
