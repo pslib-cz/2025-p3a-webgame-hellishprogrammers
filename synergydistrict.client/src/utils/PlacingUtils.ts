@@ -1,8 +1,7 @@
 import type { BuildingTileType } from "../types";
-import type { BuildingSynergy, BuildingType, Production } from "../types/Game/Buildings";
+import type { BuildingSynergy, BuildingType, Edge, Production } from "../types/Game/Buildings";
 import type { GameResources } from "../types/Game/GameResources";
-// import type { BuildingType } from "../types/Game/Buildings";
-import type { Edge, EdgeSide, MapBuilding, MapTile, Position } from "../types/Game/Grid";
+import type { ActiveSynergies, EdgeSide, MapBuilding, MapTile, Position } from "../types/Game/Grid";
 
 export const CanPlaceBuilding = (
     shape: BuildingTileType[][],
@@ -20,7 +19,7 @@ export const CanPlaceBuilding = (
                     const building = placedBuildingsMappped[key];
                     const otherX = tileX - building.position.x;
                     const otherY = tileY - building.position.y;
-                    if (building.shape[otherY][otherX] != "Empty") {
+                    if (building.buildingType.shape[otherY][otherX] != "Empty") {
                         return false; // Kolize s další budovou (velký špatný)
                     }
                 }
@@ -47,8 +46,8 @@ export const CanAfford = (building: BuildingType, variables: GameResources) => {
 };
 
 type CalculateValuesResult = {
-    newValues: GameResources;
-    newSynergiesBuildings: MapBuilding[];
+    newResources: GameResources;
+    newSynergies: ActiveSynergies[];
 };
 
 export const CalculateValues = (
@@ -57,16 +56,14 @@ export const CalculateValues = (
     synergies: BuildingSynergy[],
     variables: GameResources,
 ): CalculateValuesResult | null => {
-    const result: CalculateValuesResult = { newValues: { ...variables }, newSynergiesBuildings: [] };
+    const result: CalculateValuesResult = { newResources: { ...variables }, newSynergies: [] };
 
-    const modifiedBuildings: Record<string, MapBuilding> = {};
+    result.newResources.moneyBalance -= building.buildingType.cost;
 
-    result.newValues.moneyBalance -= building.buildingType.cost;
-
-    if (!AddProductionSum(building.buildingType.baseProduction || [], result.newValues)) return null;
+    if (!AddProductionSum(building.buildingType.baseProduction || [], result.newResources)) return null;
 
     // Checking synergies production
-    for (const edge of building.edges) {
+    for (const edge of building.buildingType.edges) {
         let delX = 0;
         let delY = 0;
         let neighborEdgeSide: EdgeSide;
@@ -94,72 +91,53 @@ export const CalculateValues = (
 
         const neighbor = placedBuildingsMappped[`${neighborPosX};${neighborPosY}`];
 
-        if (neighbor) {
-            const activeSynergies = synergies.filter(
-                (s) =>
-                    (s.sourceBuildingId === building.buildingType.buildingId &&
-                        s.targetBuildingId === neighbor.buildingType.buildingId) ||
-                    (s.sourceBuildingId === neighbor.buildingType.buildingId &&
-                        s.targetBuildingId === building.buildingType.buildingId),
-            );
+        if (!neighbor) continue;
 
-            if (activeSynergies.length === 0) continue;
-            for (const synergy of activeSynergies) {
-                // Adding synergy production to values
-                if (!AddProductionSum(synergy.synergyProductions || [], result.newValues)) return null;
+        const activeSynergies = synergies.filter(
+            (s) =>
+                (s.sourceBuildingId === building.buildingType.buildingId &&
+                    s.targetBuildingId === neighbor.buildingType.buildingId) ||
+                (s.sourceBuildingId === neighbor.buildingType.buildingId &&
+                    s.targetBuildingId === building.buildingType.buildingId),
+        );
 
-                // Adding synergy to target building
-                let target: MapBuilding;
-                let source: MapBuilding;
-                let edgePosition: Position;
-                let edgeSide: EdgeSide;
+        if (activeSynergies.length === 0) continue;
 
-                if (synergy.targetBuildingId === building.buildingType.buildingId) {
-                    target = building;
-                    source = neighbor;
+        for (const synergy of activeSynergies) {
+            if (!AddProductionSum(synergy.synergyProductions || [], result.newResources)) return null;
 
-                    edgePosition = {
-                        x: neighborPosX - neighbor.position.x,
-                        y: neighborPosY - neighbor.position.y,
-                    };
-                    edgeSide = neighborEdgeSide;
-                } else {
-                    target = neighbor;
-                    source = building;
+            let target: MapBuilding;
+            let source: MapBuilding;
+            let edgePosition: Position;
+            let edgeSide: EdgeSide;
 
-                    edgePosition = edge.position;
-                    edgeSide = edge.side;
-                }
-
-                const currentSource = modifiedBuildings[source.MapBuildingId] || source;
-
-                // New source edges
-                const newEdges = currentSource.edges.map((e) => {
-                    if (e.position.x === edgePosition.x && e.position.y === edgePosition.y && e.side === edgeSide) {
-                        return {
-                            ...e,
-                            synergy: {
-                                // activeSynergyId: `${source.MapBuildingId}:${target.MapBuildingId}`,
-                                activeSynergyId: crypto.randomUUID(),
-                                targetBuilding: target,
-                                synergyProductions: synergy.synergyProductions,
-                            },
-                        } as Edge;
-                    }
-                    return e;
-                });
-
-                modifiedBuildings[source.MapBuildingId] = { ...currentSource, edges: newEdges };
+            if (synergy.targetBuildingId === building.buildingType.buildingId) {
+                target = building;
+                source = neighbor;
+                edgePosition = {
+                    x: neighborPosX - neighbor.position.x,
+                    y: neighborPosY - neighbor.position.y,
+                };
+                edgeSide = neighborEdgeSide;
+            } else {
+                target = neighbor;
+                source = building;
+                edgePosition = edge.position;
+                edgeSide = edge.side;
             }
+
+            result.newSynergies.push({
+                sourceBuildingId: source.MapBuildingId,
+                targetBuildingId: target.MapBuildingId,
+                synergyProductions: synergy.synergyProductions,
+                edge: { position: edgePosition, side: edgeSide },
+            });
         }
     }
-
-    result.newSynergiesBuildings = Object.values(modifiedBuildings);
-
     return result;
 };
 
-const CanAddProdution = (products: Production[], variables: GameResources) => {
+export const CanAddProdution = (products: Production[], variables: GameResources) => {
     for (const product of products) {
         const resourceKey = product.type.toLowerCase() as keyof GameResources;
         const currentValue = variables[resourceKey];
@@ -182,7 +160,32 @@ const CanAddProdution = (products: Production[], variables: GameResources) => {
     return true;
 };
 
-const AddProductionSum = (products: Production[], variables: GameResources): boolean => {
+export const AddProductionSum = (products: Production[], variables: GameResources): boolean => {
+    if (!CanAddProdution(products, variables)) return false;
+    for (const product of products) {
+        const resourceKey = product.type.toLowerCase() as keyof GameResources;
+        const currentValue = variables[resourceKey];
+
+        if (typeof currentValue === "number") {
+            const resultProduction = currentValue + product.value;
+
+            if (resourceKey === "energy" && product.value < 0) {
+                variables.energyUsed -= product.value;
+                continue;
+            }
+
+            if (resourceKey === "people" && product.value < 0) {
+                variables.peopleUsed -= product.value;
+                continue;
+            }
+
+            (variables as any)[resourceKey] = resultProduction;
+        }
+    }
+    return true;
+};
+
+export const DeleteProductionSum = (products: Production[], variables: GameResources): boolean => {
     if (!CanAddProdution(products, variables)) return false;
     for (const product of products) {
         const resourceKey = product.type.toLowerCase() as keyof GameResources;
@@ -238,7 +241,6 @@ export const createEgdesForShape = (shape: BuildingTileType[][]): Edge[] => {
                     edges.push({
                         position: { x, y },
                         side,
-                        synergy: null,
                     });
                 }
             }
@@ -283,8 +285,8 @@ export const buildPlacedBuildingsMap = (buildings: MapBuilding[]): Record<string
     const mapped: Record<string, MapBuilding> = {};
 
     for (const building of buildings) {
-        for (let y = 0; y < building.shape.length; y++) {
-            const row = building.shape[y];
+        for (let y = 0; y < building.buildingType.shape.length; y++) {
+            const row = building.buildingType.shape[y];
             for (let x = 0; x < row.length; x++) {
                 if (row[x] === "Empty") continue;
                 const key = `${building.position.x + x};${building.position.y + y}`;

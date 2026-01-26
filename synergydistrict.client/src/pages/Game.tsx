@@ -118,46 +118,36 @@ const Game = () => {
 
         if (
             CanPlaceBuilding(
-                buildingPreview!.shape,
+                buildingPreview.buildingType.shape,
                 position,
                 GameMapData.placedBuildingsMappped,
                 GameMapData.loadedMapTiles,
             )
         ) {
             const newBuilding: MapBuilding = {
-                buildingType: activeBuildingType,
+                buildingType: buildingPreview.buildingType,
                 MapBuildingId: crypto.randomUUID(),
                 position: position,
-                edges: buildingPreview!.edges,
                 rotation: buildingPreview!.rotation,
                 level: 1,
-                shape: buildingPreview!.shape,
                 isSelected: false,
             };
 
-            const newValues = CalculateValues(
-                newBuilding,
-                GameMapData.placedBuildingsMappped,
-                synergies,
-                GameResources,
-            );
-            if (!newValues) return;
+            const newData = CalculateValues(newBuilding, GameMapData.placedBuildingsMappped, synergies, GameResources);
+            if (!newData) return;
 
-            setGameResources(newValues.newValues);
+            const newBuildings = [...GameMapData.placedBuildings, newBuilding];
 
-            const newBuildings = [...GameMapData.placedBuildings, newBuilding].map((b) => {
-                const changedBuilding = newValues.newSynergiesBuildings.find(
-                    (bi) => bi.MapBuildingId === b.MapBuildingId,
-                );
-                return changedBuilding ? changedBuilding : b;
-            });
+            setGameResources(newData.newResources);
 
             setGameMapData((prev) => ({
                 ...prev,
+                activeSynergies: [...prev.activeSynergies, ...newData.newSynergies],
                 placedBuildings: newBuildings,
                 placedBuildingsMappped: buildPlacedBuildingsMap(newBuildings),
             }));
-            if (!CanAfford(buildingPreview!.buildingType, newValues.newValues)) setBuildingPreview(null);
+
+            if (!CanAfford(buildingPreview!.buildingType, newData.newResources)) setBuildingPreview(null);
         }
     };
 
@@ -171,17 +161,12 @@ const Game = () => {
             return;
         }
 
-        const shape = building.shape;
-        const edges = createEgdesForShape(shape);
-
         const prewiewBuilding: MapBuilding = {
             buildingType: building,
             MapBuildingId: "preview",
             position: { x: 0, y: 0 },
-            edges: edges,
             rotation: 0,
             level: 1,
-            shape: shape,
             isSelected: false,
         };
 
@@ -191,14 +176,16 @@ const Game = () => {
     const OnRotate = () => {
         if (buildingPreview === null || gameControl.isEnd) return;
 
-        const newRotation = (buildingPreview.rotation + 1) % 4;
-        const newShape = rotateShape(buildingPreview.shape, 1);
+        const newShape = rotateShape(buildingPreview.buildingType.shape, 1);
         const newEdges = createEgdesForShape(newShape);
-        setBuildingPreview({
-            ...buildingPreview,
-            rotation: newRotation,
-            shape: newShape,
-            edges: newEdges,
+        setBuildingPreview((prev) => {
+            if (!prev) return null;
+
+            return {
+                ...prev,
+                buildingType: { ...prev.buildingType, shape: newShape, edges: newEdges },
+                rotation: (prev.rotation + 1) % 4,
+            };
         });
     };
 

@@ -14,8 +14,8 @@ const rebuildPlacedBuildingsMap = (placedBuildings: MapBuilding[]): Record<strin
     const rebuilt: Record<string, MapBuilding> = {};
 
     for (const building of placedBuildings) {
-        for (let y = 0; y < building.shape.length; y++) {
-            const row = building.shape[y];
+        for (let y = 0; y < building.buildingType.shape.length; y++) {
+            const row = building.buildingType.shape[y];
             for (let x = 0; x < row.length; x++) {
                 const tile = row[x];
                 if (tile === "Empty") continue;

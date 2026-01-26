@@ -7,9 +7,11 @@ import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import ProductionListing from "../../../components/Game/ProductionListing/ProductionListing";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameMapData from "../../../hooks/providers/useMapData";
-import type { Production } from "../../../types/Game/Buildings";
+import type { BuildingType, Production } from "../../../types/Game/Buildings";
 import TextButton from "../../../components/Buttons/TextButton/TextButton";
 import { buildPlacedBuildingsMap } from "../../../utils/PlacingUtils";
+import useGameResources from "../../../hooks/providers/useGameResources";
+import type { GameResources } from "../../../types/Game/GameResources";
 
 type BuildingDetailsProps = {
     building: MapBuilding;
@@ -18,48 +20,80 @@ type BuildingDetailsProps = {
 
 const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const { GameMapData, setGameMapData } = useGameMapData();
-    const incomingSynergies = GameMapData.placedBuildings
-        .flatMap((otherBuilding) =>
-            otherBuilding.edges
-                .filter((edge) => edge.synergy && edge.synergy.targetBuilding.MapBuildingId === building.MapBuildingId)
-                .map((edge) => ({
-                    source: otherBuilding,
-                    count: otherBuilding.edges.filter(
-                        (x) => x.synergy?.targetBuilding.MapBuildingId === edge.synergy?.targetBuilding.MapBuildingId,
-                    ).length,
-                    synergy: edge.synergy!,
-                })),
-        )
-        .reduce(
-            (accumulator, currentValue) => {
-                if (!accumulator.some((x) => x.source.MapBuildingId === currentValue.source.MapBuildingId)) {
-                    accumulator.push(currentValue);
-                }
-                return accumulator;
-            },
-            [] as { source: MapBuilding; synergy: ActiveSynergies; count: number }[],
+    // const { GameResources, setGameResources } = useGameResources();
+
+    const getGroupedSynergies = (
+        direction: "incoming" | "outgoing",
+        currentBuildingId: string,
+        allSynergies: ActiveSynergies[],
+        allBuildings: MapBuilding[],
+    ) => {
+        const relevantSynergies = allSynergies.filter((s) =>
+            direction === "incoming"
+                ? s.targetBuildingId === currentBuildingId
+                : s.sourceBuildingId === currentBuildingId,
         );
 
-    const incomingProduction = incomingSynergies
-        .flatMap((s) =>
-            s.synergy.synergyProductions.map((p) => ({
-                type: p.type,
-                value: p.value * s.count,
-            })),
-        )
-        .reduce((accumulator, currentValue) => {
-            const existing = accumulator.find((x) => x.type === currentValue.type);
-            if (existing) {
-                existing.value += currentValue.value;
-            } else {
-                accumulator.push({ ...currentValue });
+        const groups = new Map<string, { count: number; productions: Production[] }>();
+
+        relevantSynergies.forEach((syn) => {
+            const otherId = direction === "incoming" ? syn.sourceBuildingId : syn.targetBuildingId;
+
+            if (!groups.has(otherId)) {
+                groups.set(otherId, { count: 0, productions: [] });
             }
-            return accumulator;
+
+            const group = groups.get(otherId)!;
+            group.count += 1;
+
+            syn.synergyProductions.forEach((prod) => {
+                const existingProd = group.productions.find((p) => p.type === prod.type);
+                if (existingProd) {
+                    existingProd.value += prod.value;
+                } else {
+                    group.productions.push({ ...prod });
+                }
+            });
+        });
+
+        return Array.from(groups.entries())
+            .map(([otherId, data]) => {
+                const building = allBuildings.find((b) => b.MapBuildingId === otherId);
+                return {
+                    otherBuilding: building,
+                    count: data.count,
+                    productions: data.productions,
+                };
+            })
+            .filter((item) => item.otherBuilding !== undefined) as {
+            otherBuilding: MapBuilding;
+            count: number;
+            productions: Production[];
+        }[];
+    };
+
+    const incomingSynergiesList = getGroupedSynergies(
+        "incoming",
+        building.MapBuildingId,
+        GameMapData.activeSynergies,
+        GameMapData.placedBuildings,
+    );
+
+    const totalIncomingProduction = incomingSynergiesList
+        .flatMap((group) => group.productions)
+        .reduce((acc, curr) => {
+            const existing = acc.find((p) => p.type === curr.type);
+            if (existing) {
+                existing.value += curr.value;
+            } else {
+                acc.push({ ...curr });
+            }
+            return acc;
         }, [] as Production[]);
 
-    const buildingProduction = building.buildingType.baseProduction.map((product) => ({ ...product }));
+    const buildingProduction = building.buildingType.baseProduction.map((product) => ({ ...product })) as Production[];
 
-    incomingProduction.forEach((boost) => {
+    totalIncomingProduction.forEach((boost) => {
         const existing = buildingProduction.find((p) => p.type === boost.type);
         if (existing) {
             existing.value += boost.value;
@@ -73,13 +107,25 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     };
 
     const deleteBuilding = () => {
-        const newBuilding = GameMapData.placedBuildings.filter((b) => b.MapBuildingId !== building.MapBuildingId);
-        CloseBar();
-        setGameMapData((prev) => ({
-            ...prev,
-            placedBuildings: newBuilding,
-            placedBuildingsMappped: buildPlacedBuildingsMap(newBuilding),
-        }));
+        // const newResources = { ...GameResources } as GameResources;
+
+        // const tempBuilding: BuildingType = {...building.buildingType, cost: 50, baseProduction: }
+        // // buildingProduction.forEach(product => {
+        // //     if ()
+        // //     newResources[product.type.toLowerCase() as keyof GameResources] -= product.value;
+        // // })
+        // const newBuilding = GameMapData.placedBuildings.filter((b) => b.MapBuildingId !== building.MapBuildingId);
+        // const newSynergies = GameMapData.activeSynergies.filter(
+        //     (s) => s.sourceBuildingId !== building.MapBuildingId && s.targetBuildingId !== building.MapBuildingId,
+        // );
+        // CloseBar();
+        // // setGameResources();
+        // setGameMapData((prev) => ({
+        //     ...prev,
+        //     placedBuildings: newBuilding,
+        //     placedBuildingsMappped: buildPlacedBuildingsMap(newBuilding),
+        //     activeSynergies: newSynergies,
+        // }));
     };
 
     return (
@@ -107,16 +153,18 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
             </div>
             <h3>Synergy</h3>
             <div className={styles.synergies}>
-                {incomingSynergies.map((synergy) => (
+                {incomingSynergiesList.map((synergyGroup) => (
                     <ProductionListing
-                        key={synergy.synergy.activeSynergyId}
-                        title={`${synergy.source.buildingType.name} ${synergy.count > 1 ? `(${synergy.count}x)` : ""}`}
+                        key={`incoming-${synergyGroup.otherBuilding.MapBuildingId}`}
+                        title={`${synergyGroup.otherBuilding.buildingType.name} ${
+                            synergyGroup.count > 1 ? `(${synergyGroup.count}x)` : ""
+                        }`}
                     >
-                        {synergy.synergy.synergyProductions.map((product) => (
+                        {synergyGroup.productions.map((product) => (
                             <ValuesBox
                                 key={`${product.type}-${product.value}`}
                                 iconKey={product.type.toLowerCase()}
-                                text={(product.value * synergy.count).toString()}
+                                text={product.value.toString()}
                             />
                         ))}
                     </ProductionListing>

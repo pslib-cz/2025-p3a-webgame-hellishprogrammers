@@ -1,6 +1,7 @@
 import { createContext, type ReactNode, useState, useEffect } from "react";
 import type { BuildingType, BuildingSynergy } from "../types/Game/Buildings";
 import { BuildingApi } from "../api/BuildingApi";
+import { createEgdesForShape } from "../utils/PlacingUtils";
 
 interface GameDataContextType {
     buildings: BuildingType[];
@@ -28,12 +29,13 @@ const api = new BuildingApi();
 export const GameDataContext = createContext<GameDataContextType | null>(null);
 
 export function GameDataProvider({ children }: { children: ReactNode }) {
-    const [buildings, setBuildings] = useState<BuildingType[]>(
-        () => loadFromStorage<BuildingType[]>(STORAGE_KEYS.BUILDINGS) || []
-    );
+    const [buildings, setBuildings] = useState<BuildingType[]>(() => {
+        const stored = loadFromStorage<BuildingType[]>(STORAGE_KEYS.BUILDINGS);
+        return stored ? stored.map((b) => ({ ...b, edges: b.edges || createEgdesForShape(b.shape) })) : [];
+    });
 
     const [synergies, setSynergies] = useState<BuildingSynergy[]>(
-        () => loadFromStorage<BuildingSynergy[]>(STORAGE_KEYS.SYNERGIES) || []
+        () => loadFromStorage<BuildingSynergy[]>(STORAGE_KEYS.SYNERGIES) || [],
     );
 
     const [loading, setLoading] = useState(() => {
@@ -41,14 +43,14 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
         const hasSynergies = !!sessionStorage.getItem(STORAGE_KEYS.SYNERGIES);
         return !hasBuildings || !hasSynergies;
     });
-    
+
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (loading) {
             api.getGameData()
                 .then((result) => {
-                    setBuildings(result.buildings);
+                    setBuildings(result.buildings.map((b) => ({ ...b, edges: createEgdesForShape(b.shape) })));
                     setSynergies(result.synergies);
                     sessionStorage.setItem(STORAGE_KEYS.BUILDINGS, JSON.stringify(result.buildings));
                     sessionStorage.setItem(STORAGE_KEYS.SYNERGIES, JSON.stringify(result.synergies));

@@ -19,7 +19,7 @@ import GridLayer from "./GridLayer";
 import { useGameData } from "../../../hooks/providers/useGameData";
 import useGameResources from "../../../hooks/providers/useGameResources";
 
-const findIconOffset = (shape: MapBuilding["shape"]): Position => {
+const findIconOffset = (shape: MapBuilding["buildingType"]["shape"]): Position => {
     for (let y = 0; y < shape.length; y++) {
         for (let x = 0; x < shape[y].length; x++) {
             if (shape[y][x] === "Icon") {
@@ -122,7 +122,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
             return;
         }
 
-        const iconOffset = findIconOffset(previewBuilding.shape);
+        const iconOffset = findIconOffset(previewBuilding.buildingType.shape);
         const origin: Position = {
             x: tile.x - iconOffset.x,
             y: tile.y - iconOffset.y,
@@ -131,7 +131,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
         setPreviewTile(origin);
         setIsPreviewPlaceable(
             CanPlaceBuilding(
-                previewBuilding.shape,
+                previewBuilding.buildingType.shape,
                 origin,
                 GameMapData.placedBuildingsMappped,
                 GameMapData.loadedMapTiles,
@@ -191,7 +191,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
         if (building) return;
 
         if (previewBuilding) {
-            const iconOffset = findIconOffset(previewBuilding.shape);
+            const iconOffset = findIconOffset(previewBuilding.buildingType.shape);
             placementTile = {
                 x: pointerTile.x - iconOffset.x,
                 y: pointerTile.y - iconOffset.y,
