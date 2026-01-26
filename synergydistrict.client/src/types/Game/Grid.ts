@@ -1,4 +1,4 @@
-import type { BuildingTileType, TileType } from "..";
+import type { TileType } from "..";
 import type { BuildingType, Edge, Production } from "./Buildings";
 
 export type EdgeSide = "top" | "bottom" | "left" | "right";
@@ -29,6 +29,12 @@ export type MapBuilding = {
     rotation: number;
     level: number;
 };
+
+export type NaturalFeature = {
+    id: string;
+    position: Position;
+    type: TileType;
+}
 
 export type ActiveSynergies = {
     // activeSynergyId: string;

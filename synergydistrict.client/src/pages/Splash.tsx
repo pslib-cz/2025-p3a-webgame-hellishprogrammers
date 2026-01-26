@@ -1,13 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/Splash.module.css";
 import underscore from "../styles/FlashingUnderscore.module.css";
-import { useSettings } from "../hooks/providers/useSettings";
 
 
 const Splash = () => {
     const navigate = useNavigate();
-    const { gameSettings } = useSettings();
 
     useEffect(() => {
         const handleKeyPress = () => {

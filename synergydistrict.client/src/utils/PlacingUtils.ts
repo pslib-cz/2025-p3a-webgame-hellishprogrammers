@@ -1,7 +1,7 @@
-import type { BuildingTileType } from "../types";
+import type { BuildingTileType, TileType } from "../types";
 import type { BuildingSynergy, BuildingType, Edge, Production } from "../types/Game/Buildings";
 import type { GameResources } from "../types/Game/GameResources";
-import type { ActiveSynergies, EdgeSide, MapBuilding, MapTile, Position } from "../types/Game/Grid";
+import type { ActiveSynergies, EdgeSide, MapBuilding, MapTile, NaturalFeature, Position } from "../types/Game/Grid";
 
 export const CanPlaceBuilding = (
     shape: BuildingTileType[][],
@@ -35,6 +35,63 @@ export const CanPlaceBuilding = (
     }
     return true;
 };
+
+export const CheckForNaturalFeatures = (
+    shape: BuildingTileType[][],
+    position: { x: number; y: number },
+    loadedMapTiles: Record<string, MapTile>,
+): { type: TileType, position: Position }[] => {
+    const toCheckMask: Position[] = [];
+    const foundFeatures: { type: TileType, position: Position }[] = [];
+    for (let y = 0; y < shape.length + 2; y++) {
+        for (let x = 0; x < shape[0].length + 2; x++) {
+            if([CheckNeighboringTile({x: x - 1, y: y - 1}, shape), 
+                CheckNeighboringTile({x: x, y: y - 1}, shape), 
+                CheckNeighboringTile({x: x - 1, y: y}, shape), 
+                CheckNeighboringTile({x: x, y: y}, shape)].some(v => v)) {
+                toCheckMask.push({x, y});
+            }
+        }
+    }
+
+    for (let i = 0; i < toCheckMask.length; i++) {
+        const pos = toCheckMask[i];
+        const tileX = position.x + pos.x - 1;
+        const tileY = position.y + pos.y - 1;
+        const key = `${tileX};${tileY}`;
+        const tile = loadedMapTiles[key];
+        if (tile) {
+            if (tile.hasIcon) {
+                foundFeatures.push({ type: tile.tileType, position: { x: tileX, y: tileY } });
+            }
+        }
+    }
+
+    return foundFeatures;
+
+}
+
+export const CheckNeighboringTile = ( position: Position, shape: BuildingTileType[][]): boolean => {
+    if (shape.length <= position.y || shape[0].length <= position.x) {
+        return false;
+    }
+    return shape[position.y][position.x] != "Empty";
+}
+
+export const MaterializeNaturalFeatures = (
+    naturalFeatures: { type: TileType, position: Position }[],
+): NaturalFeature[] => {
+    const materializedFeatures: NaturalFeature[] = [];
+    for (let i = 0; i < naturalFeatures.length; i++) {
+        materializedFeatures.push({
+            id: crypto.randomUUID(),
+            position: naturalFeatures[i].position,
+            type: naturalFeatures[i].type,
+        });
+    }
+    return materializedFeatures;
+}
+
 
 export const CanAfford = (building: BuildingType, variables: GameResources) => {
     // Checking price is less or equal balance
