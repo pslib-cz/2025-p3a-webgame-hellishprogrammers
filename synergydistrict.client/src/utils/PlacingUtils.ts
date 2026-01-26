@@ -278,3 +278,20 @@ export const rotateShape = (shape: BuildingTileType[][], rotation: number): Buil
 
     return currentShape;
 };
+
+export const buildPlacedBuildingsMap = (buildings: MapBuilding[]): Record<string, MapBuilding> => {
+    const mapped: Record<string, MapBuilding> = {};
+
+    for (const building of buildings) {
+        for (let y = 0; y < building.shape.length; y++) {
+            const row = building.shape[y];
+            for (let x = 0; x < row.length; x++) {
+                if (row[x] === "Empty") continue;
+                const key = `${building.position.x + x};${building.position.y + y}`;
+                mapped[key] = building;
+            }
+        }
+    }
+
+    return mapped;
+};

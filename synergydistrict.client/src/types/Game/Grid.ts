@@ -33,6 +33,7 @@ export type MapBuilding = {
     position: Position;
     isSelected: boolean;
     rotation: number;
+    level: number;
     edges: Edge[];
     shape: BuildingTileType[][];
 };

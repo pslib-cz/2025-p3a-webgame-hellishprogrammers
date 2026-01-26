@@ -8,6 +8,8 @@ import ProductionListing from "../../../components/Game/ProductionListing/Produc
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameMapData from "../../../hooks/providers/useMapData";
 import type { Production } from "../../../types/Game/Buildings";
+import TextButton from "../../../components/Buttons/TextButton/TextButton";
+import { buildPlacedBuildingsMap } from "../../../utils/PlacingUtils";
 
 type BuildingDetailsProps = {
     building: MapBuilding;
@@ -15,7 +17,7 @@ type BuildingDetailsProps = {
 };
 
 const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
-    const { GameMapData } = useGameMapData();
+    const { GameMapData, setGameMapData } = useGameMapData();
     const incomingSynergies = GameMapData.placedBuildings
         .flatMap((otherBuilding) =>
             otherBuilding.edges
@@ -55,8 +57,6 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
             return accumulator;
         }, [] as Production[]);
 
-    console.log(incomingProduction);
-
     const buildingProduction = building.buildingType.baseProduction.map((product) => ({ ...product }));
 
     incomingProduction.forEach((boost) => {
@@ -68,15 +68,29 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
         }
     });
 
+    const upgradeBuilding = () => {
+        console.log("UPGRADE");
+    };
+
+    const deleteBuilding = () => {
+        const newBuilding = GameMapData.placedBuildings.filter((b) => b.MapBuildingId !== building.MapBuildingId);
+        CloseBar();
+        setGameMapData((prev) => ({
+            ...prev,
+            placedBuildings: newBuilding,
+            placedBuildingsMappped: buildPlacedBuildingsMap(newBuilding),
+        }));
+    };
+
     return (
         <div className={styles.buildingDetails}>
-            <div className={styles.title}>
+            <div className={styles.row}>
                 <h2 className={underscore.parent}>{building.buildingType.name}</h2>
-                <button onClick={() => CloseBar()}>
+                <button onClick={() => CloseBar()} className={styles.close}>
                     <IconClose />
                 </button>
             </div>
-            <p>Level 1 (Efficiency: 100%)</p>
+            <p>Level {building.level} (Efficiency: 100%)</p>
             <div className={styles.infoContainer}>
                 {buildingProduction.map((product) => (
                     <ShowInfo
@@ -107,6 +121,26 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                         ))}
                     </ProductionListing>
                 ))}
+            </div>
+            <div className={styles.row}>
+                <h3>Preview</h3>
+                <h3>Lvl {building.level + 1}</h3>
+            </div>
+            <div className={styles.infoContainer}>
+                <ShowInfo
+                    gameStyle={true}
+                    left={<div className={`${styles.icon} icon`}>industry</div>}
+                    right={<>5</>}
+                />
+                <ShowInfo gameStyle={true} left={<div className={`${styles.icon} icon`}>people</div>} right={<>2</>} />
+            </div>
+            <div className={styles.buttons}>
+                <TextButton text="upgrade" onClick={upgradeBuilding}>
+                    <ValuesBox iconKey="money" text={"150"} />
+                </TextButton>
+                <TextButton text="demolish" onClick={deleteBuilding}>
+                    <ValuesBox iconKey="money" text={"50"} />
+                </TextButton>
             </div>
         </div>
     );

@@ -19,15 +19,7 @@ const getRank = (score: number) => {
     else return "S - VISIONARY";
 };
 
-const SESSION_PA_RESET_KEYS = [
-    "gameControl",
-    "gameMapData",
-    "gameProperties",
-    "gameResources",
-    "gameTime",
-    "buildings",
-    "synergies",
-];
+const SESSION_PA_RESET_KEYS = ["gameControl", "gameMapData", "gameResources", "gameTime", "buildings", "synergies"];
 
 const EndScreen: FC = () => {
     const { setGameControl } = useGameControl();
