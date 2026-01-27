@@ -8,7 +8,6 @@ import ProductionListing from "../../../components/Game/ProductionListing/Produc
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameMapData from "../../../hooks/providers/useMapData";
 import type { Production } from "../../../types/Game/Buildings";
-import type { Production } from "../../../types/Game/Buildings";
 import TextButton from "../../../components/Buttons/TextButton/TextButton";
 import { buildPlacedBuildingsMap, CanDeleteProdution, DeleteProductionSum } from "../../../utils/PlacingUtils";
 import useGameResources from "../../../hooks/providers/useGameResources";
