@@ -2,37 +2,44 @@
 @import "@fontsource/roboto-mono/700.css";
 
 :root {
-  font-family: "Roboto Mono";
-  font-weight: 700;
+    font-size: 16px;
+    font-family: "Roboto Mono";
+    font-weight: 700;
 
-  color: var(--text);
-  background-color: var(--background);
+    color: var(--text);
+    background-color: var(--background);
 
-  --text: #fefae0;
-  --background: #191919;
+    --text: #fefae0;
+    --background: #191919;
 
-  --residential: #1982c4;
-  --commercial: #6a4c93;
-  --industrial: #ff595e;
-  --extractional: #ffca3a;
-  --recreational: #8ac926;
+    --residential: #1982c4;
+    --commercial: #6a4c93;
+    --industrial: #ff595e;
+    --extractional: #ffca3a;
+    --recreational: #8ac926;
 
-  --water-light: #598392;
-  --water--dark: #124559;
-  --grass--light: #7c8b4a;
-  --grass--dark: #606c38;
-  --forrest--dark: #283618;
-  --mountain--light: #be8f5b;
-  --mountain--dark: #8f531d;
+    --water-light: #598392;
+    --water--dark: #124559;
+    --grass--light: #7c8b4a;
+    --grass--dark: #606c38;
+    --forrest--dark: #283618;
+    --mountain--light: #be8f5b;
+    --mountain--dark: #8f531d;
 
-  --bg80: rgba(var(--background), 0.8);
-  --bg32: rgba(var(--background), 0.32);
+    --bg80: rgba(var(--background), 0.8);
+    --bg32: rgba(var(--background), 0.32);
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  }
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@media screen and (max-width: 1920px) {
+    :root {
+        font-size: 12px;
+    }
+}
 
 h1,
 h2,
@@ -40,25 +47,24 @@ h3,
 .h1,
 .h2,
 .h3 {
-  font-family: "Space Mono";
+    font-family: "Space Mono";
 }
 h1,
 .h1 {
-  font-size: 2.5rem;
-  text-transform: uppercase;
-  margin: 2rem 0;
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    margin: 2rem 0;
 }
 h2,
 .h2 {
-  font-size: 1.5rem;
+    font-size: 1.5rem;
 }
 h3,
 .h3 {
-  font-size: 1.25rem;
-  margin: 0;
+    font-size: 1.25rem;
+    margin: 0;
 }
 a {
-  color: var(--text);
-  text-decoration: none;
+    color: var(--text);
+    text-decoration: none;
 }
-
