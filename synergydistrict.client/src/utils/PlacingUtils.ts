@@ -256,7 +256,7 @@ export const CanDeleteProdution = (products: Production[], variables: GameResour
                 continue;
             }
 
-            if (resourceKey === "people" && product.value < 0) {
+            if (resourceKey === "people" && product.value > 0) {
                 if (variables.people - product.value < variables.peopleUsed) return false;
                 continue;
             }

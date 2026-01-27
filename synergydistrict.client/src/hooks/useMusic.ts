@@ -1,22 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 
-const audioModules = import.meta.glob(
-  '/public/audio/**/*.{mp3,wav,ogg}',
-  { eager: true, as: 'url' }
-);
+const audioModules = import.meta.glob("/public/audio/**/*.{mp3,wav,ogg}", { eager: true, as: "url" });
 
 export type MusicOptions = {
     songsPath: string[];
     volume: number;
     timeBetweenSongs: number;
     isEnabled: boolean;
-    mode: 'single' | 'random';
-}
+    mode: "single" | "random";
+};
 
 export type AudioData = {
     audioElement: HTMLAudioElement;
     name: string;
-}
+};
 
 const useMusic = (musicOptions: MusicOptions) => {
     const [currentTrack, setCurrentTrack] = useState<string>("");
@@ -41,13 +38,17 @@ const useMusic = (musicOptions: MusicOptions) => {
 
         const loadedTracks = loadAudioPaths(songsPath);
         tracksRef.current = loadedTracks;
-        
+
         if (loadedTracks.length === 0) {
             return;
         }
 
         const playTrack = (trackPath: string) => {
-            const trackName = trackPath.split("/").pop()?.replace(/\.(mp3|wav|ogg)$/, "") || "Unknown";
+            const trackName =
+                trackPath
+                    .split("/")
+                    .pop()
+                    ?.replace(/\.(mp3|wav|ogg)$/, "") || "Unknown";
             setCurrentTrack(trackName);
 
             if (audioRef.current) {
@@ -61,14 +62,14 @@ const useMusic = (musicOptions: MusicOptions) => {
         const playRandomTrack = () => {
             const tracks = tracksRef.current;
             if (tracks.length === 0) return;
-            
+
             if (playedTracksRef.current.length === tracks.length) {
                 playedTracksRef.current = [];
             }
 
-            const availableIndices = tracks.map((_, index) => index).filter(
-                (index) => !playedTracksRef.current.includes(index),
-            );
+            const availableIndices = tracks
+                .map((_, index) => index)
+                .filter((index) => !playedTracksRef.current.includes(index));
 
             const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
             playedTracksRef.current.push(randomIndex);
@@ -85,7 +86,7 @@ const useMusic = (musicOptions: MusicOptions) => {
 
         const handleSongEnd = () => {
             setCurrentTrack("");
-            if (mode === 'random') {
+            if (mode === "random") {
                 timeoutRef.current = setTimeout(() => handlersRef.current?.playRandomTrack(), timeBetweenSongs);
             } else {
                 timeoutRef.current = setTimeout(() => handlersRef.current?.playSingleTrack(), timeBetweenSongs);
@@ -100,7 +101,7 @@ const useMusic = (musicOptions: MusicOptions) => {
             audioRef.current.volume = volume;
         }
 
-        if (mode === 'random') {
+        if (mode === "random") {
             playRandomTrack();
         } else {
             playSingleTrack();
@@ -132,7 +133,7 @@ const useMusic = (musicOptions: MusicOptions) => {
 
 function loadAudioPaths(songPaths: string[]): string[] {
     return Object.entries(audioModules)
-        .filter(([path]) => songPaths.some(p => path.includes(p)))
+        .filter(([path]) => songPaths.some((p) => path.includes(p)))
         .map(([, url]) => url);
 }
 
