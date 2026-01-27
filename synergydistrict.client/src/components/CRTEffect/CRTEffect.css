@@ -43,9 +43,9 @@
     height: 100%;
     background: radial-gradient(
         ellipse at center,
-        rgba(0, 0, 0, 0) 50%,
-        rgba(0, 0, 0, 0.3) 85%,
-        rgba(0, 0, 0, 0.6) 100%
+        rgba(0, 0, 0, 0) 40%,
+        rgba(0, 0, 0, 0.4) 75%,
+        rgba(0, 0, 0, 0.8) 100%
     );
 }
 
@@ -68,6 +68,21 @@ html, body {
     overflow: hidden;
 }
 
+/* Enhanced vignette for more apparent edge effect */
+.crt-vignette {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0, 0, 0, 0) 40%,
+        rgba(0, 0, 0, 0.4) 75%,
+        rgba(0, 0, 0, 0.8) 100%
+    );
+}
+
 /* Screen warp effect - applied through backdrop filter */
 @supports (backdrop-filter: blur(0)) {
     .crt-effect::after {
@@ -77,18 +92,18 @@ html, body {
         left: 0;
         width: 100%;
         height: 100%;
-        backdrop-filter: contrast(1.05) brightness(1.02);
+        backdrop-filter: contrast(1.1) brightness(0.95);
         
         /* Subtle distortion at edges */
         mask-image: radial-gradient(
             ellipse at center,
-            black 60%,
-            transparent 100%
+            transparent 50%,
+            black 100%
         );
         -webkit-mask-image: radial-gradient(
             ellipse at center,
-            black 60%,
-            transparent 100%
+            transparent 50%,
+            black 100%
         );
     }
 }
