@@ -1,4 +1,4 @@
-import { useState, type FC } from "react";
+import { useEffect, useState, type FC } from "react";
 import styles from "./BuildingDetails.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
 import type { ActiveSynergies, MapBuilding } from "../../../types/Game/Grid";
@@ -8,8 +8,9 @@ import ProductionListing from "../../../components/Game/ProductionListing/Produc
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameMapData from "../../../hooks/providers/useMapData";
 import type { Production } from "../../../types/Game/Buildings";
+import type { Production } from "../../../types/Game/Buildings";
 import TextButton from "../../../components/Buttons/TextButton/TextButton";
-import { buildPlacedBuildingsMap, DeleteProductionSum } from "../../../utils/PlacingUtils";
+import { buildPlacedBuildingsMap, CanDeleteProdution, DeleteProductionSum } from "../../../utils/PlacingUtils";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import type { GameResources } from "../../../types/Game/GameResources";
 
@@ -18,11 +19,14 @@ type BuildingDetailsProps = {
     CloseBar: () => void;
 };
 
+const DELETE_PRICE = 50;
+const UPGRADE_PRICE = 150;
+
 const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
-    const [isDeletable, setIsDeletable] = useState<boolean>(true);
-    const [isUpgradable] = useState<boolean>(true);
+
+    const [isUpgradable, setIsUpgradable] = useState<boolean>(true);
 
     const getGroupedSynergies = (
         direction: "incoming" | "outgoing",
@@ -104,23 +108,28 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
         }
     });
 
+    const isDeletable = () => {
+        const newResources = { ...GameResources } as GameResources;
+        return (
+            newResources.moneyBalance - DELETE_PRICE > 0 &&
+            CanDeleteProdution(building.buildingType.baseProduction, newResources) &&
+            CanDeleteProdution(totalIncomingProduction, newResources)
+        );
+    };
+
     const upgradeBuilding = () => {
         console.log("UPGRADE");
     };
 
-    const deleteBuilding = (price: number) => {
+    const deleteBuilding = () => {
+        if (!isDeletable()) return;
+
         const newResources = { ...GameResources } as GameResources;
+        newResources.moneyBalance -= DELETE_PRICE;
 
-        const canDelete =
-            newResources.moneyBalance - price > 0 &&
-            DeleteProductionSum(building.buildingType.baseProduction, newResources) &&
-            DeleteProductionSum(totalIncomingProduction, newResources);
+        DeleteProductionSum(building.buildingType.baseProduction, newResources);
+        DeleteProductionSum(totalIncomingProduction, newResources);
 
-        setIsDeletable(canDelete);
-
-        if (!canDelete) return;
-
-        newResources.moneyBalance -= price;
         const newBuilding = GameMapData.placedBuildings.filter((b) => b.MapBuildingId !== building.MapBuildingId);
         const newSynergies = GameMapData.activeSynergies.filter(
             (s) => s.sourceBuildingId !== building.MapBuildingId && s.targetBuildingId !== building.MapBuildingId,
@@ -196,8 +205,8 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                         <ValuesBox iconKey="money" text={"150"} />
                     </TextButton>
                 </div>
-                <div className={styles.button} style={{ opacity: isDeletable ? 1 : 0.2 }}>
-                    <TextButton text="demolish" onClick={() => deleteBuilding(50)}>
+                <div className={styles.button} style={{ opacity: isDeletable() ? 1 : 0.2 }}>
+                    <TextButton text="demolish" onClick={deleteBuilding}>
                         <ValuesBox iconKey="money" text={"50"} />
                     </TextButton>
                 </div>

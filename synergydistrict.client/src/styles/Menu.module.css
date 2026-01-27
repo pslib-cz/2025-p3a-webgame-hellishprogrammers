@@ -1,7 +1,7 @@
 /* Animation configuration */
 :root {
-  --menu-animation-duration: 0.3s;
-  --menu-animation-base-delay: 0.1s;
+  --menu-animation-duration: 0.2s;
+  --menu-animation-base-delay: 0.0s;
   --menu-animation-step-delay: 0.1s;
 }
 
