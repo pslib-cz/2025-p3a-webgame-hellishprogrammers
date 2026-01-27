@@ -121,7 +121,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const isDeletable = () => {
         const newResources = { ...GameResources } as GameResources;
         return (
-            newResources.moneyBalance - DELETE_PRICE > 0 &&
+            newResources.moneyBalance - DELETE_PRICE >= 0 &&
             CanDeleteProdution(building.buildingType.baseProduction, newResources) &&
             CanDeleteProdution(totalIncomingProduction, newResources)
         );
