@@ -1,7 +1,7 @@
 .title{
     background-color: var(--text);
     color: var(--background);
-    height: 40px;
+    height: 2.5rem;
 }
 .titleContent{
     padding: .5rem 1rem;

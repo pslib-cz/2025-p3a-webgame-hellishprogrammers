@@ -33,18 +33,19 @@ namespace SynergyDistrict.Server.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("ShapeSerialized")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("SynergyItemId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("BuildingId");
+
+                    b.HasIndex("SynergyItemId");
 
                     b.ToTable("Buildings");
                 });
@@ -76,25 +77,51 @@ namespace SynergyDistrict.Server.Migrations
                     b.ToTable("BuildingProductions");
                 });
 
-            modelBuilder.Entity("SynergyDistrict.Server.Models.Buildings.BuildingSynergy", b =>
+            modelBuilder.Entity("SynergyDistrict.Server.Models.Buildings.Synergy", b =>
                 {
-                    b.Property<int>("BuildingSynergyId")
+                    b.Property<int>("SynergyId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("SourceBuildingId")
+                    b.Property<int>("SourceSynergyItemId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("TargetBuildingId")
+                    b.Property<int>("TargetSynergyItemId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("BuildingSynergyId");
+                    b.HasKey("SynergyId");
 
-                    b.HasIndex("SourceBuildingId");
+                    b.HasIndex("SourceSynergyItemId");
 
-                    b.HasIndex("TargetBuildingId");
+                    b.HasIndex("TargetSynergyItemId");
 
                     b.ToTable("BuildingSynergies");
+                });
+
+            modelBuilder.Entity("SynergyDistrict.Server.Models.SynergyItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SynergyItems");
+                });
+
+            modelBuilder.Entity("SynergyDistrict.Server.Models.Buildings.Building", b =>
+                {
+                    b.HasOne("SynergyDistrict.Server.Models.SynergyItem", "SynergyItem")
+                        .WithMany()
+                        .HasForeignKey("SynergyItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SynergyItem");
                 });
 
             modelBuilder.Entity("SynergyDistrict.Server.Models.Buildings.BuildingProduction", b =>
@@ -103,7 +130,7 @@ namespace SynergyDistrict.Server.Migrations
                         .WithMany("BaseProduction")
                         .HasForeignKey("BuildingId");
 
-                    b.HasOne("SynergyDistrict.Server.Models.Buildings.BuildingSynergy", "BuildingSynergy")
+                    b.HasOne("SynergyDistrict.Server.Models.Buildings.Synergy", "BuildingSynergy")
                         .WithMany("SynergyProductions")
                         .HasForeignKey("BuildingSynergyId");
 
@@ -112,35 +139,31 @@ namespace SynergyDistrict.Server.Migrations
                     b.Navigation("BuildingSynergy");
                 });
 
-            modelBuilder.Entity("SynergyDistrict.Server.Models.Buildings.BuildingSynergy", b =>
+            modelBuilder.Entity("SynergyDistrict.Server.Models.Buildings.Synergy", b =>
                 {
-                    b.HasOne("SynergyDistrict.Server.Models.Buildings.Building", "SourceBuilding")
-                        .WithMany("OutgoingSynergies")
-                        .HasForeignKey("SourceBuildingId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("SynergyDistrict.Server.Models.SynergyItem", "SourceSynergyItem")
+                        .WithMany()
+                        .HasForeignKey("SourceSynergyItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SynergyDistrict.Server.Models.Buildings.Building", "TargetBuilding")
-                        .WithMany("IncomingSynergies")
-                        .HasForeignKey("TargetBuildingId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                    b.HasOne("SynergyDistrict.Server.Models.SynergyItem", "TargetSynergyItem")
+                        .WithMany()
+                        .HasForeignKey("TargetSynergyItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("SourceBuilding");
+                    b.Navigation("SourceSynergyItem");
 
-                    b.Navigation("TargetBuilding");
+                    b.Navigation("TargetSynergyItem");
                 });
 
             modelBuilder.Entity("SynergyDistrict.Server.Models.Buildings.Building", b =>
                 {
                     b.Navigation("BaseProduction");
-
-                    b.Navigation("IncomingSynergies");
-
-                    b.Navigation("OutgoingSynergies");
                 });
 
-            modelBuilder.Entity("SynergyDistrict.Server.Models.Buildings.BuildingSynergy", b =>
+            modelBuilder.Entity("SynergyDistrict.Server.Models.Buildings.Synergy", b =>
                 {
                     b.Navigation("SynergyProductions");
                 });

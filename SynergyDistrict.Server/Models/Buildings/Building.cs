@@ -6,7 +6,8 @@ namespace SynergyDistrict.Server.Models.Buildings
     public class Building
     {
         public int BuildingId { get; set; }
-        public required string Name { get; set; }
+        public int SynergyItemId { get; set; }
+        public SynergyItem SynergyItem { get; set; } = null!;
         public BuildingType Type { get; set; }
         public required string Description { get; set; }
         public required string IconKey { get; set; }
@@ -24,8 +25,6 @@ namespace SynergyDistrict.Server.Models.Buildings
         public string ShapeSerialized { get; set; } = string.Empty;
 
         public ICollection<BuildingProduction> BaseProduction { get; set; } = [];
-        public ICollection<BuildingSynergy> IncomingSynergies { get; set; } = [];
-        public ICollection<BuildingSynergy> OutgoingSynergies { get; set; } = [];
     }
 
     public enum BuildingType

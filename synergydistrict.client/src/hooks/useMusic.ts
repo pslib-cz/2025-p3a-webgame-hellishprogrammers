@@ -1,6 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 
-const audioModules = import.meta.glob("/public/audio/**/*.{mp3,wav,ogg}", { eager: true, as: "url" });
+const availableAudioTracks = [
+    "/audio/loading.mp3",
+    "/audio/menu_music.mp3",
+    "/audio/game-music/01.mp3",
+    "/audio/game-music/03.mp3",
+    "/audio/game-music/05.mp3",
+    "/audio/game-music/game-8-bit-328398.mp3",
+    "/audio/game-music/news-summary-449042.mp3",
+    "/audio/game-music/retro-game-arcade-236133.mp3",
+    "/audio/game-music/sandy-vibe-summer-background-tropical-house-for-video-full-version-471397.mp3",
+];
 
 export type MusicOptions = {
     songsPath: string[];
@@ -132,9 +142,9 @@ const useMusic = (musicOptions: MusicOptions) => {
 };
 
 function loadAudioPaths(songPaths: string[]): string[] {
-    return Object.entries(audioModules)
-        .filter(([path]) => songPaths.some((p) => path.includes(p)))
-        .map(([, url]) => url);
+    return availableAudioTracks.filter(track => 
+        songPaths.some(p => track.includes(p))
+    );
 }
 
 export default useMusic;

@@ -65,7 +65,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
     });
 
     const { GameMapData, setGameMapData } = useGameMapData();
-    const { synergies } = useGameData();
+    const { synergies, naturalFeatures } = useGameData();
     const { GameResources } = useGameResources();
 
     const {
@@ -136,9 +136,9 @@ const GameCanvas: FC<GameCanvasProps> = ({
                 GameMapData.placedBuildingsMappped,
                 GameMapData.loadedMapTiles,
             ) &&
-                CalculateValues(previewBuilding, GameMapData.placedBuildingsMappped, synergies, GameResources) !== null,
+                CalculateValues(previewBuilding, GameMapData.placedBuildingsMappped, naturalFeatures, synergies, GameResources, GameMapData.loadedMapTiles, GameMapData.ActiveNaturalFeatures) !== null,
         );
-    }, [previewBuilding, getTileFromPointer, GameMapData.placedBuildingsMappped, GameMapData.loadedMapTiles]);
+    }, [previewBuilding, getTileFromPointer, GameMapData.placedBuildingsMappped, GameMapData.loadedMapTiles, naturalFeatures, synergies, GameResources]);
 
     useEffect(() => {
         setGameMapData((prev) => ({

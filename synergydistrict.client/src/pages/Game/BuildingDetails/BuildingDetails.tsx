@@ -1,7 +1,7 @@
-import { useEffect, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import styles from "./BuildingDetails.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
-import type { ActiveSynergies, MapBuilding } from "../../../types/Game/Grid";
+import type { ActiveSynergies, MapBuilding, NaturalFeature } from "../../../types/Game/Grid";
 import { IconClose } from "../../../components/Icons";
 import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import ProductionListing from "../../../components/Game/ProductionListing/ProductionListing";
@@ -12,6 +12,7 @@ import TextButton from "../../../components/Buttons/TextButton/TextButton";
 import { buildPlacedBuildingsMap, CanDeleteProdution, DeleteProductionSum } from "../../../utils/PlacingUtils";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import type { GameResources } from "../../../types/Game/GameResources";
+import { useGameData } from "../../../hooks/providers/useGameData";
 
 type BuildingDetailsProps = {
     building: MapBuilding;
@@ -19,19 +20,21 @@ type BuildingDetailsProps = {
 };
 
 const DELETE_PRICE = 50;
-const UPGRADE_PRICE = 150;
+//const UPGRADE_PRICE = 150;
 
 const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
+    const { naturalFeatures } = useGameData();
 
-    const [isUpgradable, setIsUpgradable] = useState<boolean>(true);
+    const [isUpgradable, /*setIsUpgradable*/] = useState<boolean>(true);
 
     const getGroupedSynergies = (
         direction: "incoming" | "outgoing",
         currentBuildingId: string,
         allSynergies: ActiveSynergies[],
         allBuildings: MapBuilding[],
+        allNaturalFeatures: NaturalFeature[],
     ) => {
         const relevantSynergies = allSynergies.filter((s) =>
             direction === "incoming"
@@ -64,24 +67,32 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
         return Array.from(groups.entries())
             .map(([otherId, data]) => {
                 const building = allBuildings.find((b) => b.MapBuildingId === otherId);
+                const naturalFeature = allNaturalFeatures.find((nf) => nf.id === otherId);
                 return {
                     otherBuilding: building,
+                    naturalFeature: naturalFeature,
                     count: data.count,
                     productions: data.productions,
                 };
             })
-            .filter((item) => item.otherBuilding !== undefined) as {
-            otherBuilding: MapBuilding;
+            .filter((item) => item.otherBuilding !== undefined || item.naturalFeature !== undefined) as {
+            otherBuilding?: MapBuilding;
+            naturalFeature?: NaturalFeature;
             count: number;
             productions: Production[];
         }[];
     };
+
+    const allNaturalFeatures = GameMapData.ActiveNaturalFeatures 
+        ? Object.values(GameMapData.ActiveNaturalFeatures) 
+        : [];
 
     const incomingSynergiesList = getGroupedSynergies(
         "incoming",
         building.MapBuildingId,
         GameMapData.activeSynergies,
         GameMapData.placedBuildings,
+        allNaturalFeatures,
     );
 
     const totalIncomingProduction = incomingSynergiesList
@@ -169,22 +180,31 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
             </div>
             <h3>Synergy</h3>
             <div className={styles.synergies}>
-                {incomingSynergiesList.map((synergyGroup) => (
-                    <ProductionListing
-                        key={`incoming-${synergyGroup.otherBuilding.MapBuildingId}`}
-                        title={`${synergyGroup.otherBuilding.buildingType.name} ${
-                            synergyGroup.count > 1 ? `(${synergyGroup.count}x)` : ""
-                        }`}
-                    >
-                        {synergyGroup.productions.map((product) => (
-                            <ValuesBox
-                                key={`${product.type}-${product.value}`}
-                                iconKey={product.type.toLowerCase()}
-                                text={product.value.toString()}
-                            />
-                        ))}
-                    </ProductionListing>
-                ))}
+                {incomingSynergiesList.map((synergyGroup) => {
+                    const name = synergyGroup.otherBuilding 
+                        ? synergyGroup.otherBuilding.buildingType.name
+                        : synergyGroup.naturalFeature?.type || "Unknown";
+                    const id = synergyGroup.otherBuilding 
+                        ? synergyGroup.otherBuilding.MapBuildingId
+                        : synergyGroup.naturalFeature?.id || "unknown";
+                    
+                    return (
+                        <ProductionListing
+                            key={`incoming-${id}`}
+                            title={`${name} ${
+                                synergyGroup.count > 1 ? `(${synergyGroup.count}x)` : ""
+                            }`}
+                        >
+                            {synergyGroup.productions.map((product) => (
+                                <ValuesBox
+                                    key={`${product.type}-${product.value}`}
+                                    iconKey={product.type.toLowerCase()}
+                                    text={product.value.toString()}
+                                />
+                            ))}
+                        </ProductionListing>
+                    );
+                })}
             </div>
             <div className={styles.row}>
                 <h3>Preview</h3>

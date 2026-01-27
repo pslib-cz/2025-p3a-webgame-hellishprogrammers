@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SynergyDistrict.Server.Data;
 using SynergyDistrict.Server.DTOs;
 using SynergyDistrict.Server.Models.Buildings;
+using SynergyDistrict.Server.Models.Map;
 
 namespace SynergyDistrict.Server.Controllers
 {
@@ -24,11 +25,10 @@ namespace SynergyDistrict.Server.Controllers
         {
             var buildings = _context.Buildings
                 .AsNoTracking()
-                .Include(b => b.BaseProduction)
                 .Select(b => new BuildingDTO
                 {
                     BuildingId = b.BuildingId,
-                    Name = b.Name,
+                    Name = b.SynergyItem.Name,
                     Type = b.Type,
                     Description = b.Description,
                     IconKey = b.IconKey,
@@ -44,12 +44,11 @@ namespace SynergyDistrict.Server.Controllers
 
             var synergies = _context.BuildingSynergies
                 .AsNoTracking()
-                .Include(s => s.SynergyProductions)
                 .Select(s => new BuildingSynergyDTO
                 {
-                    BuildingSynergyId = s.BuildingSynergyId,
-                    TargetBuildingId = s.TargetBuildingId,
-                    SourceBuildingId = s.SourceBuildingId,
+                    BuildingSynergyId = s.SynergyId,
+                    TargetBuildingId = s.TargetSynergyItemId,
+                    SourceBuildingId = s.SourceSynergyItemId,
                     SynergyProductions = s.SynergyProductions.Select(p => new BuildingProductionDTO
                     {
                         Value = p.Value,
@@ -58,7 +57,17 @@ namespace SynergyDistrict.Server.Controllers
                 })
                 .ToList();
 
-            return Ok(new GameDataDTO { Buildings = buildings, Synergies = synergies });
+            var tileTypeNames = Enum.GetNames(typeof(MapTileType));
+            var naturalFeatures = _context.SynergyItems
+                .AsNoTracking()
+                .Where(i => tileTypeNames.Contains(i.Name))
+                .Select(i => new SynergyItemDTO
+                {
+                    SynergyItemId = i.Id,
+                    Name = i.Name,
+                });
+
+            return Ok(new GameDataDTO { Buildings = buildings, Synergies = synergies, NaturalFeatures = naturalFeatures });
         }
     }
 }
