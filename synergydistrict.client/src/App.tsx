@@ -2,7 +2,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./styles/App.css";
 import Splash from "./pages/Splash";
 import Menu from "./pages/Menu";
-import LeaderboardMenu from "./pages/Menu/LeaderboardMenu";
 import MainMenu from "./pages/Menu/MainMenu";
 import PlayMenu from "./pages/Menu/PlayMenu";
 import SettingsMenu from "./pages/Menu/SettingsMenu";
@@ -16,6 +15,7 @@ import { GameControlProvider } from "./provider/GameControlProvider";
 import { GameMapDataProvider } from "./provider/GameMapDataProvider";
 import { GameResourcesProvider } from "./provider/GameResourcesProvider";
 import { GameTimeProvider } from "./provider/GameTimeProvider";
+import TutorialMenu from "./pages/Menu/TutorialMenu";
 
 function App() {
     return (
@@ -30,24 +30,26 @@ function App() {
                                     <Route path="/menu" element={<Menu />}>
                                         <Route path="" element={<MainMenu />} />
                                         <Route path="play" element={<PlayMenu />} />
-                                        <Route path="leaderboard" element={<LeaderboardMenu />} />
+                                        <Route path="tutorial" element={<TutorialMenu />} />
                                         <Route path="statistics" element={<StatisticsMenu />} />
                                         <Route path="settings" element={<SettingsMenu />} />
                                     </Route>
-                                    <Route path="/game" element={
-                                        <GameControlProvider>
-                                            <GameMapDataProvider>
-
-                                                <GameTimeProvider>
-                                                    <GameResourcesProvider>
-                                                        <GameDataProvider>
-                                                            <Game />
-                                                        </GameDataProvider>
-                                                    </GameResourcesProvider>
-                                                </GameTimeProvider>
-                                            </GameMapDataProvider>
-                                        </GameControlProvider>
-                                    } />
+                                    <Route
+                                        path="/game"
+                                        element={
+                                            <GameControlProvider>
+                                                <GameMapDataProvider>
+                                                    <GameTimeProvider>
+                                                        <GameResourcesProvider>
+                                                            <GameDataProvider>
+                                                                <Game />
+                                                            </GameDataProvider>
+                                                        </GameResourcesProvider>
+                                                    </GameTimeProvider>
+                                                </GameMapDataProvider>
+                                            </GameControlProvider>
+                                        }
+                                    />
                                 </Routes>
                             </BrowserRouter>
                         </GamePropertiesProvider>

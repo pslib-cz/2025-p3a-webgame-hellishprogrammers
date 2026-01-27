@@ -30,7 +30,7 @@ const Menu = () => {
                                 <TextButton text="play" linkTo="play" />
                             </li>
                             <li>
-                                <TextButton text="leaderboard" linkTo="leaderboard" />
+                                <TextButton text="tutorial" linkTo="tutorial" />
                             </li>
                             <li>
                                 <TextButton text="statistics" linkTo="statistics" />
