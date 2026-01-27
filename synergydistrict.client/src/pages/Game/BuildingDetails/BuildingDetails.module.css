@@ -70,3 +70,7 @@
     flex-direction: column;
     gap: 0.25rem;
 }
+
+.button > * {
+    width: 100%;
+}
