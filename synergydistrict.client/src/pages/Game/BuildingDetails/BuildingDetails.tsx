@@ -1,4 +1,4 @@
-import { useEffect, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import styles from "./BuildingDetails.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
 import type { ActiveSynergies, MapBuilding } from "../../../types/Game/Grid";
@@ -19,13 +19,13 @@ type BuildingDetailsProps = {
 };
 
 const DELETE_PRICE = 50;
-const UPGRADE_PRICE = 150;
+//const UPGRADE_PRICE = 150;
 
 const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
 
-    const [isUpgradable, setIsUpgradable] = useState<boolean>(true);
+    const [isUpgradable, /*setIsUpgradable*/] = useState<boolean>(true);
 
     const getGroupedSynergies = (
         direction: "incoming" | "outgoing",
