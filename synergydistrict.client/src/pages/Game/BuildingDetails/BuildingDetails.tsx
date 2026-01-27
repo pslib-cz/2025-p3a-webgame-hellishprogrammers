@@ -7,7 +7,7 @@ import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import ProductionListing from "../../../components/Game/ProductionListing/ProductionListing";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameMapData from "../../../hooks/providers/useMapData";
-import type { BuildingType, Production } from "../../../types/Game/Buildings";
+import type { Production } from "../../../types/Game/Buildings";
 import TextButton from "../../../components/Buttons/TextButton/TextButton";
 import { buildPlacedBuildingsMap, DeleteProductionSum } from "../../../utils/PlacingUtils";
 import useGameResources from "../../../hooks/providers/useGameResources";
@@ -22,7 +22,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
     const [isDeletable, setIsDeletable] = useState<boolean>(true);
-    const [isUpgradable, setIsUpgradable] = useState<boolean>(true);
+    const [isUpgradable] = useState<boolean>(true);
 
     const getGroupedSynergies = (
         direction: "incoming" | "outgoing",
