@@ -106,18 +106,19 @@ type CalculateValuesResult = {
     newResources: GameResources;
     newSynergies: ActiveSynergies[];
     newNaturalFeatures: NaturalFeature[];
+    removedNaturalFeatureIds: string[];
 };
 
 export const CalculateValues = (
     building: MapBuilding,
     placedBuildingsMappped: Record<string, MapBuilding>,
-    naturalFeatures: { SynergyItemId: number; Name: string }[],
+    naturalFeatures: { synergyItemId: number; name: string }[],
     synergies: BuildingSynergy[],
     variables: GameResources,
     loadedMapTiles: Record<string, MapTile>,
     existingNaturalFeatures?: Record<string, NaturalFeature>,
 ): CalculateValuesResult | null => {
-    const result: CalculateValuesResult = { newResources: { ...variables }, newSynergies: [], newNaturalFeatures: [] };
+    const result: CalculateValuesResult = { newResources: { ...variables }, newSynergies: [], newNaturalFeatures: [], removedNaturalFeatureIds: [] };
     const naturalFeaturesMap = new Map<string, NaturalFeature>();
     
     // Pre-populate with existing natural features
@@ -126,6 +127,25 @@ export const CalculateValues = (
             const key = `${nf.position.x};${nf.position.y}`;
             naturalFeaturesMap.set(key, nf);
         });
+    }
+
+    // Check if building is being placed on top of any natural features and mark them for removal
+    for (let y = 0; y < building.buildingType.shape.length; y++) {
+        for (let x = 0; x < building.buildingType.shape[y].length; x++) {
+            if (building.buildingType.shape[y][x] !== "Empty") {
+                const tileX = building.position.x + x;
+                const tileY = building.position.y + y;
+                const key = `${tileX};${tileY}`;
+                
+                // Check if there's a natural feature at this position
+                const existingFeature = naturalFeaturesMap.get(key);
+                if (existingFeature) {
+                    console.log('Building placed on natural feature, removing:', existingFeature);
+                    result.removedNaturalFeatureIds.push(existingFeature.id);
+                    naturalFeaturesMap.delete(key);
+                }
+            }
+        }
     }
 
     result.newResources.moneyBalance -= building.buildingType.cost;
@@ -141,11 +161,6 @@ export const CalculateValues = (
         building.position,
         loadedMapTiles
     );
-
-    console.log('Building placed:', building.buildingType.name);
-    console.log('Possible natural features found:', possibleNaturalFeatures);
-    console.log('Available naturalFeatures data:', naturalFeatures);
-    console.log('Possible synergies for this building:', possibleSynergies);
 
     // Checking synergies production
     for (const edge of building.buildingType.edges) {
@@ -183,11 +198,8 @@ export const CalculateValues = (
             
             if (neighborTile && neighborTile.hasIcon && naturalFeatures) {
                 const naturalFeatureData = { type: neighborTile.tileType, position: { x: neighborPosX, y: neighborPosY } };
-                console.log('Found natural feature at neighbor position:', naturalFeatureData);
                 const id = naturalFeatures.find(n => n.name === naturalFeatureData.type.toString())?.synergyItemId;
-                console.log('Natural feature ID:', id, 'for type:', naturalFeatureData.type.toString());
                 const activeSynergies = possibleSynergies.filter( (s) => s.targetBuildingId === id || s.sourceBuildingId === id );
-                console.log('Active synergies with natural feature:', activeSynergies);
 
                 if (activeSynergies.length === 0) continue;
 
@@ -220,11 +232,6 @@ export const CalculateValues = (
                         targetBuildingId: target.MapBuildingId,
                         synergyProductions: synergy.synergyProductions,
                         edge: { position: edgePosition, side: edgeSide },
-                    });
-                    console.log('Created natural feature synergy:', {
-                        naturalFeature,
-                        targetBuilding: target.MapBuildingId,
-                        productions: synergy.synergyProductions
                     });
                 }
 

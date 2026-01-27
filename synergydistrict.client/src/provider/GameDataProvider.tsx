@@ -6,7 +6,7 @@ import { createEgdesForShape } from "../utils/PlacingUtils";
 interface GameDataContextType {
     buildings: BuildingType[];
     synergies: BuildingSynergy[];
-    naturalFeatures: { SynergyItemId: number; Name: string }[];
+    naturalFeatures: { synergyItemId: number; name: string }[];
     loading: boolean;
     error: string | null;
 }
@@ -40,8 +40,8 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
         () => loadFromStorage<BuildingSynergy[]>(STORAGE_KEYS.SYNERGIES) || [],
     );
 
-    const [naturalFeatures, setNaturalFeatures] = useState<{ SynergyItemId: number; Name: string }[]>(
-        () => loadFromStorage<{ SynergyItemId: number; Name: string }[]>(STORAGE_KEYS.NATURAL_FEATURES) || [],
+    const [naturalFeatures, setNaturalFeatures] = useState<{ synergyItemId: number; name: string }[]>(
+        () => loadFromStorage<{ synergyItemId: number; name: string }[]>(STORAGE_KEYS.NATURAL_FEATURES) || [],
     );
 
     const [loading, setLoading] = useState(() => {
