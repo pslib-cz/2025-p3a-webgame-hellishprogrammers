@@ -24,7 +24,6 @@ namespace SynergyDistrict.Server.Controllers
         {
             var buildings = _context.Buildings
                 .AsNoTracking()
-                .Include(b => b.BaseProduction)
                 .Select(b => new BuildingDTO
                 {
                     BuildingId = b.BuildingId,
@@ -44,7 +43,6 @@ namespace SynergyDistrict.Server.Controllers
 
             var synergies = _context.BuildingSynergies
                 .AsNoTracking()
-                .Include(s => s.SynergyProductions)
                 .Select(s => new BuildingSynergyDTO
                 {
                     BuildingSynergyId = s.BuildingSynergyId,
