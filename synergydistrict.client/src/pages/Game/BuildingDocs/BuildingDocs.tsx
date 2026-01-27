@@ -56,7 +56,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
                 ))}
             </div>
             <ProductionListing title="Shape">
-                <canvas ref={canvasRef} />
+                <canvas ref={canvasRef} style={{width: "100%"}}/>
             </ProductionListing>
             <div>
                 <h2 className={styles.title}>Synergy</h2>
