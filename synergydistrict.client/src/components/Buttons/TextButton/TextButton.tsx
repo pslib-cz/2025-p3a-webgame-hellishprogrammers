@@ -1,4 +1,4 @@
-import { type FC, type ReactElement } from "react";
+import { type FC, type ReactElement, useState } from "react";
 import { NavLink } from "react-router-dom";
 import styles from "./TextButton.module.css";
 import ToggleableText from "../../ToggleableText";
@@ -13,13 +13,17 @@ type TextButtonProps = {
 };
 
 export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActive = false, bacgroundColor, children }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
     const renderContext = () => {
         if (!linkTo) {
             return (
                 <button
                     onClick={onClick}
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
                     className={`${styles.link} ${styles.linkUppercase} ${isActive && !bacgroundColor ? styles.linkActive : ""} ${children ? styles.row : ""}`}
-                    style={{backgroundColor:`${isActive ? `var(${bacgroundColor})` : ""}`}}
+                    style={{backgroundColor:`${(isActive || isHovered) && bacgroundColor ? `var(${bacgroundColor})` : ""}`}}
                 >
                     <ToggleableText text={text} isActive={isActive} />
                     {children}

@@ -12,7 +12,6 @@ import TextButton from "../../../components/Buttons/TextButton/TextButton";
 import { buildPlacedBuildingsMap, CanDeleteProdution, DeleteProductionSum } from "../../../utils/PlacingUtils";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import type { GameResources } from "../../../types/Game/GameResources";
-import { useGameData } from "../../../hooks/providers/useGameData";
 
 type BuildingDetailsProps = {
     building: MapBuilding;
@@ -25,7 +24,7 @@ const DELETE_PRICE = 50;
 const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
-    const { naturalFeatures } = useGameData();
+    //const { naturalFeatures } = useGameData();
 
     const [isUpgradable, /*setIsUpgradable*/] = useState<boolean>(true);
 

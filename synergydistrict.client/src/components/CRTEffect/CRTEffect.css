@@ -1,0 +1,115 @@
+/* CRT Monitor Effect - Covers entire viewport */
+.crt-effect {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+    --crt-intensity: 1; /* Default intensity, will be overridden by inline style */
+}
+
+/* Scanlines overlay */
+.crt-scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0) 50%,
+        rgba(0, 0, 0, 0.25) 50%
+    );
+    background-size: 100% 4px;
+    opacity: 0.4;
+    animation: scanline-flicker 0.1s infinite;
+}
+
+@keyframes scanline-flicker {
+    0% { opacity: 0.4; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0.4; }
+}
+
+/* Vignette effect with edge darkening */
+.crt-vignette {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0, 0, 0, 0) 40%,
+        rgba(0, 0, 0, 0.4) 75%,
+        rgba(0, 0, 0, 0.8) 100%
+    );
+}
+
+/* Apply CRT distortion to the container */
+body {
+    perspective: 1000px;
+    overflow: hidden;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.container {
+    transform-style: preserve-3d;
+    overflow: hidden;
+}
+
+/* Enhanced vignette for more apparent edge effect */
+.crt-vignette {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0, 0, 0, 0) 40%,
+        rgba(0, 0, 0, 0.4) 75%,
+        rgba(0, 0, 0, 0.8) 100%
+    );
+}
+
+/* Screen warp effect - applied through backdrop filter */
+@supports (backdrop-filter: blur(0)) {
+    .crt-effect::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: contrast(1.1) brightness(0.95);
+        
+        /* Subtle distortion at edges */
+        mask-image: radial-gradient(
+            ellipse at center,
+            transparent 50%,
+            black 100%
+        );
+        -webkit-mask-image: radial-gradient(
+            ellipse at center,
+            transparent 50%,
+            black 100%
+        );
+    }
+}
+
+/* Subtle RGB shift at edges for chromatic aberration effect */
+.crt-effect {
+    filter: drop-shadow(0.5px 0 0 rgba(255, 0, 0, 0.1))
+            drop-shadow(-0.5px 0 0 rgba(0, 255, 255, 0.1));
+}

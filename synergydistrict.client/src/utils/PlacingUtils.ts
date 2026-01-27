@@ -156,11 +156,11 @@ export const CalculateValues = (
         s.sourceBuildingId === building.buildingType.buildingId || s.targetBuildingId === building.buildingType.buildingId,
     );
 
-    const possibleNaturalFeatures = CheckForNaturalFeatures(
+    /*const possibleNaturalFeatures = CheckForNaturalFeatures(
         building.buildingType.shape,
         building.position,
         loadedMapTiles
-    );
+    );*/
 
     // Checking synergies production
     for (const edge of building.buildingType.edges) {

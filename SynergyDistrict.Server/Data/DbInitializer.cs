@@ -1,5 +1,6 @@
 using SynergyDistrict.Server.Models.Buildings;
 using SynergyDistrict.Server.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace SynergyDistrict.Server.Data
 {
@@ -7,7 +8,8 @@ namespace SynergyDistrict.Server.Data
     {
         public static void Initialize(AppDBContext context)
         {
-            context.Database.EnsureCreated();
+            // Apply any pending migrations
+            context.Database.Migrate();
 
             if (context.Buildings.Any())
             {

@@ -23,11 +23,13 @@ import BuildingDocs from "./Game/BuildingDocs/BuildingDocs";
 import BuildingDetails from "./Game/BuildingDetails/BuildingDetails";
 import { useSettings } from "../hooks/providers/useSettings";
 import useMusic from "../hooks/useMusic";
+import PauseMenu from "./Game/PauseMenu/PauseMenu";
 
 const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
     const [selectedBuilding, setSelectedBuilding] = useState<MapBuilding | null>(null);
     const [buildingPreview, setBuildingPreview] = useState<MapBuilding | null>(null);
+    const [isPaused, setIsPaused] = useState(false);
     const { options } = useGameOptions();
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
@@ -47,6 +49,20 @@ const Game = () => {
         if (!gameControl.isEnd) return;
         setActiveBuildingType(null);
         setBuildingPreview(null);
+    }, [gameControl.isEnd]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                e.preventDefault();
+                if (!gameControl.isEnd) {
+                    setIsPaused(prev => !prev);
+                }
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
     }, [gameControl.isEnd]);
 
     const OnMapClick = (position: Position) => {
@@ -185,6 +201,7 @@ const Game = () => {
             )}
             {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}
             {gameControl.isEnd && <EndScreen />}
+            {isPaused && !gameControl.isEnd && <PauseMenu onResume={() => setIsPaused(false)} />}
         </div>
     );
 };

@@ -16,10 +16,15 @@ import { GameMapDataProvider } from "./provider/GameMapDataProvider";
 import { GameResourcesProvider } from "./provider/GameResourcesProvider";
 import { GameTimeProvider } from "./provider/GameTimeProvider";
 import TutorialMenu from "./pages/Menu/TutorialMenu";
+import CRTEffect from "./components/CRTEffect/CRTEffect";
+import { useSettings } from "./hooks/providers/useSettings";
 
-function App() {
+function AppContent() {
+    const { gameSettings } = useSettings();
+
     return (
         <>
+            <CRTEffect intensity={gameSettings.crtIntensity} />
             <div className="container">
                 <GameOptionsProvider>
                     <SettingsProvider>
@@ -57,6 +62,16 @@ function App() {
                 </GameOptionsProvider>
             </div>
         </>
+    );
+}
+
+function App() {
+    return (
+        <GameOptionsProvider>
+            <SettingsProvider>
+                <AppContent />
+            </SettingsProvider>
+        </GameOptionsProvider>
     );
 }
 
