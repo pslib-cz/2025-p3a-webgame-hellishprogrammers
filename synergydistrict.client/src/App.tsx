@@ -16,45 +16,56 @@ import { GameControlProvider } from "./provider/GameControlProvider";
 import { GameMapDataProvider } from "./provider/GameMapDataProvider";
 import { GameResourcesProvider } from "./provider/GameResourcesProvider";
 import { GameTimeProvider } from "./provider/GameTimeProvider";
+import CRTEffect from "./components/CRTEffect/CRTEffect";
+import { useSettings } from "./hooks/providers/useSettings";
+
+function AppContent() {
+    const { gameSettings } = useSettings();
+
+    return (
+        <>
+            <CRTEffect intensity={gameSettings.crtIntensity} />
+            <div className="container">
+                <GamePropertiesProvider>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="/" element={<Splash />} />
+                            <Route path="/menu" element={<Menu />}>
+                                <Route path="" element={<MainMenu />} />
+                                <Route path="play" element={<PlayMenu />} />
+                                <Route path="leaderboard" element={<LeaderboardMenu />} />
+                                <Route path="statistics" element={<StatisticsMenu />} />
+                                <Route path="settings" element={<SettingsMenu />} />
+                            </Route>
+                            <Route path="/game" element={
+                                <GameControlProvider>
+                                    <GameMapDataProvider>
+
+                                        <GameTimeProvider>
+                                            <GameResourcesProvider>
+                                                <GameDataProvider>
+                                                    <Game />
+                                                </GameDataProvider>
+                                            </GameResourcesProvider>
+                                        </GameTimeProvider>
+                                    </GameMapDataProvider>
+                                </GameControlProvider>
+                            } />
+                        </Routes>
+                    </BrowserRouter>
+                </GamePropertiesProvider>
+            </div>
+        </>
+    );
+}
 
 function App() {
     return (
-        <>
-            <div className="container">
-                <GameOptionsProvider>
-                    <SettingsProvider>
-                        <GamePropertiesProvider>
-                            <BrowserRouter>
-                                <Routes>
-                                    <Route path="/" element={<Splash />} />
-                                    <Route path="/menu" element={<Menu />}>
-                                        <Route path="" element={<MainMenu />} />
-                                        <Route path="play" element={<PlayMenu />} />
-                                        <Route path="leaderboard" element={<LeaderboardMenu />} />
-                                        <Route path="statistics" element={<StatisticsMenu />} />
-                                        <Route path="settings" element={<SettingsMenu />} />
-                                    </Route>
-                                    <Route path="/game" element={
-                                        <GameControlProvider>
-                                            <GameMapDataProvider>
-
-                                                <GameTimeProvider>
-                                                    <GameResourcesProvider>
-                                                        <GameDataProvider>
-                                                            <Game />
-                                                        </GameDataProvider>
-                                                    </GameResourcesProvider>
-                                                </GameTimeProvider>
-                                            </GameMapDataProvider>
-                                        </GameControlProvider>
-                                    } />
-                                </Routes>
-                            </BrowserRouter>
-                        </GamePropertiesProvider>
-                    </SettingsProvider>
-                </GameOptionsProvider>
-            </div>
-        </>
+        <GameOptionsProvider>
+            <SettingsProvider>
+                <AppContent />
+            </SettingsProvider>
+        </GameOptionsProvider>
     );
 }
 
