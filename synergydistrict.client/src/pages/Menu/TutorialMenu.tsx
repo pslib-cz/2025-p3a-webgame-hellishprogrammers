@@ -1,7 +1,7 @@
 import Construction from "../../components/Construction";
 
-const LeaderboardMenu = () => {
+const TutorialMenu = () => {
     return <Construction />;
 };
 
-export default LeaderboardMenu;
+export default TutorialMenu;
