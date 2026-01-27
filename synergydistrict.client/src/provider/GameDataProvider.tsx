@@ -6,6 +6,7 @@ import { createEgdesForShape } from "../utils/PlacingUtils";
 interface GameDataContextType {
     buildings: BuildingType[];
     synergies: BuildingSynergy[];
+    naturalFeatures: { SynergyItemId: number; Name: string }[];
     loading: boolean;
     error: string | null;
 }
@@ -13,6 +14,7 @@ interface GameDataContextType {
 const STORAGE_KEYS = {
     BUILDINGS: "buildings",
     SYNERGIES: "synergies",
+    NATURAL_FEATURES: "naturalFeatures",
 };
 
 const loadFromStorage = <T,>(key: string): T | null => {
@@ -38,10 +40,15 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
         () => loadFromStorage<BuildingSynergy[]>(STORAGE_KEYS.SYNERGIES) || [],
     );
 
+    const [naturalFeatures, setNaturalFeatures] = useState<{ SynergyItemId: number; Name: string }[]>(
+        () => loadFromStorage<{ SynergyItemId: number; Name: string }[]>(STORAGE_KEYS.NATURAL_FEATURES) || [],
+    );
+
     const [loading, setLoading] = useState(() => {
         const hasBuildings = !!sessionStorage.getItem(STORAGE_KEYS.BUILDINGS);
         const hasSynergies = !!sessionStorage.getItem(STORAGE_KEYS.SYNERGIES);
-        return !hasBuildings || !hasSynergies;
+        const hasNaturalFeatures = !!sessionStorage.getItem(STORAGE_KEYS.NATURAL_FEATURES);
+        return !hasBuildings || !hasSynergies || !hasNaturalFeatures;
     });
 
     const [error, setError] = useState<string | null>(null);
@@ -52,8 +59,10 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
                 .then((result) => {
                     setBuildings(result.buildings.map((b) => ({ ...b, edges: createEgdesForShape(b.shape) })));
                     setSynergies(result.synergies);
+                    setNaturalFeatures(result.naturalFeatures);
                     sessionStorage.setItem(STORAGE_KEYS.BUILDINGS, JSON.stringify(result.buildings));
                     sessionStorage.setItem(STORAGE_KEYS.SYNERGIES, JSON.stringify(result.synergies));
+                    sessionStorage.setItem(STORAGE_KEYS.NATURAL_FEATURES, JSON.stringify(result.naturalFeatures));
                 })
                 .catch((err) => setError(err.message))
                 .finally(() => setLoading(false));
@@ -61,6 +70,6 @@ export function GameDataProvider({ children }: { children: ReactNode }) {
     }, []);
 
     return (
-        <GameDataContext.Provider value={{ buildings, synergies, loading, error }}>{children}</GameDataContext.Provider>
+        <GameDataContext.Provider value={{ buildings, synergies, naturalFeatures, loading, error }}>{children}</GameDataContext.Provider>
     );
 }

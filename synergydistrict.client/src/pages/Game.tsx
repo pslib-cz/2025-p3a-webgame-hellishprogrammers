@@ -31,7 +31,7 @@ const Game = () => {
     const { options } = useGameOptions();
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
-    const { synergies } = useGameData();
+    const { synergies, naturalFeatures } = useGameData();
     const { gameControl } = useGameControl();
     const { gameSettings } = useSettings();
     
@@ -69,10 +69,15 @@ const Game = () => {
                 isSelected: false,
             };
 
-            const newData = CalculateValues(newBuilding, GameMapData.placedBuildingsMappped, synergies, GameResources);
+            const newData = CalculateValues(newBuilding, GameMapData.placedBuildingsMappped, naturalFeatures, synergies, GameResources, GameMapData.loadedMapTiles, GameMapData.ActiveNaturalFeatures);
             if (!newData) return;
 
             const newBuildings = [...GameMapData.placedBuildings, newBuilding];
+            
+            const newNaturalFeaturesMap = { ...(GameMapData.ActiveNaturalFeatures || {}) };
+            newData.newNaturalFeatures.forEach(nf => {
+                newNaturalFeaturesMap[nf.id] = nf;
+            });
 
             setGameResources(newData.newResources);
 
@@ -81,6 +86,7 @@ const Game = () => {
                 activeSynergies: [...prev.activeSynergies, ...newData.newSynergies],
                 placedBuildings: newBuildings,
                 placedBuildingsMappped: buildPlacedBuildingsMap(newBuildings),
+                ActiveNaturalFeatures: newNaturalFeaturesMap,
             }));
 
             if (!CanAfford(buildingPreview!.buildingType, newData.newResources)) setBuildingPreview(null);

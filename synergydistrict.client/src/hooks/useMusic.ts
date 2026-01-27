@@ -133,8 +133,8 @@ const useMusic = (musicOptions: MusicOptions) => {
 
 function loadAudioPaths(songPaths: string[]): string[] {
     return Object.entries(audioModules)
-        .filter(([path]) => songPaths.some((p) => path.includes(p)))
-        .map(([, url]) => url);
+        .filter(([path]) => songPaths.some((p) => path.replace('/public', '').includes(p)))
+        .map(([, url]) => url as string);
 }
 
 export default useMusic;

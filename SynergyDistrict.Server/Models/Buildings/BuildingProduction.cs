@@ -8,7 +8,7 @@
         public int? BuildingId { get; set; }
         public Building? Building { get; set; }
         public int? BuildingSynergyId { get; set; }
-        public BuildingSynergy? BuildingSynergy { get; set; }
+        public Synergy? BuildingSynergy { get; set; }
     }
 
     public enum BuildingProductionType

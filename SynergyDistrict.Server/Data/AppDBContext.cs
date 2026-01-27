@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SynergyDistrict.Server.Models;
 using SynergyDistrict.Server.Models.Buildings;
 using System.Text.Json;
 
@@ -12,21 +13,13 @@ namespace SynergyDistrict.Server.Data
 
         public DbSet<Building> Buildings { get; set; }
         public DbSet<BuildingProduction> BuildingProductions { get; set; }
-        public DbSet<BuildingSynergy> BuildingSynergies { get; set; }
+        public DbSet<Synergy> BuildingSynergies { get; set; }
+
+        public DbSet<SynergyItem> SynergyItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<BuildingSynergy>()
-                .HasOne(bs => bs.TargetBuilding)
-                .WithMany(b => b.IncomingSynergies)
-                .HasForeignKey(bs => bs.TargetBuildingId)
-                .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<BuildingSynergy>()
-                .HasOne(bs => bs.SourceBuilding)
-                .WithMany(b => b.OutgoingSynergies)
-                .HasForeignKey(bs => bs.SourceBuildingId)
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
