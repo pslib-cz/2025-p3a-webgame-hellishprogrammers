@@ -118,14 +118,23 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
                             onClick={() => setSelectedCategory(category)}
                         ></TextButton>
                     ))}
-                    <TextButton
-                        key={"n"}
-                        isActive={selectedCategory === "NaturalFeatures"}
-                        text={"Natural Features"}
-                        bacgroundColor={`--forest--dark`}
-                        textAlign="left"
-                        onClick={() => setSelectedCategory("NaturalFeatures")}
-                    ></TextButton>
+                    {
+                        possibleSynergies.some(s => {
+                                if (!IO) {
+                                    return naturalFeatures.find(n => n.synergyItemId == s.sourceBuildingId);
+                                } else {
+                                    return naturalFeatures.find(n => n.synergyItemId == s.targetBuildingId);
+                                }
+                        }) ? 
+                        <TextButton
+                            key={"n"}
+                            isActive={selectedCategory === "NaturalFeatures"}
+                            text={"Natural Features"}
+                            bacgroundColor={`--forest--dark`}
+                            textAlign="left"
+                            onClick={() => setSelectedCategory("NaturalFeatures")}
+                        ></TextButton> : null
+                    }
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
                     {possibleSynergies
