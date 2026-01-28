@@ -9,6 +9,8 @@ import TextButton from "../../../components/Buttons/TextButton/TextButton";
 import type { BuildingCategory } from "../../../types/";
 import ToggleButton from "../../../components/Buttons/ToggleButton/ToggleButton";
 import { useGameData } from "../../../hooks/providers/useGameData";
+import useGameResources from "../../../hooks/providers/useGameResources";
+import { GetUnaffordableResources } from "../../../utils/PlacingUtils";
 import SynergyDisplay from "../SynergyDisplay";
 
 const buildingCategories: BuildingCategory[] = ["Residential", "Commercial", "Industrial", "Extractional", "Recreational"];
@@ -21,7 +23,9 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
     const { buildingsBitmap } = useBuildingsBitmap();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<BuildingCategory>("Residential");
-    const { synergies, buildings } = useGameData()
+    const { synergies, buildings } = useGameData();
+    const { GameResources } = useGameResources();
+    const unaffordableResources = GetUnaffordableResources(building, GameResources);
     const [IO,setIO] = useState<boolean>(false)
     useEffect(() => {
         const canvas = canvasRef.current!;
@@ -46,14 +50,18 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
                 <span className={`${styles.icon} icon`}>{building.iconKey}</span>
             </div>
             <p>{building.description}</p>
-            <ProductionListing title="Cost">
-                <ValuesBox iconKey="money" text={building.cost.toString()} />
+            <ProductionListing title="Cost" style={{ opacity: unaffordableResources.has("money") ? ".2" : "1" } as React.CSSProperties}>
+                <ValuesBox 
+                    iconKey="money" 
+                    text={building.cost.toString()} 
+                />
             </ProductionListing>
             <div className={styles.infoContainer}>
                 {building.baseProduction.map((product) => (
                     <ShowInfo
                         gameStyle={true}
                         key={`${product.type}${product.value}`}
+                        style={{ opacity: unaffordableResources.has(product.type.toLowerCase()) ? ".2" : "1" } as React.CSSProperties}
                         left={
                             <div className={`${styles.icon} icon`}>
                                 {product.type.toLowerCase() == "energy" ? "electricity" : product.type.toLowerCase()}
