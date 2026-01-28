@@ -28,11 +28,11 @@ type BuildingDocsProps = {
 const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
     const { buildingsBitmap } = useBuildingsBitmap();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState<BuildingCategory>("Residential");
-    const { synergies, buildings } = useGameData();
+    const [selectedCategory, setSelectedCategory] = useState<BuildingCategory | "NaturalFeatures">("Residential");
+    const { synergies, buildings, naturalFeatures } = useGameData();
     const { GameResources } = useGameResources();
     const unaffordableResources = GetUnaffordableResources(building, GameResources);
-    const [IO,setIO] = useState<boolean>(false)
+    const [IO, setIO] = useState<boolean>(false)
     useEffect(() => {
         const canvas = canvasRef.current!;
         const context = canvas?.getContext("2d");
@@ -57,9 +57,9 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
             </div>
             <p>{building.description}</p>
             <ProductionListing title="Cost" style={{ opacity: unaffordableResources.has("money") ? ".2" : "1" } as React.CSSProperties}>
-                <ValuesBox 
-                    iconKey="money" 
-                    text={building.cost.toString()} 
+                <ValuesBox
+                    iconKey="money"
+                    text={building.cost.toString()}
                 />
             </ProductionListing>
             <div className={styles.infoContainer}>
@@ -99,29 +99,48 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
                             onClick={() => setSelectedCategory(category)}
                         ></TextButton>
                     ))}
+                    <TextButton
+                        key={"n"}
+                        isActive={selectedCategory === "NaturalFeatures"}
+                        text={"Natural Features"}
+                        bacgroundColor={`--forest--dark`}
+                        textAlign="left"
+                        onClick={() => setSelectedCategory("NaturalFeatures")}
+                    ></TextButton>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
                     {synergies
                         .filter((s) => {
-                            const other = buildings.find(
-                                (b) => b.buildingId == (!IO ? s.sourceBuildingId : s.targetBuildingId),
-                            );
-                            if (!IO) {
-                                return s.targetBuildingId == building.buildingId && other?.type == selectedCategory;
-                            } else {
-                                return s.sourceBuildingId == building.buildingId && other?.type == selectedCategory;
+                            if (selectedCategory == "NaturalFeatures") {
+                                
+                                if (!IO) {
+                                    return s.targetBuildingId == building.buildingId && naturalFeatures.find(n => n.synergyItemId == s.sourceBuildingId);
+                                } else {
+                                    return s.sourceBuildingId == building.buildingId && naturalFeatures.find(n => n.synergyItemId == s.targetBuildingId);
+                                }
                             }
+                            else {
+                                const other = buildings.find(
+                                    (b) => b.buildingId == (!IO ? s.sourceBuildingId : s.targetBuildingId),
+                                );
+                                if (!IO) {
+                                    return s.targetBuildingId == building.buildingId && other?.type == selectedCategory;
+                                } else {
+                                    return s.sourceBuildingId == building.buildingId && other?.type == selectedCategory;
+                                }
+                            }
+
                         })
                         .map((s) => {
-                            const other = buildings.find(
+                            const other = selectedCategory == "NaturalFeatures" ? naturalFeatures.find(n => n.synergyItemId == (!IO ? s.sourceBuildingId : s.targetBuildingId))?.name : buildings.find(
                                 (b) => b.buildingId == (!IO ? s.sourceBuildingId : s.targetBuildingId),
-                            );
+                            )?.name;
                             if (!other) return;
                             return (
                                 <SynergyDisplay
                                     key={Math.random()}
                                     id={!IO ? s.sourceBuildingId.toString() : s.targetBuildingId.toString()}
-                                    name={other?.name}
+                                    name={other}
                                     amount={null}
                                     productions={s.synergyProductions}
                                 />
