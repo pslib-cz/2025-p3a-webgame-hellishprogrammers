@@ -3,14 +3,13 @@ import { useEffect, useRef, useState } from "react";
 const availableAudioTracks = [
     "/audio/loading.mp3",
     "/audio/menu_music.mp3",
-    "/audio/game-music/01.mp3",
-    "/audio/game-music/03.mp3",
-    "/audio/game-music/05.mp3",
-    "/audio/game-music/game-8-bit-328398.mp3",
-    "/audio/game-music/news-summary-449042.mp3",
-    "/audio/game-music/retro-game-arcade-236133.mp3",
-    "/audio/game-music/sandy-vibe-summer-background-tropical-house-for-video-full-version-471397.mp3",
-    "/audio/game-music/synthwave-groove-403308.mp3",
+    "/audio/game-music/01 - cheezy-80s-synth-tune-background-music-instrumental-297048.mp3",
+    "/audio/game-music/02 - go-for-it-80s-cheesy-vhs-infomercial-synthpop-soundtrack-187085.mp3",
+    "/audio/game-music/03 - level-ix-short-211052.mp3",
+    "/audio/game-music/04 - game-8-bit-328398.mp3",
+    "/audio/game-music/05 - news-summary-449042.mp3",
+    "/audio/game-music/06 - retro-game-arcade-236133.mp3",
+    "/audio/game-music/07 - sandy-vibe-summer-background-tropical-house-for-video-full-version-471397.mp3",
 ];
 
 export type MusicOptions = {
