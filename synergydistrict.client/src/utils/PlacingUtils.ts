@@ -255,7 +255,6 @@ export const CalculateValues = (
                 (s.sourceBuildingId === nId && s.targetBuildingId === bId)
             );
         });
-        // console.log(activeSynergies)
 
         if (activeSynergies.length === 0) continue;
 

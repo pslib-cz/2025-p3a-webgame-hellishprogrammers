@@ -137,7 +137,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
                 GameMapData.loadedMapTiles,
             ) &&
                 CalculateValues(
-                    previewBuilding,
+                    { ...previewBuilding, position: origin },
                     GameMapData.placedBuildingsMappped,
                     naturalFeatures,
                     synergies,
