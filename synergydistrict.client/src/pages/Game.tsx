@@ -68,6 +68,7 @@ const Game = () => {
     const OnMapClick = (position: Position) => {
         if (activeBuildingType === null || buildingPreview === null || gameControl.isEnd) return;
 
+        
         if (
             CanPlaceBuilding(
                 buildingPreview.buildingType.shape,

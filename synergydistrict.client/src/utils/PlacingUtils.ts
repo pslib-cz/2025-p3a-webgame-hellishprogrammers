@@ -150,6 +150,7 @@ export const CalculateValues = (
 
     result.newResources.moneyBalance -= building.buildingType.cost;
 
+    console.log("Adding base production of building:", building.buildingType.baseProduction);
     if (!AddProductionSum(building.buildingType.baseProduction || [], result.newResources)) return null;
 
     const possibleSynergies = synergies.filter((s) =>
@@ -244,6 +245,7 @@ export const CalculateValues = (
         if (activeSynergies.length === 0) continue;
 
         for (const synergy of activeSynergies) {
+            console.log("Adding synergy production:", synergy.synergyProductions);
             if (!AddProductionSum(synergy.synergyProductions || [], result.newResources)) return null;
 
             let target: MapBuilding;

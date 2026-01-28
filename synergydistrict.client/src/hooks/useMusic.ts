@@ -10,6 +10,7 @@ const availableAudioTracks = [
     "/audio/game-music/news-summary-449042.mp3",
     "/audio/game-music/retro-game-arcade-236133.mp3",
     "/audio/game-music/sandy-vibe-summer-background-tropical-house-for-video-full-version-471397.mp3",
+    "/audio/game-music/synthwave-groove-403308.mp3",
 ];
 
 export type MusicOptions = {

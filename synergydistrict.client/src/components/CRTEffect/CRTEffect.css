@@ -30,7 +30,7 @@
 
 @keyframes scanline-flicker {
     0% { opacity: calc(0.8 * var(--crt-intensity)); }
-    50% { opacity: calc(0.6 * var(--crt-intensity)); }
+    50% { opacity: calc(0.5 * var(--crt-intensity)); }
     100% { opacity: calc(0.8 * var(--crt-intensity)); }
 }
 
