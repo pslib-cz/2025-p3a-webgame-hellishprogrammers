@@ -85,8 +85,8 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
                     {
                         synergies.filter(s => 
                         {
-                            const other = buildings.find(b => b.buildingId == (IO ? s.sourceBuildingId : s.targetBuildingId))
-                            if(IO){
+                            const other = buildings.find(b => b.buildingId == (!IO ? s.sourceBuildingId : s.targetBuildingId))
+                            if(!IO){
                                 return s.targetBuildingId == building.buildingId && other?.type == selectedCategory
                             }
                             else
@@ -95,9 +95,9 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
                             }
                         }).map(s => 
                             { 
-                                const other = buildings.find(b => b.buildingId == (IO ? s.sourceBuildingId : s.targetBuildingId))
+                                const other = buildings.find(b => b.buildingId == (!IO ? s.sourceBuildingId : s.targetBuildingId))
                                 if(!other) return;
-                                return <SynergyDisplay id={IO ? s.sourceBuildingId.toString() : s.targetBuildingId.toString()} name={other?.name} amount={null} productions={s.synergyProductions}/> 
+                                return <SynergyDisplay id={!IO ? s.sourceBuildingId.toString() : s.targetBuildingId.toString()} name={other?.name} amount={null} productions={s.synergyProductions}/> 
                             } 
                         )
                     }
