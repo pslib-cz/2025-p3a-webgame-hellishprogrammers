@@ -72,9 +72,9 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
             <ProductionListing title="Shape">
                 <canvas ref={canvasRef} style={{ width: "100%" }} />
             </ProductionListing>
-            <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <h2 className={styles.title}>Synergy</h2>
+                    <h3 className={styles.title}>Synergy</h3>
                     <div style={{ fontSize: "0.75rem" }}>
                         <ToggleButton options={["I", "O"]} onChange={() => setIO((io) => !io)} />
                     </div>
@@ -92,7 +92,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
                         ></TextButton>
                     ))}
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                     {synergies
                         .filter((s) => {
                             const other = buildings.find(

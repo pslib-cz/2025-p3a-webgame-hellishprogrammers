@@ -1,10 +1,9 @@
-import { useState, type FC } from "react";
+import { useEffect, useState, type FC } from "react";
 import styles from "./BuildingDetails.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
 import type { ActiveSynergies, MapBuilding, NaturalFeature } from "../../../types/Game/Grid";
 import { IconClose } from "../../../components/Icons";
 import ShowInfo from "../../../components/ShowInfo/ShowInfo";
-import ProductionListing from "../../../components/Game/ProductionListing/ProductionListing";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameMapData from "../../../hooks/providers/useMapData";
 import type { Production } from "../../../types/Game/Buildings";
@@ -19,6 +18,7 @@ import {
 import useGameResources from "../../../hooks/providers/useGameResources";
 import type { GameResources } from "../../../types/Game/GameResources";
 import SynergyDisplay from "../../../components/Game/SynergyDisplay";
+import ToggleButton from "../../../components/Buttons/ToggleButton/ToggleButton";
 
 type BuildingDetailsProps = {
     building: MapBuilding;
@@ -102,7 +102,29 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
         allNaturalFeatures,
     );
 
+    const outgoingSynergiesList = getGroupedSynergies(
+        "outgoing",
+        building.MapBuildingId,
+        GameMapData.activeSynergies,
+        GameMapData.placedBuildings,
+        allNaturalFeatures,
+    );
+
+    const synergies = IO ? outgoingSynergiesList : incomingSynergiesList;
+
     const totalIncomingProduction = incomingSynergiesList
+        .flatMap((group) => group.productions)
+        .reduce((acc, curr) => {
+            const existing = acc.find((p) => p.type === curr.type);
+            if (existing) {
+                existing.value += curr.value;
+            } else {
+                acc.push({ ...curr });
+            }
+            return acc;
+        }, [] as Production[]);
+
+    const totalOutgoingProduction = outgoingSynergiesList
         .flatMap((group) => group.productions)
         .reduce((acc, curr) => {
             const existing = acc.find((p) => p.type === curr.type);
@@ -133,7 +155,8 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
         return (
             newResources.moneyBalance - DELETE_PRICE >= 0 &&
             CanDeleteProdution(building.buildingType.baseProduction, newResources) &&
-            CanDeleteProdution(totalIncomingProduction, newResources)
+            CanDeleteProdution(totalIncomingProduction, newResources) &&
+            CanDeleteProdution(totalOutgoingProduction, newResources)
         );
     };
 
@@ -187,6 +210,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
             DeleteProductionSum(building.buildingType.baseProduction, newResources);
         }
         DeleteProductionSum(totalIncomingProduction, newResources);
+        DeleteProductionSum(totalOutgoingProduction, newResources);
 
         const newBuildings = GameMapData.placedBuildings.filter((b) => b.MapBuildingId !== building.MapBuildingId);
         const newSynergies = GameMapData.activeSynergies.filter(
@@ -228,9 +252,14 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                     />
                 ))}
             </div>
-            <h3>Synergy</h3>
+            <div className={styles.row}>
+                <h3>Synergy</h3>
+                <div style={{ fontSize: "0.75rem" }}>
+                    <ToggleButton options={["I", "O"]} onChange={() => setIO((io) => !io)} />
+                </div>
+            </div>
             <div className={styles.synergies}>
-                {incomingSynergiesList.map((synergyGroup) => {
+                {synergies.map((synergyGroup) => {
                     const name = synergyGroup.otherBuilding
                         ? synergyGroup.otherBuilding.buildingType.name
                         : synergyGroup.naturalFeature?.type || "Unknown";
