@@ -68,6 +68,15 @@ const Game = () => {
     const OnMapClick = (position: Position) => {
         if (activeBuildingType === null || buildingPreview === null || gameControl.isEnd) return;
 
+        if (buildingPreview.buildingType.name === "Town Hall") {
+            const townHallExists = GameMapData.placedBuildings.some(
+                (building) => building.buildingType.name === "Town Hall"
+            );
+            if (townHallExists) {
+                return;
+            }
+        }
+
         if (
             CanPlaceBuilding(
                 buildingPreview.buildingType.shape,
@@ -127,7 +136,7 @@ const Game = () => {
                 ActiveNaturalFeatures: newNaturalFeaturesMap,
             }));
 
-            if (!CanAfford(buildingPreview!.buildingType, newData.newResources)) setBuildingPreview(null);
+            if (!CanAfford(buildingPreview!.buildingType, newData.newResources, newBuildings)) setBuildingPreview(null);
         }
     };
 
@@ -136,7 +145,7 @@ const Game = () => {
 
         setActiveBuildingType(building);
 
-        if (building === null || !CanAfford(building, GameResources)) {
+        if (building === null || !CanAfford(building, GameResources, GameMapData.placedBuildings)) {
             setBuildingPreview(null);
             return;
         }

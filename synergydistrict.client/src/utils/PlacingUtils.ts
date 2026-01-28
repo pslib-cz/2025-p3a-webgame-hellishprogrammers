@@ -95,7 +95,14 @@ export const MaterializeNaturalFeatures = (
     return materializedFeatures;
 };
 
-export const CanAfford = (building: BuildingType, variables: GameResources) => {
+export const CanAfford = (building: BuildingType, variables: GameResources, placedBuildings: MapBuilding[] = []) => {
+    if (building.name === "Town Hall") {
+        const townHallExists = placedBuildings.some(
+            (placedBuilding) => placedBuilding.buildingType.name === "Town Hall"
+        );
+        if (townHallExists) return false;
+    }
+
     // Checking price is less or equal balance
     if (building.cost > variables.moneyBalance) return false;
 
