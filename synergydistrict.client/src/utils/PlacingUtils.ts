@@ -40,16 +40,20 @@ export const CheckForNaturalFeatures = (
     shape: BuildingTileType[][],
     position: { x: number; y: number },
     loadedMapTiles: Record<string, MapTile>,
-): { type: TileType, position: Position }[] => {
+): { type: TileType; position: Position }[] => {
     const toCheckMask: Position[] = [];
-    const foundFeatures: { type: TileType, position: Position }[] = [];
+    const foundFeatures: { type: TileType; position: Position }[] = [];
     for (let y = 0; y < shape.length + 2; y++) {
         for (let x = 0; x < shape[0].length + 2; x++) {
-            if([CheckNeighboringTile({x: x - 1, y: y - 1}, shape), 
-                CheckNeighboringTile({x: x, y: y - 1}, shape), 
-                CheckNeighboringTile({x: x - 1, y: y}, shape), 
-                CheckNeighboringTile({x: x, y: y}, shape)].some(v => v)) {
-                toCheckMask.push({x, y});
+            if (
+                [
+                    CheckNeighboringTile({ x: x - 1, y: y - 1 }, shape),
+                    CheckNeighboringTile({ x: x, y: y - 1 }, shape),
+                    CheckNeighboringTile({ x: x - 1, y: y }, shape),
+                    CheckNeighboringTile({ x: x, y: y }, shape),
+                ].some((v) => v)
+            ) {
+                toCheckMask.push({ x, y });
             }
         }
     }
@@ -68,18 +72,17 @@ export const CheckForNaturalFeatures = (
     }
 
     return foundFeatures;
+};
 
-}
-
-export const CheckNeighboringTile = ( position: Position, shape: BuildingTileType[][]): boolean => {
+export const CheckNeighboringTile = (position: Position, shape: BuildingTileType[][]): boolean => {
     if (position.y < 0 || position.x < 0 || shape.length <= position.y || shape[0].length <= position.x) {
         return false;
     }
     return shape[position.y][position.x] != "Empty";
-}
+};
 
 export const MaterializeNaturalFeatures = (
-    naturalFeatures: { type: TileType, position: Position }[],
+    naturalFeatures: { type: TileType; position: Position }[],
 ): NaturalFeature[] => {
     const materializedFeatures: NaturalFeature[] = [];
     for (let i = 0; i < naturalFeatures.length; i++) {
@@ -90,8 +93,7 @@ export const MaterializeNaturalFeatures = (
         });
     }
     return materializedFeatures;
-}
-
+};
 
 export const CanAfford = (building: BuildingType, variables: GameResources) => {
     // Checking price is less or equal balance
@@ -118,12 +120,17 @@ export const CalculateValues = (
     loadedMapTiles: Record<string, MapTile>,
     existingNaturalFeatures?: Record<string, NaturalFeature>,
 ): CalculateValuesResult | null => {
-    const result: CalculateValuesResult = { newResources: { ...variables }, newSynergies: [], newNaturalFeatures: [], removedNaturalFeatureIds: [] };
+    const result: CalculateValuesResult = {
+        newResources: { ...variables },
+        newSynergies: [],
+        newNaturalFeatures: [],
+        removedNaturalFeatureIds: [],
+    };
     const naturalFeaturesMap = new Map<string, NaturalFeature>();
-    
+
     // Pre-populate with existing natural features
     if (existingNaturalFeatures) {
-        Object.values(existingNaturalFeatures).forEach(nf => {
+        Object.values(existingNaturalFeatures).forEach((nf) => {
             const key = `${nf.position.x};${nf.position.y}`;
             naturalFeaturesMap.set(key, nf);
         });
@@ -136,11 +143,11 @@ export const CalculateValues = (
                 const tileX = building.position.x + x;
                 const tileY = building.position.y + y;
                 const key = `${tileX};${tileY}`;
-                
+
                 // Check if there's a natural feature at this position
                 const existingFeature = naturalFeaturesMap.get(key);
                 if (existingFeature) {
-                    console.log('Building placed on natural feature, removing:', existingFeature);
+                    console.log("Building placed on natural feature, removing:", existingFeature);
                     result.removedNaturalFeatureIds.push(existingFeature.id);
                     naturalFeaturesMap.delete(key);
                 }
@@ -150,18 +157,14 @@ export const CalculateValues = (
 
     result.newResources.moneyBalance -= building.buildingType.cost;
 
-    console.log("Adding base production of building:", building.buildingType.baseProduction);
+    // console.log("Adding base production of building:", building.buildingType.baseProduction);
     if (!AddProductionSum(building.buildingType.baseProduction || [], result.newResources)) return null;
 
-    const possibleSynergies = synergies.filter((s) =>
-        s.sourceBuildingId === building.buildingType.buildingId || s.targetBuildingId === building.buildingType.buildingId,
+    const possibleSynergies = synergies.filter(
+        (s) =>
+            s.sourceBuildingId === building.buildingType.buildingId ||
+            s.targetBuildingId === building.buildingType.buildingId,
     );
-
-    /*const possibleNaturalFeatures = CheckForNaturalFeatures(
-        building.buildingType.shape,
-        building.position,
-        loadedMapTiles
-    );*/
 
     // Checking synergies production
     for (const edge of building.buildingType.edges) {
@@ -196,21 +199,26 @@ export const CalculateValues = (
             // Check if the neighbor tile is a natural feature
             const neighborTileKey = `${neighborPosX};${neighborPosY}`;
             const neighborTile = loadedMapTiles[neighborTileKey];
-            
+
             if (neighborTile && neighborTile.hasIcon && naturalFeatures) {
-                const naturalFeatureData = { type: neighborTile.tileType, position: { x: neighborPosX, y: neighborPosY } };
-                const id = naturalFeatures.find(n => n.name === naturalFeatureData.type.toString())?.synergyItemId;
-                const activeSynergies = possibleSynergies.filter( (s) => s.targetBuildingId === id || s.sourceBuildingId === id );
+                const naturalFeatureData = {
+                    type: neighborTile.tileType,
+                    position: { x: neighborPosX, y: neighborPosY },
+                };
+                const id = naturalFeatures.find((n) => n.name === naturalFeatureData.type.toString())?.synergyItemId;
+                const activeSynergies = possibleSynergies.filter(
+                    (s) => s.targetBuildingId === id || s.sourceBuildingId === id,
+                );
 
                 if (activeSynergies.length === 0) continue;
 
                 for (const synergy of activeSynergies) {
                     if (!AddProductionSum(synergy.synergyProductions || [], result.newResources)) return null;
-                    
+
                     // Check if natural feature already exists at this position
                     const positionKey = `${neighborPosX};${neighborPosY}`;
                     let naturalFeature = naturalFeaturesMap.get(positionKey);
-                    
+
                     if (!naturalFeature) {
                         // Create new natural feature only if it doesn't exist
                         naturalFeature = MaterializeNaturalFeatures([naturalFeatureData])[0];
@@ -235,17 +243,24 @@ export const CalculateValues = (
                         edge: { position: edgePosition, side: edgeSide },
                     });
                 }
-
             }
             continue;
         }
 
-        const activeSynergies = possibleSynergies.filter( (s) => s.targetBuildingId === neighbor.buildingType.buildingId || s.sourceBuildingId === neighbor.buildingType.buildingId );
+        const activeSynergies = possibleSynergies.filter((s) => {
+            const bId = building.buildingType.buildingId;
+            const nId = neighbor.buildingType.buildingId;
+            return (
+                (s.sourceBuildingId === bId && s.targetBuildingId === nId) ||
+                (s.sourceBuildingId === nId && s.targetBuildingId === bId)
+            );
+        });
+        // console.log(activeSynergies)
 
         if (activeSynergies.length === 0) continue;
 
         for (const synergy of activeSynergies) {
-            console.log("Adding synergy production:", synergy.synergyProductions);
+            // console.log("Adding synergy production:", synergy.synergyProductions);
             if (!AddProductionSum(synergy.synergyProductions || [], result.newResources)) return null;
 
             let target: MapBuilding;
@@ -274,6 +289,25 @@ export const CalculateValues = (
                 synergyProductions: synergy.synergyProductions,
                 edge: { position: edgePosition, side: edgeSide },
             });
+
+            // If it's a self-synergy (same building type), apply the reverse direction as well
+            // so both buildings get the synergy benefit
+            if (synergy.sourceBuildingId === synergy.targetBuildingId) {
+                if (!AddProductionSum(synergy.synergyProductions || [], result.newResources)) return null;
+
+                // Reverse direction (Building -> Neighbor)
+                target = neighbor;
+                source = building;
+                edgePosition = edge.position;
+                edgeSide = edge.side;
+
+                result.newSynergies.push({
+                    sourceBuildingId: source.MapBuildingId,
+                    targetBuildingId: target.MapBuildingId,
+                    synergyProductions: synergy.synergyProductions,
+                    edge: { position: edgePosition, side: edgeSide },
+                });
+            }
         }
     }
     return result;

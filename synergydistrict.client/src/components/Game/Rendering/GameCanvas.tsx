@@ -136,9 +136,25 @@ const GameCanvas: FC<GameCanvasProps> = ({
                 GameMapData.placedBuildingsMappped,
                 GameMapData.loadedMapTiles,
             ) &&
-                CalculateValues(previewBuilding, GameMapData.placedBuildingsMappped, naturalFeatures, synergies, GameResources, GameMapData.loadedMapTiles, GameMapData.ActiveNaturalFeatures) !== null,
+                CalculateValues(
+                    previewBuilding,
+                    GameMapData.placedBuildingsMappped,
+                    naturalFeatures,
+                    synergies,
+                    GameResources,
+                    GameMapData.loadedMapTiles,
+                    GameMapData.ActiveNaturalFeatures,
+                ) !== null,
         );
-    }, [previewBuilding, getTileFromPointer, GameMapData.placedBuildingsMappped, GameMapData.loadedMapTiles, naturalFeatures, synergies, GameResources]);
+    }, [
+        previewBuilding,
+        getTileFromPointer,
+        GameMapData.placedBuildingsMappped,
+        GameMapData.loadedMapTiles,
+        naturalFeatures,
+        synergies,
+        GameResources,
+    ]);
 
     useEffect(() => {
         setGameMapData((prev) => ({

@@ -35,7 +35,7 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-@media screen and (max-width: 1920px) {
+@media screen and (max-width: 1600px) {
     :root {
         font-size: 12px;
     }

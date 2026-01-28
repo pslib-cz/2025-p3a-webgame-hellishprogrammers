@@ -36,13 +36,13 @@ const Game = () => {
     const { synergies, naturalFeatures } = useGameData();
     const { gameControl } = useGameControl();
     const { gameSettings } = useSettings();
-    
+
     const { currentTrack } = useMusic({
         songsPath: ["/audio/game-music"],
         volume: 0.3,
         timeBetweenSongs: 10000,
         isEnabled: gameSettings.isMusic,
-        mode: 'random'
+        mode: "random",
     });
 
     useEffect(() => {
@@ -56,7 +56,7 @@ const Game = () => {
             if (e.key === "Escape") {
                 e.preventDefault();
                 if (!gameControl.isEnd) {
-                    setIsPaused(prev => !prev);
+                    setIsPaused((prev) => !prev);
                 }
             }
         };
@@ -68,7 +68,6 @@ const Game = () => {
     const OnMapClick = (position: Position) => {
         if (activeBuildingType === null || buildingPreview === null || gameControl.isEnd) return;
 
-        
         if (
             CanPlaceBuilding(
                 buildingPreview.buildingType.shape,
@@ -86,27 +85,36 @@ const Game = () => {
                 isSelected: false,
             };
 
-            const newData = CalculateValues(newBuilding, GameMapData.placedBuildingsMappped, naturalFeatures, synergies, GameResources, GameMapData.loadedMapTiles, GameMapData.ActiveNaturalFeatures);
+            const newData = CalculateValues(
+                newBuilding,
+                GameMapData.placedBuildingsMappped,
+                naturalFeatures,
+                synergies,
+                GameResources,
+                GameMapData.loadedMapTiles,
+                GameMapData.ActiveNaturalFeatures,
+            );
             if (!newData) return;
 
             const newBuildings = [...GameMapData.placedBuildings, newBuilding];
-            
+
             const newNaturalFeaturesMap = { ...(GameMapData.ActiveNaturalFeatures || {}) };
-            
+
             // Remove natural features that were built over
-            newData.removedNaturalFeatureIds.forEach(id => {
+            newData.removedNaturalFeatureIds.forEach((id) => {
                 delete newNaturalFeaturesMap[id];
             });
-            
+
             // Add new natural features
-            newData.newNaturalFeatures.forEach(nf => {
+            newData.newNaturalFeatures.forEach((nf) => {
                 newNaturalFeaturesMap[nf.id] = nf;
             });
 
             // Filter out synergies that involve removed natural features
             const remainingSynergies = GameMapData.activeSynergies.filter(
-                synergy => !newData.removedNaturalFeatureIds.includes(synergy.sourceBuildingId) && 
-                           !newData.removedNaturalFeatureIds.includes(synergy.targetBuildingId)
+                (synergy) =>
+                    !newData.removedNaturalFeatureIds.includes(synergy.sourceBuildingId) &&
+                    !newData.removedNaturalFeatureIds.includes(synergy.targetBuildingId),
             );
 
             setGameResources(newData.newResources);
@@ -196,7 +204,9 @@ const Game = () => {
                 />
                 {!gameControl.isEnd && activeBuildingType && <BuildingDocs building={activeBuildingType} />}
             </BuildingsBitmapProvider>
-            {!gameControl.isEnd && currentTrack && gameSettings.isMusic && <div className={styles.nowPlaying}>Now Playing: {currentTrack}</div>}
+            {!gameControl.isEnd && currentTrack && gameSettings.isMusic && (
+                <div className={styles.nowPlaying}>Now Playing: {currentTrack}</div>
+            )}
             {!gameControl.isEnd && selectedBuilding && (
                 <BuildingDetails building={selectedBuilding} CloseBar={() => OnBuildingClick(null)} />
             )}
