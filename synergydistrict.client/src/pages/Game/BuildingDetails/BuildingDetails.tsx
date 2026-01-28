@@ -31,7 +31,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const [IO, setIO] = useState<boolean>(false);
 
     const currentBuilding = GameMapData.placedBuildings.find((b) => b.MapBuildingId === building.MapBuildingId)!;
-    const isMaxLevel = currentBuilding.level >= 3;
+    const isMaxLevel = currentBuilding.level >= 5;
 
     const DELETE_PRICE = 50 * currentBuilding.level;
     const UPGRADE_PRICE = 150 * currentBuilding.level * currentBuilding.level;
