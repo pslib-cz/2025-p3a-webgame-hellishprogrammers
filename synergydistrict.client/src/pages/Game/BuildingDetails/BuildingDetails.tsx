@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { useState, type FC } from "react";
 import styles from "./BuildingDetails.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
 import type { ActiveSynergies, MapBuilding, NaturalFeature } from "../../../types/Game/Grid";
@@ -18,7 +18,7 @@ import {
 } from "../../../utils/PlacingUtils";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import type { GameResources } from "../../../types/Game/GameResources";
-import SynergyDisplay from "../SynergyDisplay";
+import SynergyDisplay from "../../../components/Game/SynergyDisplay";
 
 type BuildingDetailsProps = {
     building: MapBuilding;
@@ -28,6 +28,7 @@ type BuildingDetailsProps = {
 const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
+    const [IO, setIO] = useState<boolean>(false);
 
     const currentBuilding = GameMapData.placedBuildings.find((b) => b.MapBuildingId === building.MapBuildingId)!;
     const isMaxLevel = currentBuilding.level >= 3;
@@ -113,7 +114,10 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
             return acc;
         }, [] as Production[]);
 
-    const buildingProduction = building.buildingType.baseProduction.map((product) => ({ ...product, value: product.value * currentBuilding.level })) as Production[];
+    const buildingProduction = building.buildingType.baseProduction.map((product) => ({
+        ...product,
+        value: product.value * currentBuilding.level,
+    })) as Production[];
 
     totalIncomingProduction.forEach((boost) => {
         const existing = buildingProduction.find((p) => p.type === boost.type);
@@ -200,7 +204,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     };
 
     return (
-        <div className={styles.buildingDetails} style={{userSelect: "none"}}>
+        <div className={styles.buildingDetails} style={{ userSelect: "none" }}>
             <div className={styles.row}>
                 <h2 className={underscore.parent}>{building.buildingType.name}</h2>
                 <button onClick={() => CloseBar()} className={styles.close}>
@@ -235,7 +239,12 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                         : synergyGroup.naturalFeature?.id || "unknown";
 
                     return (
-                        <SynergyDisplay id={id} name={name} productions={synergyGroup.productions} amount={synergyGroup.count > 1 ? synergyGroup.count : null}/>
+                        <SynergyDisplay
+                            id={id}
+                            name={name}
+                            productions={synergyGroup.productions}
+                            amount={synergyGroup.count > 1 ? synergyGroup.count : null}
+                        />
                     );
                 })}
             </div>
