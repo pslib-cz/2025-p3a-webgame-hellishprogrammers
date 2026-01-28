@@ -9,7 +9,13 @@ import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameMapData from "../../../hooks/providers/useMapData";
 import type { Production } from "../../../types/Game/Buildings";
 import TextButton from "../../../components/Buttons/TextButton/TextButton";
-import { buildPlacedBuildingsMap, CanDeleteProdution, DeleteProductionSum } from "../../../utils/PlacingUtils";
+import {
+    AddProductionSum,
+    buildPlacedBuildingsMap,
+    CanAddProdution,
+    CanDeleteProdution,
+    DeleteProductionSum,
+} from "../../../utils/PlacingUtils";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import type { GameResources } from "../../../types/Game/GameResources";
 
@@ -26,7 +32,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const isMaxLevel = currentBuilding.level >= 3;
 
     const DELETE_PRICE = 50 * currentBuilding.level;
-    const UPGRADE_PRICE = 150 * currentBuilding.level;
+    const UPGRADE_PRICE = 150 * currentBuilding.level * currentBuilding.level;
 
     const getGroupedSynergies = (
         direction: "incoming" | "outgoing",
@@ -106,7 +112,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
             return acc;
         }, [] as Production[]);
 
-    const buildingProduction = building.buildingType.baseProduction.map((product) => ({ ...product })) as Production[];
+    const buildingProduction = building.buildingType.baseProduction.map((product) => ({ ...product, value: product.value * currentBuilding.level })) as Production[];
 
     totalIncomingProduction.forEach((boost) => {
         const existing = buildingProduction.find((p) => p.type === boost.type);
@@ -127,7 +133,12 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     };
 
     const isUpgradable = () => {
-        return GameResources.moneyBalance - UPGRADE_PRICE >= 0 && !isMaxLevel;
+        const newResources = { ...GameResources } as GameResources;
+        return (
+            GameResources.moneyBalance - UPGRADE_PRICE >= 0 &&
+            !isMaxLevel &&
+            CanAddProdution(currentBuilding.buildingType.baseProduction, newResources)
+        );
     };
 
     const upgradeBuilding = () => {
@@ -135,6 +146,19 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
 
         const newResources = { ...GameResources } as GameResources;
         newResources.moneyBalance -= UPGRADE_PRICE;
+
+        AddProductionSum(currentBuilding.buildingType.baseProduction, newResources);
+
+        // const addedBuildingProduction: Production[] =
+        //     currentBuilding.level !== 1
+        //         ? currentBuilding.buildingType.baseProduction.map((product) => ({
+        //               ...product,
+        //               value:
+        //                 //   product.value * (-0.5 + 0.5 * currentBuilding.level) -
+        //                 //   product.value * (-0.5 + 0.5 * currentBuilding.level - 1), // product.value * (1 + 0.5 * (currentBuilding.level - 1))
+        //                 product.value
+        //           }))
+        //         : [];
 
         const newBuilding = GameMapData.placedBuildings.map((b) =>
             b.MapBuildingId === building.MapBuildingId ? { ...b, level: b.level + 1 } : b,
@@ -154,10 +178,12 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
         const newResources = { ...GameResources } as GameResources;
         newResources.moneyBalance -= DELETE_PRICE;
 
-        DeleteProductionSum(building.buildingType.baseProduction, newResources);
+        for (let i = 0; i < currentBuilding.level; i++) {
+            DeleteProductionSum(building.buildingType.baseProduction, newResources);
+        }
         DeleteProductionSum(totalIncomingProduction, newResources);
 
-        const newBuilding = GameMapData.placedBuildings.filter((b) => b.MapBuildingId !== building.MapBuildingId);
+        const newBuildings = GameMapData.placedBuildings.filter((b) => b.MapBuildingId !== building.MapBuildingId);
         const newSynergies = GameMapData.activeSynergies.filter(
             (s) => s.sourceBuildingId !== building.MapBuildingId && s.targetBuildingId !== building.MapBuildingId,
         );
@@ -166,8 +192,8 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
         setGameResources(newResources);
         setGameMapData((prev) => ({
             ...prev,
-            placedBuildings: newBuilding,
-            placedBuildingsMappped: buildPlacedBuildingsMap(newBuilding),
+            placedBuildings: newBuildings,
+            placedBuildingsMappped: buildPlacedBuildingsMap(newBuildings),
             activeSynergies: newSynergies,
         }));
     };
@@ -180,7 +206,9 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                     <IconClose />
                 </button>
             </div>
-            <p>Level {currentBuilding.level} (Efficiency: 100%)</p>
+            <p>
+                Level {currentBuilding.level} (Efficiency: {currentBuilding.level * 100}%)
+            </p>
             <div className={styles.infoContainer}>
                 {buildingProduction.map((product) => (
                     <ShowInfo
@@ -232,7 +260,21 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
             </div>
             {!isMaxLevel && (
                 <div className={styles.infoContainer}>
-                    <ShowInfo
+                    {currentBuilding.buildingType.baseProduction.map((product) => (
+                        <ShowInfo
+                            key={`${product.type}:${product.value}`}
+                            gameStyle={true}
+                            left={
+                                <div className={`${styles.icon} icon`}>
+                                    {product.type.toLowerCase() == "energy"
+                                        ? "electricity"
+                                        : product.type.toLowerCase()}
+                                </div>
+                            }
+                            right={<>{product.value}</>}
+                        />
+                    ))}
+                    {/* <ShowInfo
                         gameStyle={true}
                         left={<div className={`${styles.icon} icon`}>industry</div>}
                         right={<>5</>}
@@ -241,7 +283,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                         gameStyle={true}
                         left={<div className={`${styles.icon} icon`}>people</div>}
                         right={<>2</>}
-                    />
+                    /> */}
                 </div>
             )}
             <div className={styles.buttons}>
