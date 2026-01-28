@@ -103,10 +103,8 @@ export const CanAfford = (building: BuildingType, variables: GameResources, plac
         if (townHallExists) return false;
     }
 
-    // Checking price is less or equal balance
     if (building.cost > variables.moneyBalance) return false;
 
-    // Checking if final production is possitive or null
     if (!CanAddProdution(building.baseProduction || [], variables)) return false;
     return true;
 };

@@ -33,6 +33,17 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
     const { GameResources } = useGameResources();
     const unaffordableResources = GetUnaffordableResources(building, GameResources);
     const [IO, setIO] = useState<boolean>(false)
+
+    const possibleSynergies = synergies
+        .filter((s) => {
+            if (IO) {
+                return s.sourceBuildingId == building.buildingId;
+            }
+            else {
+                return s.targetBuildingId == building.buildingId;
+            }
+        })
+
     useEffect(() => {
         const canvas = canvasRef.current!;
         const context = canvas?.getContext("2d");
@@ -89,7 +100,15 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
                 </div>
 
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                    {buildingCategories.map((category) => (
+                    {buildingCategories.filter(c => {
+                        return possibleSynergies.some(s => {
+                            const other = buildings.find(
+                                (b) => b.buildingId == (!IO ? s.sourceBuildingId : s.targetBuildingId),
+                            );
+                            return other?.type.toLowerCase() == c.toLowerCase();
+                        })
+                    }
+                    ).map((category) => (
                         <TextButton
                             key={category}
                             isActive={selectedCategory === category}
@@ -109,25 +128,20 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building }) => {
                     ></TextButton>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
-                    {synergies
+                    {possibleSynergies
                         .filter((s) => {
                             if (selectedCategory == "NaturalFeatures") {
-                                
                                 if (!IO) {
-                                    return s.targetBuildingId == building.buildingId && naturalFeatures.find(n => n.synergyItemId == s.sourceBuildingId);
+                                    return naturalFeatures.find(n => n.synergyItemId == s.sourceBuildingId);
                                 } else {
-                                    return s.sourceBuildingId == building.buildingId && naturalFeatures.find(n => n.synergyItemId == s.targetBuildingId);
+                                    return naturalFeatures.find(n => n.synergyItemId == s.targetBuildingId);
                                 }
                             }
                             else {
                                 const other = buildings.find(
                                     (b) => b.buildingId == (!IO ? s.sourceBuildingId : s.targetBuildingId),
                                 );
-                                if (!IO) {
-                                    return s.targetBuildingId == building.buildingId && other?.type == selectedCategory;
-                                } else {
-                                    return s.sourceBuildingId == building.buildingId && other?.type == selectedCategory;
-                                }
+                                return s.targetBuildingId == building.buildingId && other?.type == selectedCategory;
                             }
 
                         })
