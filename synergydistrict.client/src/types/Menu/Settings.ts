@@ -5,10 +5,12 @@ export type SettingsProviderValue = {
 
 export type Settings = {
     isMusic: boolean;
-    crtIntensity: number; // 0-100, 0 = off
+    crtIntensity: number; 
+    uiScale: number; 
 };
 
 export const defaultSettings: Settings = {
     isMusic: true,
     crtIntensity: 65,
+    uiScale: 100,
 };

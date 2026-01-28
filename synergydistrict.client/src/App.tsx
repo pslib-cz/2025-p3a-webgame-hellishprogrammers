@@ -18,9 +18,16 @@ import { GameTimeProvider } from "./provider/GameTimeProvider";
 import TutorialMenu from "./pages/Menu/TutorialMenu";
 import CRTEffect from "./components/CRTEffect/CRTEffect";
 import { useSettings } from "./hooks/providers/useSettings";
+import { useEffect } from "react";
 
 function AppContent() {
     const { gameSettings } = useSettings();
+
+    useEffect(() => {
+        const baseFontSize = window.innerWidth <= 1600 ? 12 : 16;
+        const scaledFontSize = (baseFontSize * gameSettings.uiScale) / 100;
+        document.documentElement.style.fontSize = `${scaledFontSize}px`;
+    }, [gameSettings.uiScale]);
 
     return (
         <>

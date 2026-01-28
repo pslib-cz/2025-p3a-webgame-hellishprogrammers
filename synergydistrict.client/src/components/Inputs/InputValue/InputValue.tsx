@@ -8,14 +8,22 @@ type InputValueProps = {
     inputType: InputTypes;
     value?: string | number;
     onChange?: (value: string) => void;
+    onBlur?: () => void;
+    onEnter?: () => void;
     animationDelay?: boolean;
 };
 
-const InputValue: FC<InputValueProps> = ({ text, inputType, value, onChange, animationDelay }) => {
+const InputValue: FC<InputValueProps> = ({ text, inputType, value, onChange, onBlur, onEnter, animationDelay }) => {
     const inputId = useId();
 
     const left = () => {
         return <label htmlFor={inputId}>{text}</label>;
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            onEnter?.();
+        }
     };
 
     const right = () => {
@@ -27,6 +35,8 @@ const InputValue: FC<InputValueProps> = ({ text, inputType, value, onChange, ani
                     placeholder={placeholder()}
                     value={value}
                     onChange={(e) => onChange?.(e.target.value)}
+                    onBlur={onBlur}
+                    onKeyDown={handleKeyDown}
                 />
             </div>
         );
