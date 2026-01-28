@@ -46,7 +46,7 @@ const PauseMenu = ({ onResume }: PauseMenuProps) => {
 
                 <div className={styles.buttonGroup}>
                     <TextButton text="Resume Game" onClick={onResume} />
-                    <TextButton text="Quit to Menu" onClick={handleQuit} bacgroundColor="--industrial" />
+                    <TextButton text="Quit to Menu" onClick={handleQuit} bacgroundColor="--commercial" />
                 </div>
                 
                 <p className={styles.hint}>Press ESC to resume</p>
