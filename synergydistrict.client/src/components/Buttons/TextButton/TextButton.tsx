@@ -10,9 +10,10 @@ type TextButtonProps = {
     isActive?: boolean;
     bacgroundColor?: string;
     children?: ReactElement;
+    textAlign?: "left" | "center" | "right";
 };
 
-export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActive = false, bacgroundColor, children }) => {
+export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActive = false, bacgroundColor, children, textAlign = "center" }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const renderContext = () => {
@@ -23,7 +24,7 @@ export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActiv
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                     className={`${styles.link} ${styles.linkUppercase} ${isActive && !bacgroundColor ? styles.linkActive : ""} ${children ? styles.row : ""}`}
-                    style={{backgroundColor:`${(isActive || isHovered) && bacgroundColor ? `var(${bacgroundColor})` : ""}`}}
+                    style={{backgroundColor:`${(isActive || isHovered) && bacgroundColor ? `var(${bacgroundColor})` : ""}`, color:`${(isActive || isHovered) && bacgroundColor ? `var(--text)` : ""}`, textAlign: textAlign}}
                 >
                     <ToggleableText text={text} isActive={isActive} />
                     {children}

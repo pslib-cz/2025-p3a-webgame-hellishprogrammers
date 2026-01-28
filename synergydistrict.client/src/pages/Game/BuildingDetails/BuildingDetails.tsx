@@ -18,6 +18,7 @@ import {
 } from "../../../utils/PlacingUtils";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import type { GameResources } from "../../../types/Game/GameResources";
+import SynergyDisplay from "../SynergyDisplay";
 
 type BuildingDetailsProps = {
     building: MapBuilding;
@@ -199,7 +200,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     };
 
     return (
-        <div className={styles.buildingDetails}>
+        <div className={styles.buildingDetails} style={{userSelect: "none"}}>
             <div className={styles.row}>
                 <h2 className={underscore.parent}>{building.buildingType.name}</h2>
                 <button onClick={() => CloseBar()} className={styles.close}>
@@ -234,18 +235,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                         : synergyGroup.naturalFeature?.id || "unknown";
 
                     return (
-                        <ProductionListing
-                            key={`incoming-${id}`}
-                            title={`${name} ${synergyGroup.count > 1 ? `(${synergyGroup.count}x)` : ""}`}
-                        >
-                            {synergyGroup.productions.map((product) => (
-                                <ValuesBox
-                                    key={`${product.type}-${product.value}`}
-                                    iconKey={product.type.toLowerCase()}
-                                    text={product.value.toString()}
-                                />
-                            ))}
-                        </ProductionListing>
+                        <SynergyDisplay id={id} name={name} productions={synergyGroup.productions} amount={synergyGroup.count > 1 ? synergyGroup.count : null}/>
                     );
                 })}
             </div>
