@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import type { MapBuilding } from "../../../types/Game/Grid";
-import { Layer, Image, Group, Shape } from "react-konva";
+import { Layer, Image, Group, Shape, Circle, Text } from "react-konva";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
 import { useBuildingsBitmap } from "../../../hooks/providers/useBuildingsBitmap";
 import { useImageBitmap } from "../../../hooks/useImage";
@@ -10,6 +10,8 @@ type BuildingsLayerProps = {
 };
 
 const SELECTION_OUTLINE_COLOR = "#FEFAE0";
+const BUILDING_LEVEL_BACKGROUND = "#191919";
+const BUILDING_LEVEL_NUMBER = "#FEFAE0";
 
 const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
     const { TILE_SIZE } = useGameProperties();
@@ -33,9 +35,36 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
                     const outlineStrokeWidth = Math.max(2, TILE_SIZE / 12);
                     const tiles = building.buildingType.shape;
 
+                    const iconRowIndex = tiles.findIndex((row) => row.includes("Icon"));
+                    const iconColIndex = tiles[iconRowIndex].indexOf("Icon");
+                    const iconPosX = baseX + iconColIndex * TILE_SIZE + TILE_SIZE / 2 + (15 / 64) * TILE_SIZE;
+                    const iconPosY = baseY + iconRowIndex * TILE_SIZE + (20 / 64) * TILE_SIZE;
+
                     return (
                         <Group key={building.MapBuildingId} zIndex={building.isSelected ? 1000 : 0}>
                             <Image x={baseX} y={baseY} width={width} height={height} image={bitmap!} />
+                            {building.level > 1 ? (
+                                <Group>
+                                    <Circle
+                                        x={iconPosX}
+                                        y={iconPosY}
+                                        width={TILE_SIZE / 4}
+                                        height={TILE_SIZE / 4}
+                                        fill={BUILDING_LEVEL_BACKGROUND}
+                                    />
+                                    <Text
+                                        x={iconPosX - TILE_SIZE / 16}
+                                        y={iconPosY - TILE_SIZE / 16}
+                                        width={TILE_SIZE / 8}
+                                        height={TILE_SIZE / 8}
+                                        text={building.level.toString()}
+                                        fill={BUILDING_LEVEL_NUMBER}
+                                        fontSize={TILE_SIZE / 6}
+                                        align="center"
+                                        verticalAlign="middle"
+                                    />
+                                </Group>
+                            ) : null}
                             {building.isSelected ? (
                                 <Shape
                                     x={baseX}
