@@ -1,4 +1,4 @@
-import type { FC, ReactElement } from "react";
+import type { FC, ReactElement, CSSProperties } from "react";
 import styles from "./ShowInfo.module.css";
 
 type ShowInfoProps = {
@@ -6,9 +6,10 @@ type ShowInfoProps = {
     right: ReactElement;
     gameStyle?: boolean;
     animationDelay?: boolean;
+    style?: CSSProperties;
 };
 
-const ShowInfo: FC<ShowInfoProps> = ({ left, right, gameStyle = false, animationDelay }) => {
+const ShowInfo: FC<ShowInfoProps> = ({ left, right, gameStyle = false, animationDelay, style }) => {
 
     const getAnimationDelay = () => {
         animationDelay = animationDelay ?? true;
@@ -17,7 +18,7 @@ const ShowInfo: FC<ShowInfoProps> = ({ left, right, gameStyle = false, animation
 
     return (
         <>
-            <div className={gameStyle ? styles.showGameInfo : styles.showInfo} style={{animationDelay: `${getAnimationDelay()}`}}>
+            <div className={gameStyle ? styles.showGameInfo : styles.showInfo} style={{animationDelay: `${getAnimationDelay()}`, ...style}}>
                 <div className={`${gameStyle ? styles.showGameInfo__left : styles.showInfo__left} border`}>{left}</div>
                 <div className={gameStyle ? styles.showGameInfo__right : styles.showInfo__right}>{right}</div>
             </div>

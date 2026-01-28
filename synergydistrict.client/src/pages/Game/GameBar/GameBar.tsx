@@ -11,6 +11,7 @@ import useGameResources from "../../../hooks/providers/useGameResources";
 import useGameTime from "../../../hooks/providers/useGameTime";
 import { useGameOptions } from "../../../hooks/providers/useGameOptions";
 import { useSettings } from "../../../hooks/providers/useSettings";
+import useGameMapData from "../../../hooks/providers/useMapData";
 
 type GameBarProps = {
     setBuilding: (x: BuildingType | null) => void;
@@ -20,6 +21,7 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
     const { gameControl, setGameControl } = useGameControl();
     const { gameSettings, setGameSettings } = useSettings();
     const { GameResources } = useGameResources();
+    const { GameMapData } = useGameMapData();
     const { time } = useGameTime();
     const { buildings, loading } = useGameData();
     const { TPS } = useGameProperties();
@@ -32,14 +34,14 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
             const affordability: Record<string, boolean> = {};
 
             buildings.forEach((building) => {
-                affordability[building.buildingId] = CanAfford(building, GameResources);
+                affordability[building.buildingId] = CanAfford(building, GameResources, GameMapData.placedBuildings);
             });
 
             setBuildingAffordability(affordability);
         } else {
             setBuildingAffordability({});
         }
-    }, [GameResources, buildings]);
+    }, [GameResources, buildings, GameMapData.placedBuildings]);
 
     const formatTime = (totalSeconds: number) => {
         const minutes = Math.floor(totalSeconds / 60)

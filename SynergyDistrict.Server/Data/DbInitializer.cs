@@ -163,6 +163,7 @@ namespace SynergyDistrict.Server.Data
                     BaseProduction = 
                     [
                         new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },
+                        new BuildingProduction { Type = BuildingProductionType.Money, Value = 1}
                     ]
                 },
                 new Building

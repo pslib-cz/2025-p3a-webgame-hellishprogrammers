@@ -15,7 +15,9 @@ const SynergyDisplay: React.FC<SynergyDisplayProps> = ({ id, amount, name, produ
             {productions.map((product) => (
                 <ValuesBox
                     key={`${product.type}-${product.value}`}
-                    iconKey={product.type.toLowerCase()}
+                    iconKey={product.type.toLowerCase() == "energy"
+                        ? "electricity"
+                        : product.type.toLowerCase()}
                     text={product.value.toString()}
                 />
             ))}

@@ -95,7 +95,14 @@ export const MaterializeNaturalFeatures = (
     return materializedFeatures;
 };
 
-export const CanAfford = (building: BuildingType, variables: GameResources) => {
+export const CanAfford = (building: BuildingType, variables: GameResources, placedBuildings: MapBuilding[] = []) => {
+    if (building.name === "Town Hall") {
+        const townHallExists = placedBuildings.some(
+            (placedBuilding) => placedBuilding.buildingType.name === "Town Hall"
+        );
+        if (townHallExists) return false;
+    }
+
     // Checking price is less or equal balance
     if (building.cost > variables.moneyBalance) return false;
 
@@ -494,4 +501,38 @@ export const buildPlacedBuildingsMap = (buildings: MapBuilding[]): Record<string
     }
 
     return mapped;
+};
+
+export const GetUnaffordableResources = (building: BuildingType, variables: GameResources): Set<string> => {
+    const unaffordable = new Set<string>();
+
+    if (building.cost > variables.moneyBalance) {
+        unaffordable.add("money");
+    }
+
+    for (const product of building.baseProduction || []) {
+        const resourceKey = product.type.toLowerCase() as keyof GameResources;
+        const currentValue = variables[resourceKey];
+
+        if (typeof currentValue === "number") {
+            const resultProduction = currentValue + product.value;
+            if (resultProduction < 0) {
+                unaffordable.add(resourceKey);
+            }
+
+            if (resourceKey === "energy" && product.value < 0) {
+                if (variables.energyUsed - product.value > variables.energy) {
+                    unaffordable.add("energy");
+                }
+            }
+
+            if (resourceKey === "people" && product.value < 0) {
+                if (variables.peopleUsed - product.value > variables.people) {
+                    unaffordable.add("people");
+                }
+            }
+        }
+    }
+
+    return unaffordable;
 };
