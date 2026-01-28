@@ -27,38 +27,36 @@ function AppContent() {
             <CRTEffect intensity={gameSettings.crtIntensity} />
             <div className="container">
                 <GameOptionsProvider>
-                    <SettingsProvider>
-                        <GamePropertiesProvider>
-                            <BrowserRouter>
-                                <Routes>
-                                    <Route path="/" element={<Splash />} />
-                                    <Route path="/menu" element={<Menu />}>
-                                        <Route path="" element={<MainMenu />} />
-                                        <Route path="play" element={<PlayMenu />} />
-                                        <Route path="tutorial" element={<TutorialMenu />} />
-                                        <Route path="statistics" element={<StatisticsMenu />} />
-                                        <Route path="settings" element={<SettingsMenu />} />
-                                    </Route>
-                                    <Route
-                                        path="/game"
-                                        element={
-                                            <GameControlProvider>
-                                                <GameMapDataProvider>
-                                                    <GameTimeProvider>
-                                                        <GameResourcesProvider>
-                                                            <GameDataProvider>
-                                                                <Game />
-                                                            </GameDataProvider>
-                                                        </GameResourcesProvider>
-                                                    </GameTimeProvider>
-                                                </GameMapDataProvider>
-                                            </GameControlProvider>
-                                        }
-                                    />
-                                </Routes>
-                            </BrowserRouter>
-                        </GamePropertiesProvider>
-                    </SettingsProvider>
+                    <GamePropertiesProvider>
+                        <BrowserRouter>
+                            <Routes>
+                                <Route path="/" element={<Splash />} />
+                                <Route path="/menu" element={<Menu />}>
+                                    <Route path="" element={<MainMenu />} />
+                                    <Route path="play" element={<PlayMenu />} />
+                                    <Route path="tutorial" element={<TutorialMenu />} />
+                                    <Route path="statistics" element={<StatisticsMenu />} />
+                                    <Route path="settings" element={<SettingsMenu />} />
+                                </Route>
+                                <Route
+                                    path="/game"
+                                    element={
+                                        <GameControlProvider>
+                                            <GameMapDataProvider>
+                                                <GameTimeProvider>
+                                                    <GameResourcesProvider>
+                                                        <GameDataProvider>
+                                                            <Game />
+                                                        </GameDataProvider>
+                                                    </GameResourcesProvider>
+                                                </GameTimeProvider>
+                                            </GameMapDataProvider>
+                                        </GameControlProvider>
+                                    }
+                                />
+                            </Routes>
+                        </BrowserRouter>
+                    </GamePropertiesProvider>
                 </GameOptionsProvider>
             </div>
         </>
@@ -67,11 +65,9 @@ function AppContent() {
 
 function App() {
     return (
-        <GameOptionsProvider>
-            <SettingsProvider>
-                <AppContent />
-            </SettingsProvider>
-        </GameOptionsProvider>
+        <SettingsProvider>
+            <AppContent />
+        </SettingsProvider>
     );
 }
 

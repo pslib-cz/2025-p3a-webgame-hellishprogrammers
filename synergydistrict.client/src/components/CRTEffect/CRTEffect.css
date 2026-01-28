@@ -21,17 +21,17 @@
     background: linear-gradient(
         to bottom,
         rgba(255, 255, 255, 0) 50%,
-        rgba(0, 0, 0, 0.25) 50%
+        rgba(0, 0, 0, calc(0.5 * var(--crt-intensity))) 50%
     );
     background-size: 100% 4px;
-    opacity: 0.4;
+    opacity: calc(0.8 * var(--crt-intensity));
     animation: scanline-flicker 0.1s infinite;
 }
 
 @keyframes scanline-flicker {
-    0% { opacity: 0.4; }
-    50% { opacity: 0.3; }
-    100% { opacity: 0.4; }
+    0% { opacity: calc(0.8 * var(--crt-intensity)); }
+    50% { opacity: calc(0.6 * var(--crt-intensity)); }
+    100% { opacity: calc(0.8 * var(--crt-intensity)); }
 }
 
 /* Vignette effect with edge darkening */
@@ -44,8 +44,8 @@
     background: radial-gradient(
         ellipse at center,
         rgba(0, 0, 0, 0) 40%,
-        rgba(0, 0, 0, 0.4) 75%,
-        rgba(0, 0, 0, 0.8) 100%
+        rgba(0, 0, 0, calc(0.6 * var(--crt-intensity))) 75%,
+        rgba(0, 0, 0, calc(1.0 * var(--crt-intensity))) 100%
     );
 }
 
@@ -78,8 +78,8 @@ html, body {
     background: radial-gradient(
         ellipse at center,
         rgba(0, 0, 0, 0) 40%,
-        rgba(0, 0, 0, 0.4) 75%,
-        rgba(0, 0, 0, 0.8) 100%
+        rgba(0, 0, 0, calc(0.6 * var(--crt-intensity))) 75%,
+        rgba(0, 0, 0, calc(1.0 * var(--crt-intensity))) 100%
     );
 }
 
@@ -110,6 +110,6 @@ html, body {
 
 /* Subtle RGB shift at edges for chromatic aberration effect */
 .crt-effect {
-    filter: drop-shadow(0.5px 0 0 rgba(255, 0, 0, 0.1))
-            drop-shadow(-0.5px 0 0 rgba(0, 255, 255, 0.1));
+    filter: drop-shadow(calc(1px * var(--crt-intensity)) 0 0 rgba(255, 0, 0, calc(0.2 * var(--crt-intensity))))
+            drop-shadow(calc(-1px * var(--crt-intensity)) 0 0 rgba(0, 255, 255, calc(0.2 * var(--crt-intensity))));
 }
