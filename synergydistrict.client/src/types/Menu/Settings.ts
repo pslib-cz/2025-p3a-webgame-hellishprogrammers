@@ -12,5 +12,5 @@ export type Settings = {
 export const defaultSettings: Settings = {
     isMusic: true,
     crtIntensity: 65,
-    uiScale: 100,
+    uiScale: 75,
 };

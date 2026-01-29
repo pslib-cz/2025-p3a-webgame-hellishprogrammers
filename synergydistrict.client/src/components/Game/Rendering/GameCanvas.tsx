@@ -37,6 +37,7 @@ type GameCanvasProps = {
     onContext: () => void;
     onBuildingClick: (building: MapBuilding | null) => void;
     previewBuilding: MapBuilding | null;
+    onPreviewMove?: (position: Position | null, isPlaceable: boolean) => void;
 };
 
 const GameCanvas: FC<GameCanvasProps> = ({
@@ -44,6 +45,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
     onMapClick,
     onContext,
     previewBuilding,
+    onPreviewMove,
     onBuildingClick,
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -51,6 +53,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
     const stageRef = useRef<Konva.Stage | null>(null);
     const chunkBitmapRef = useRef<Record<string, PreparedChunkCanvas>>({});
     const gridBitmapRef = useRef<ImageBitmap | null>(null);
+    const lastPreviewRef = useRef<{ key: string | null; placeable: boolean }>({ key: null, placeable: false });
 
     const { CHUNK_SIZE, SCALE_BY, MIN_SCALE, MAX_SCALE, TILE_SIZE, RENDER_DISTANCE_CHUNKS, MAX_LOADED_CHUNKS } =
         useGameProperties();
@@ -112,6 +115,10 @@ const GameCanvas: FC<GameCanvasProps> = ({
         if (!previewBuilding) {
             setPreviewTile(null);
             setIsPreviewPlaceable(false);
+            if (lastPreviewRef.current.key !== null || lastPreviewRef.current.placeable !== false) {
+                lastPreviewRef.current = { key: null, placeable: false };
+                onPreviewMove?.(null, false);
+            }
             return;
         }
 
@@ -128,24 +135,29 @@ const GameCanvas: FC<GameCanvasProps> = ({
             y: tile.y - iconOffset.y,
         };
 
-        setPreviewTile(origin);
-        setIsPreviewPlaceable(
+        const placeable =
             CanPlaceBuilding(
                 previewBuilding.buildingType.shape,
                 origin,
                 GameMapData.placedBuildingsMappped,
                 GameMapData.loadedMapTiles,
             ) &&
-                CalculateValues(
-                    { ...previewBuilding, position: origin },
-                    GameMapData.placedBuildingsMappped,
-                    naturalFeatures,
-                    synergies,
-                    GameResources,
-                    GameMapData.loadedMapTiles,
-                    GameMapData.ActiveNaturalFeatures,
-                ) !== null,
-        );
+            CalculateValues(
+                { ...previewBuilding, position: origin },
+                GameMapData.placedBuildingsMappped,
+                naturalFeatures,
+                synergies,
+                GameResources,
+                GameMapData.loadedMapTiles,
+                GameMapData.ActiveNaturalFeatures,
+            ) !== null;
+        const key = `${origin.x};${origin.y}`;
+        setPreviewTile(origin);
+        setIsPreviewPlaceable(placeable);
+        if (lastPreviewRef.current.key !== key || lastPreviewRef.current.placeable !== placeable) {
+            lastPreviewRef.current = { key, placeable };
+            onPreviewMove?.(origin, placeable);
+        }
     }, [
         previewBuilding,
         getTileFromPointer,
@@ -154,6 +166,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
         naturalFeatures,
         synergies,
         GameResources,
+        onPreviewMove,
     ]);
 
     useEffect(() => {
@@ -238,6 +251,10 @@ const GameCanvas: FC<GameCanvasProps> = ({
         setIsPointerOverStage(false);
         setPreviewTile(null);
         setIsPreviewPlaceable(false);
+        if (lastPreviewRef.current.key !== null || lastPreviewRef.current.placeable !== false) {
+            lastPreviewRef.current = { key: null, placeable: false };
+            onPreviewMove?.(null, false);
+        }
     }, []);
 
     const handleStageWheel = useCallback(

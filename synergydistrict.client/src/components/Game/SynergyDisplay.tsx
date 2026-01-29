@@ -7,11 +7,18 @@ type SynergyDisplayProps = {
     amount: number | null;
     name: string;
     productions: Production[];
+    highlight?: boolean
 };
 
-const SynergyDisplay: React.FC<SynergyDisplayProps> = ({ id, amount, name, productions }) => {
+const SynergyDisplay: React.FC<SynergyDisplayProps> = ({ id, amount, name, productions, highlight }) => {
+    const highlightStyle: React.CSSProperties | undefined = highlight
+        ? {
+              boxShadow: "0 0 .8rem var(--text)",
+          }
+        : undefined;
+
     return (
-        <ProductionListing key={`incoming-${id}`} title={`${name} ${amount ? `${amount}x` : ""}`}>
+        <ProductionListing key={`incoming-${id}`} title={`${name} ${amount ? `${amount}x` : ""}`} style={highlightStyle}>
             {productions.map((product) => (
                 <ValuesBox
                     key={`${product.type}-${product.value}`}

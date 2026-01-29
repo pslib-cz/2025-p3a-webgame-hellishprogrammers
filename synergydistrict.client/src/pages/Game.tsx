@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import styles from "../styles/Game.module.css";
 import GameCanvas from "../components/Game/Rendering/GameCanvas";
 import GameBar from "./Game/GameBar/GameBar";
@@ -12,6 +12,7 @@ import {
     rotateShape,
     CanAfford,
     buildPlacedBuildingsMap,
+    GetPreviewSynergies,
 } from "../utils/PlacingUtils";
 import type { BuildingType } from "../types/Game/Buildings";
 import { useGameData } from "../hooks/providers/useGameData";
@@ -29,6 +30,8 @@ const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
     const [selectedBuilding, setSelectedBuilding] = useState<MapBuilding | null>(null);
     const [buildingPreview, setBuildingPreview] = useState<MapBuilding | null>(null);
+    const [buildingPreviewPosition, setBuildingPreviewPosition] = useState<Position | null>(null);
+    const [buildingPreviewPlaceable, setBuildingPreviewPlaceable] = useState<boolean>(false);
     const [isPaused, setIsPaused] = useState(false);
     const { options } = useGameOptions();
     const { GameMapData, setGameMapData } = useGameMapData();
@@ -44,6 +47,30 @@ const Game = () => {
         isEnabled: gameSettings.isMusic,
         mode: "random",
     });
+
+    const previewSynergies = useMemo(() => {
+        if (!activeBuildingType || !buildingPreview || !buildingPreviewPosition)
+            return [] as import("../types/Game/Buildings").BuildingSynergy[];
+
+        return GetPreviewSynergies(
+            buildingPreview.buildingType,
+            buildingPreviewPosition,
+            GameMapData.placedBuildingsMappped,
+            naturalFeatures,
+            synergies,
+            GameMapData.loadedMapTiles,
+        );
+    }, [
+        activeBuildingType,
+        buildingPreview?.buildingType.buildingId,
+        buildingPreview?.rotation,
+        buildingPreviewPosition?.x,
+        buildingPreviewPosition?.y,
+        GameMapData.placedBuildingsMappped,
+        naturalFeatures,
+        synergies,
+        GameMapData.loadedMapTiles,
+    ]);
 
     useEffect(() => {
         if (!gameControl.isEnd) return;
@@ -109,17 +136,14 @@ const Game = () => {
 
             const newNaturalFeaturesMap = { ...(GameMapData.ActiveNaturalFeatures || {}) };
 
-            // Remove natural features that were built over
             newData.removedNaturalFeatureIds.forEach((id) => {
                 delete newNaturalFeaturesMap[id];
             });
 
-            // Add new natural features
             newData.newNaturalFeatures.forEach((nf) => {
                 newNaturalFeaturesMap[nf.id] = nf;
             });
 
-            // Filter out synergies that involve removed natural features
             const remainingSynergies = GameMapData.activeSynergies.filter(
                 (synergy) =>
                     !newData.removedNaturalFeatureIds.includes(synergy.sourceBuildingId) &&
@@ -180,11 +204,8 @@ const Game = () => {
 
     const OnBuildingClick = (building: MapBuilding | null) => {
         const newBuildings: MapBuilding[] = GameMapData.placedBuildings.map((b) => {
-            // deselect selected building
             if (b.isSelected) b.isSelected = false;
-            // select the building on which user clicks
             if (building && b.MapBuildingId === building.MapBuildingId) b.isSelected = true;
-            // deselect if the building is already selected
             if (selectedBuilding && b.MapBuildingId === selectedBuilding.MapBuildingId) b.isSelected = false;
 
             return b;
@@ -209,9 +230,15 @@ const Game = () => {
                     onMapClick={OnMapClick}
                     onContext={OnRotate}
                     previewBuilding={buildingPreview}
+                    onPreviewMove={(pos, isPlaceable) => {
+                        setBuildingPreviewPosition(pos);
+                        setBuildingPreviewPlaceable(!!isPlaceable);
+                    }}
                     onBuildingClick={OnBuildingClick}
                 />
-                {!gameControl.isEnd && activeBuildingType && <BuildingDocs building={activeBuildingType} />}
+                {!gameControl.isEnd && activeBuildingType && (
+                    <BuildingDocs building={activeBuildingType} activeSynergies={previewSynergies} />
+                )}
             </BuildingsBitmapProvider>
             {!gameControl.isEnd && currentTrack && gameSettings.isMusic && (
                 <div className={styles.nowPlaying}>Now Playing: {currentTrack}</div>

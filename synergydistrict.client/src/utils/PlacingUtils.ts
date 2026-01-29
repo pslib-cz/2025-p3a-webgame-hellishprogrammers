@@ -534,3 +534,71 @@ export const GetUnaffordableResources = (building: BuildingType, variables: Game
 
     return unaffordable;
 };
+
+export const GetPreviewSynergies = (
+    buildingType: BuildingType,
+    position: Position,
+    placedBuildingsMappped: Record<string, MapBuilding>,
+    naturalFeatures: { synergyItemId: number; name: string }[] | undefined,
+    synergies: BuildingSynergy[],
+    loadedMapTiles: Record<string, MapTile>,
+): BuildingSynergy[] => {
+    const found = new Set<BuildingSynergy>();
+
+    const possibleSynergies = synergies.filter(
+        (s) => s.sourceBuildingId === buildingType.buildingId || s.targetBuildingId === buildingType.buildingId,
+    );
+
+    for (const edge of buildingType.edges) {
+        let delX = 0;
+        let delY = 0;
+        switch (edge.side) {
+            case "top":
+                delY = -1;
+                break;
+            case "bottom":
+                delY = 1;
+                break;
+            case "left":
+                delX = -1;
+                break;
+            case "right":
+                delX = 1;
+                break;
+        }
+
+        const neighborPosX = position.x + edge.position.x + delX;
+        const neighborPosY = position.y + edge.position.y + delY;
+
+        const neighbor = placedBuildingsMappped[`${neighborPosX};${neighborPosY}`];
+
+        if (!neighbor) {
+            const neighborTileKey = `${neighborPosX};${neighborPosY}`;
+            const neighborTile = loadedMapTiles[neighborTileKey];
+
+            if (neighborTile && neighborTile.hasIcon && naturalFeatures) {
+                const id = naturalFeatures.find((n) => n.name === neighborTile.tileType.toString())?.synergyItemId;
+                if (id == null) continue;
+
+                for (const s of possibleSynergies) {
+                    if (s.sourceBuildingId === id || s.targetBuildingId === id) {
+                        found.add(s);
+                    }
+                }
+            }
+            continue;
+        }
+
+        for (const s of possibleSynergies) {
+            const bId = buildingType.buildingId;
+            const nId = neighbor.buildingType.buildingId;
+            if ((s.sourceBuildingId === bId && s.targetBuildingId === nId) || (s.sourceBuildingId === nId && s.targetBuildingId === bId)) {
+                found.add(s);
+            }
+        }
+    }
+
+    return Array.from(found);
+};
+
+
