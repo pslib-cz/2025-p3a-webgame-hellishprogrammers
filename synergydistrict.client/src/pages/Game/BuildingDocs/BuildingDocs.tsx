@@ -221,10 +221,8 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
                             return s.sourceBuildingId === building.buildingId ? s.targetBuildingId : s.sourceBuildingId;
                         })();
 
-                        const other = selectedCategory == "NaturalFeatures"
-                            ? naturalFeatures.find(n => n.synergyItemId == otherId)?.name
-                            : buildings.find((b) => b.buildingId == otherId)?.name;
-
+                        const other = buildings.find((b) => b.buildingId == otherId)?.name
+                            || naturalFeatures.find(n => n.synergyItemId == otherId)?.name;
                         if (!other) return null;
                         return (
                             <SynergyDisplay
