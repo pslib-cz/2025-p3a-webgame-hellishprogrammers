@@ -36,18 +36,19 @@ const SettingsMenu = () => {
                     onChange={(index) => setGameSettings({ ...gameSettings, isMusic: index === 0 })}
                 />
                 <InputValue
-                    text="CRT Effect"
-                    inputType="number"
-                    value={gameSettings.crtIntensity}
-                    onChange={handleCrtIntensityChange}
-                />
-                <InputValue
                     text="UI Scale (%)"
                     inputType="number"
                     value={uiScaleInput}
                     onChange={handleUiScaleInputChange}
                     onBlur={commitUiScaleChange}
                     onEnter={commitUiScaleChange}
+                />
+                <h3>Effects</h3>
+                <InputValue
+                    text="CRT"
+                    inputType="number"
+                    value={gameSettings.crtIntensity}
+                    onChange={handleCrtIntensityChange}
                 />
             </div>
         </>
