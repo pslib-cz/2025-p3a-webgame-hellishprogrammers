@@ -126,7 +126,6 @@ export const CalculateValues = (
     };
     const naturalFeaturesMap = new Map<string, NaturalFeature>();
 
-    // Pre-populate with existing natural features
     if (existingNaturalFeatures) {
         Object.values(existingNaturalFeatures).forEach((nf) => {
             const key = `${nf.position.x};${nf.position.y}`;
@@ -134,7 +133,6 @@ export const CalculateValues = (
         });
     }
 
-    // Check if building is being placed on top of any natural features and mark them for removal
     for (let y = 0; y < building.buildingType.shape.length; y++) {
         for (let x = 0; x < building.buildingType.shape[y].length; x++) {
             if (building.buildingType.shape[y][x] !== "Empty") {
@@ -142,10 +140,8 @@ export const CalculateValues = (
                 const tileY = building.position.y + y;
                 const key = `${tileX};${tileY}`;
 
-                // Check if there's a natural feature at this position
                 const existingFeature = naturalFeaturesMap.get(key);
                 if (existingFeature) {
-                    console.log("Building placed on natural feature, removing:", existingFeature);
                     result.removedNaturalFeatureIds.push(existingFeature.id);
                     naturalFeaturesMap.delete(key);
                 }
@@ -155,7 +151,6 @@ export const CalculateValues = (
 
     result.newResources.moneyBalance -= building.buildingType.cost;
 
-    // console.log("Adding base production of building:", building.buildingType.baseProduction);
     if (!AddProductionSum(building.buildingType.baseProduction || [], result.newResources)) return null;
 
     const possibleSynergies = synergies.filter(
@@ -164,7 +159,6 @@ export const CalculateValues = (
             s.targetBuildingId === building.buildingType.buildingId,
     );
 
-    // Checking synergies production
     for (const edge of building.buildingType.edges) {
         let delX = 0;
         let delY = 0;
@@ -194,7 +188,6 @@ export const CalculateValues = (
         const neighbor = placedBuildingsMappped[`${neighborPosX};${neighborPosY}`];
 
         if (!neighbor) {
-            // Check if the neighbor tile is a natural feature
             const neighborTileKey = `${neighborPosX};${neighborPosY}`;
             const neighborTile = loadedMapTiles[neighborTileKey];
 
@@ -213,12 +206,10 @@ export const CalculateValues = (
                 for (const synergy of activeSynergies) {
                     if (!AddProductionSum(synergy.synergyProductions || [], result.newResources)) return null;
 
-                    // Check if natural feature already exists at this position
                     const positionKey = `${neighborPosX};${neighborPosY}`;
                     let naturalFeature = naturalFeaturesMap.get(positionKey);
 
                     if (!naturalFeature) {
-                        // Create new natural feature only if it doesn't exist
                         naturalFeature = MaterializeNaturalFeatures([naturalFeatureData])[0];
                         naturalFeaturesMap.set(positionKey, naturalFeature);
                         result.newNaturalFeatures.push(naturalFeature);
@@ -257,7 +248,6 @@ export const CalculateValues = (
         if (activeSynergies.length === 0) continue;
 
         for (const synergy of activeSynergies) {
-            // console.log("Adding synergy production:", synergy.synergyProductions);
             if (!AddProductionSum(synergy.synergyProductions || [], result.newResources)) return null;
 
             let target: MapBuilding;
@@ -287,12 +277,9 @@ export const CalculateValues = (
                 edge: { position: edgePosition, side: edgeSide },
             });
 
-            // If it's a self-synergy (same building type), apply the reverse direction as well
-            // so both buildings get the synergy benefit
             if (synergy.sourceBuildingId === synergy.targetBuildingId) {
                 if (!AddProductionSum(synergy.synergyProductions || [], result.newResources)) return null;
 
-                // Reverse direction (Building -> Neighbor)
                 target = neighbor;
                 source = building;
                 edgePosition = edge.position;

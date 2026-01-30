@@ -165,50 +165,36 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
             <div className={styles.row}>
                 <h3>Synergy</h3>
                 <div style={{ fontSize: "0.75rem" }}>
-                    <ToggleButton options={["I", "O"]} onChange={() => setIO((io) => !io)} />
+                    <ToggleButton options={["incoming", "outgoing"]} onChange={(x) => setIO([false, true][x])} isIcons={true} />
                 </div>
             </div>
             <div className={styles.synergies}>
                 {synergies.length === 0
                     ? "No synergies found"
                     : synergies.map((synergyGroup) => {
-                          const name = synergyGroup.otherBuilding
-                              ? synergyGroup.otherBuilding.buildingType.name
-                              : synergyGroup.naturalFeature?.type || "Unknown";
-                          const id = synergyGroup.otherBuilding
-                              ? synergyGroup.otherBuilding.MapBuildingId
-                              : synergyGroup.naturalFeature?.id || "unknown";
+                        const name = synergyGroup.otherBuilding
+                            ? synergyGroup.otherBuilding.buildingType.name
+                            : synergyGroup.naturalFeature?.type || "Unknown";
+                        const id = synergyGroup.otherBuilding
+                            ? synergyGroup.otherBuilding.MapBuildingId
+                            : synergyGroup.naturalFeature?.id || "unknown";
 
-                    return (
-                                <SynergyDisplay
-                                    id={id}
-                                    name={name}
-                                    productions={synergyGroup.productions.map((p) => {
-                                        let detlaValue = 0;
-                                        const resourceKey = p.type.toLowerCase() as keyof GameResources;
-                                        const currentValue = (GameResources as any)[resourceKey];
-                                        if (typeof currentValue === "number") {
-                                            if (resourceKey === "energy" && p.value < 0) {
-                                                const usedAfter = GameResources.energyUsed - p.value;
-                                                detlaValue = Math.max(0, usedAfter - GameResources.energy);
-                                            } else if (resourceKey === "people" && p.value < 0) {
-                                                const usedAfter = GameResources.peopleUsed - p.value;
-                                                detlaValue = Math.max(0, usedAfter - GameResources.people);
-                                            } else {
-                                                const after = currentValue + p.value;
-                                                detlaValue = after < 0 ? -after : 0;
-                                            }
-                                        }
-
-                                        return {
-                                            production: p,
-                                            detlaValue,
-                                        };
-                                    })}
-                                    amount={synergyGroup.count > 1 ? synergyGroup.count : null}
-                                />
-                    );
-                })}
+                        return (
+                            <SynergyDisplay
+                                key={id}
+                                id={id}
+                                name={name}
+                                productions={synergyGroup.productions.map((p) => {
+                                    let detlaValue = 0;
+                                    return {
+                                        production: p,
+                                        detlaValue,
+                                    };
+                                })}
+                                amount={synergyGroup.count > 1 ? synergyGroup.count : null}
+                            />
+                        );
+                    })}
             </div>
             <div className={styles.row}>
                 {isMaxLevel && <h3>Max level</h3>}

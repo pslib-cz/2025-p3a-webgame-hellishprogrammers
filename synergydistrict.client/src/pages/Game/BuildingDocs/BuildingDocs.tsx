@@ -160,13 +160,14 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
                     <h3 className={styles.title}>Synergy</h3>
                     <div style={{ fontSize: "0.75rem" }}>
                         <ToggleButton
-                            options={["I", "O", "C"]}
+                            options={["incoming", "outgoing", "current"]}
                             selectedIndex={synergyFilter.indexOf(filter)}
                             onChange={(x) => {
                                 const sel = synergyFilter[x];
                                 setFilter(sel);
                                 setUserSelectedFilter(sel);
                             }}
+                            isIcons={true}
                         />
                     </div>
                 </div>
