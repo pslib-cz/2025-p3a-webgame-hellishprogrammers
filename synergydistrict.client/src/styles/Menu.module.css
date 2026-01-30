@@ -1,206 +1,218 @@
 /* Animation configuration */
 :root {
-  --menu-animation-duration: 0.2s;
-  --menu-animation-base-delay: 0.0s;
-  --menu-animation-step-delay: 0.1s;
+    --menu-animation-duration: 0.2s;
+    --menu-animation-base-delay: 0s;
+    --menu-animation-step-delay: 0.1s;
 }
 
 .menu {
-  display: grid;
-  grid-template-rows: 100%;
-  grid-template-columns: repeat(2, 1fr);
-  height: 100%;
+    display: grid;
+    grid-template-rows: 100%;
+    grid-template-columns: repeat(2, 1fr);
+    height: 100%;
 }
 
 .menuSide {
-  padding: 6rem 4rem;
-  position: relative;
+    padding: 6rem 4rem;
+    position: relative;
 }
 .menuSide:has(.menuSide_lineless) {
-  padding: 0;
+    padding: 0;
 }
 .menuSide:has(.menuSide_lineless)::before {
-  display: none;
+    display: none;
 }
 
 .menuSide:has(.menuSide_lineless) .closeButton {
-  display: none;
+    display: none;
 }
 
 .menuSide_lineless {
-  height: 100%;
+    height: 100%;
 }
 
 .menuSide:nth-of-type(2)::before {
-  content: "";
-  position: absolute;
-  top: 20%;
-  bottom: 20%;
-  left: -1px;
-  width: 2px;
-  background: var(--text);
+    content: "";
+    position: absolute;
+    top: 20%;
+    bottom: 20%;
+    left: -1px;
+    width: 2px;
+    background: var(--text);
 }
 
 .menuContainer {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .menuNarrow {
-  width: max-content;
+    width: max-content;
 }
 
 .closeButton {
-  display: flex;
-  justify-content: flex-end;
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-  opacity: 0;
-  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
-  animation-delay: var(--menu-animation-base-delay);
+    display: flex;
+    justify-content: flex-end;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
+    animation-delay: var(--menu-animation-base-delay);
 }
 .closeButton a {
-  line-height: 0;
-  position: relative;
-  z-index: 1;
-  padding: 1rem;
-  margin: -1rem;
+    line-height: 0;
+    position: relative;
+    z-index: 1;
+    padding: 1rem;
+    margin: -1rem;
 }
 
 .menu menu {
-  list-style-type: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin: 0;
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 0;
 }
 
 .menuContent {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  overflow-y: auto;
-  padding-right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.seed {
+    display: flex;
+    gap: 1rem;
+}
+.seed :first-child {
+  flex-grow: 1;
+}
+
+.flex {
+    display: flex;
 }
 
 .right {
-  display: flex;
-  justify-content: flex-end;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .menuContent::-webkit-scrollbar {
-  width: 6px;
+    width: 6px;
 }
 
 .menuContent::-webkit-scrollbar-track {
-  background: transparent;
+    background: transparent;
 }
 
 .menuContent::-webkit-scrollbar-thumb {
-  background: var(--text);
-  border-radius: 4px;
+    background: var(--text);
+    border-radius: 4px;
 }
 
 .menuContent::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, var(--text) 50%, transparent);
+    background: color-mix(in srgb, var(--text) 50%, transparent);
 }
 
 /* Old game loading animation */
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .menu h1 {
-  opacity: 0;
-  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
-  animation-delay: var(--menu-animation-base-delay);
+    opacity: 0;
+    animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
+    animation-delay: var(--menu-animation-base-delay);
 }
 
 .menu menu li {
-  opacity: 0;
-  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
+    opacity: 0;
+    animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
 }
 
 .menu menu li:nth-child(1) {
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 1.5);
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 1.5);
 }
 
 .menu menu li:nth-child(2) {
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 3);
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 3);
 }
 
 .menu menu li:nth-child(3) {
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 4.5);
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 4.5);
 }
 
 .menu menu li:nth-child(4) {
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 6);
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 6);
 }
 
 .closeButton {
-  opacity: 0;
-  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
-  animation-delay: var(--menu-animation-base-delay);
+    opacity: 0;
+    animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
+    animation-delay: var(--menu-animation-base-delay);
 }
 
 .menuContent {
-  opacity: 0;
-  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 2);
+    opacity: 0;
+    animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 2);
 }
 
 /* Animate child elements inside menuContent */
 .menuContent > * {
-  opacity: 0;
-  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
+    opacity: 0;
+    animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
 }
 
 .menuContent > *:nth-child(1) {
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 3);
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 3);
 }
 
 .menuContent > *:nth-child(2) {
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 4);
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 4);
 }
 
 .menuContent > *:nth-child(3) {
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 5);
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 5);
 }
 
 .menuContent > *:nth-child(4) {
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 6);
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 6);
 }
 
 .menuContent > *:nth-child(5) {
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 7);
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 7);
 }
 
 .menuContent > *:nth-child(6) {
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 8);
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 8);
 }
 
 .menuContent > *:nth-child(7) {
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 9);
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 9);
 }
 
 .menuContent > *:nth-child(8) {
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 10);
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 10);
 }
 
 /* Animate buttons in the right section */
 .right {
-  opacity: 0;
-  animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
-  animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 11);
+    opacity: 0;
+    animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 11);
 }

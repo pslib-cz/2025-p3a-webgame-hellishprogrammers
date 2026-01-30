@@ -5,7 +5,7 @@ import ToggleButton from "../../components/Buttons/ToggleButton/ToggleButton";
 import { useGameOptions } from "../../hooks/providers/useGameOptions";
 import styles from "/src/styles/Menu.module.css";
 import { stringToSeed } from "../../utils/optionsUtils";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useGameProperties from "../../hooks/providers/useGameProperties";
 import { defaultGameProperties } from "../../types/Game/GameProperties";
 import { clearStoredState } from "../../utils/stateStorage";
@@ -24,7 +24,7 @@ const PlayMenu = () => {
     const { options, setOptions } = useGameOptions();
     const { setGameProperties } = useGameProperties();
     const [seedString, setSeedString] = useState<string>(options.seed.toString());
-    const [ hasInfMapChanged, setHasInfMapChanged ] = useState(false);
+    const [hasInfMapChanged, setHasInfMapChanged] = useState(false);
     const handleStart = useCallback(() => {
         setGameProperties(() => ({
             ...defaultGameProperties,
@@ -33,18 +33,37 @@ const PlayMenu = () => {
         clearStoredState(SESSION_RESET_KEYS);
     }, [setGameProperties, options]);
 
+    useEffect(() => {
+        const seed = Math.floor(Math.random() * 1000000);
+        setOptions({ ...options, seed: seed });
+    }, [])
+
+    // Each time user goes to menu there is new seed
+
     return (
         <>
             <div className={styles.menuContent}>
-                <InputValue
-                    text="Seed"
-                    inputType="text"
-                    value={seedString}
-                    onChange={(val) => {
-                        setOptions({ ...options, seed: stringToSeed(val) });
-                        setSeedString(val);
-                    }}
-                />
+                <div className={styles.seed}>
+                    <InputValue
+                        text="Seed"
+                        inputType="text"
+                        value={seedString}
+                        onChange={(val) => {
+                            setOptions({ ...options, seed: stringToSeed(val) });
+                            setSeedString(val);
+                        }}
+                    />
+                    <div className={`${styles.flex} border`}>
+                        <TextButton
+                            text={"Generate"}
+                            onClick={() => {
+                                const seed = Math.floor(Math.random() * 1000000);
+                                setOptions({ ...options, seed: seed });
+                                setSeedString(seed.toString());
+                            }}
+                        />
+                    </div>
+                </div>
                 <h3>Gamemode</h3>
                 <ToggleButton
                     options={["Time presure", "Survival"]}

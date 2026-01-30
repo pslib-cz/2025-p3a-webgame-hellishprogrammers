@@ -82,7 +82,7 @@ const EndScreen: FC = () => {
             <ShowInfo left={<p>Rank</p>} right={<div className={`${styles.right} border`}>{getRank(score)}</div>} />
 
             <div className={`h2 ${styles.buttons}`}>
-                <TextButton text="play again" onClick={handlePlayAgain} />
+                <TextButton text="play again" onClick={handlePlayAgain} textAlign="left" />
                 <TextButton text="exit" linkTo="/menu" />
             </div>
         </div>
