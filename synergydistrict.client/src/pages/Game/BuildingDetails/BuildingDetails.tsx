@@ -1,4 +1,4 @@
-import { useEffect, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import styles from "./BuildingDetails.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
 import type { ActiveSynergies, MapBuilding, NaturalFeature } from "../../../types/Game/Grid";
@@ -268,12 +268,33 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                         : synergyGroup.naturalFeature?.id || "unknown";
 
                     return (
-                        <SynergyDisplay
-                            id={id}
-                            name={name}
-                            productions={synergyGroup.productions}
-                            amount={synergyGroup.count > 1 ? synergyGroup.count : null}
-                        />
+                                <SynergyDisplay
+                                    id={id}
+                                    name={name}
+                                    productions={synergyGroup.productions.map((p) => {
+                                        let detlaValue = 0;
+                                        const resourceKey = p.type.toLowerCase() as keyof GameResources;
+                                        const currentValue = (GameResources as any)[resourceKey];
+                                        if (typeof currentValue === "number") {
+                                            if (resourceKey === "energy" && p.value < 0) {
+                                                const usedAfter = GameResources.energyUsed - p.value;
+                                                detlaValue = Math.max(0, usedAfter - GameResources.energy);
+                                            } else if (resourceKey === "people" && p.value < 0) {
+                                                const usedAfter = GameResources.peopleUsed - p.value;
+                                                detlaValue = Math.max(0, usedAfter - GameResources.people);
+                                            } else {
+                                                const after = currentValue + p.value;
+                                                detlaValue = after < 0 ? -after : 0;
+                                            }
+                                        }
+
+                                        return {
+                                            production: p,
+                                            detlaValue,
+                                        };
+                                    })}
+                                    amount={synergyGroup.count > 1 ? synergyGroup.count : null}
+                                />
                     );
                 })}
             </div>
