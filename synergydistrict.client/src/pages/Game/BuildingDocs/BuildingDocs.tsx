@@ -46,17 +46,12 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
     });
 
     useEffect(() => {
-        // Auto-switch to "current" when preview synergies are available.
-        // Only block auto-switch if the user explicitly selected "current" themselves.
         if (userSelectedFilter === "current") return;
 
         if (activeSynergies && activeSynergies.length > 0) {
             if (filter !== "current") setFilter("current");
             return;
         }
-
-        // If there are no active synergies and the user didn't lock to "current",
-        // revert to the default outgoing view.
         if (filter === "current") setFilter("outgoing");
     }, [activeSynergies, userSelectedFilter, filter]);
 
@@ -99,7 +94,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
                 <span className={`${styles.icon} icon`}>{building.iconKey}</span>
             </div>
             <p>{building.description}</p>
-            <ProductionListing title="Cost" style={{ opacity: unaffordableResources.has("money") ? ".2" : "1" } as React.CSSProperties}>
+            <ProductionListing title="Cost" style={{ opacity: unaffordableResources.has("moneyBalance") ? ".2" : "1" } as React.CSSProperties}>
                 <ValuesBox
                     iconKey="money"
                     text={building.cost.toString()}

@@ -505,7 +505,7 @@ export const GetUnaffordableResources = (building: BuildingType, variables: Game
     const unaffordable = new Set<string>();
 
     if (building.cost > variables.moneyBalance) {
-        unaffordable.add("money");
+        unaffordable.add("moneyBalance");
     }
 
     for (const product of building.baseProduction || []) {
