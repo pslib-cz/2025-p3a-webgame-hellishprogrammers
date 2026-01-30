@@ -85,7 +85,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
             if (filter !== "current") setFilter("current");
             return;
         }
-        if (filter === "current") setFilter("outgoing");
+        if (filter === "current" && userSelectedFilter !== null) setFilter(userSelectedFilter);
     }, [activeSynergies, userSelectedFilter, filter]);
 
     useEffect(() => {
