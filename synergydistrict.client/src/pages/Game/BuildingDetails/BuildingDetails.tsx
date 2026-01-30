@@ -1,12 +1,11 @@
 import { useState, type FC } from "react";
 import styles from "./BuildingDetails.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
-import type { ActiveSynergies, MapBuilding, NaturalFeature } from "../../../types/Game/Grid";
+import type { MapBuilding } from "../../../types/Game/Grid";
 import { IconClose } from "../../../components/Icons";
 import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameMapData from "../../../hooks/providers/useMapData";
-import type { Production } from "../../../types/Game/Buildings";
 import TextButton from "../../../components/Buttons/TextButton/TextButton";
 import {
     AddProductionSum,
@@ -14,6 +13,7 @@ import {
     CanAddProdution,
     CanDeleteProdution,
     DeleteProductionSum,
+    GetUnaffordableProduction,
 } from "../../../utils/PlacingUtils";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import type { GameResources } from "../../../types/Game/GameResources";
@@ -34,6 +34,8 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const currentBuilding = GameMapData.placedBuildings.find((b) => b.MapBuildingId === building.MapBuildingId)!;
     const currentLevel = currentBuilding.buildingType.upgrades[currentBuilding.level - 1];
     const isMaxLevel = currentBuilding.level >= currentBuilding.buildingType.upgrades.length;
+
+    const unaffordableProduction = GetUnaffordableProduction(currentLevel.upgradeProductions, GameResources);
 
     const allNaturalFeatures = GameMapData.ActiveNaturalFeatures
         ? Object.values(GameMapData.ActiveNaturalFeatures)
@@ -165,36 +167,40 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
             <div className={styles.row}>
                 <h3>Synergy</h3>
                 <div style={{ fontSize: "0.75rem" }}>
-                    <ToggleButton options={["incoming", "outgoing"]} onChange={(x) => setIO([false, true][x])} isIcons={true} />
+                    <ToggleButton
+                        options={["incoming", "outgoing"]}
+                        onChange={(x) => setIO([false, true][x])}
+                        isIcons={true}
+                    />
                 </div>
             </div>
             <div className={styles.synergies}>
                 {synergies.length === 0
                     ? "No synergies found"
                     : synergies.map((synergyGroup) => {
-                        const name = synergyGroup.otherBuilding
-                            ? synergyGroup.otherBuilding.buildingType.name
-                            : synergyGroup.naturalFeature?.type || "Unknown";
-                        const id = synergyGroup.otherBuilding
-                            ? synergyGroup.otherBuilding.MapBuildingId
-                            : synergyGroup.naturalFeature?.id || "unknown";
+                          const name = synergyGroup.otherBuilding
+                              ? synergyGroup.otherBuilding.buildingType.name
+                              : synergyGroup.naturalFeature?.type || "Unknown";
+                          const id = synergyGroup.otherBuilding
+                              ? synergyGroup.otherBuilding.MapBuildingId
+                              : synergyGroup.naturalFeature?.id || "unknown";
 
-                        return (
-                            <SynergyDisplay
-                                key={id}
-                                id={id}
-                                name={name}
-                                productions={synergyGroup.productions.map((p) => {
-                                    let detlaValue = 0;
-                                    return {
-                                        production: p,
-                                        detlaValue,
-                                    };
-                                })}
-                                amount={synergyGroup.count > 1 ? synergyGroup.count : null}
-                            />
-                        );
-                    })}
+                          return (
+                              <SynergyDisplay
+                                  key={id}
+                                  id={id}
+                                  name={name}
+                                  productions={synergyGroup.productions.map((p) => {
+                                      let detlaValue = 0;
+                                      return {
+                                          production: p,
+                                          detlaValue,
+                                      };
+                                  })}
+                                  amount={synergyGroup.count > 1 ? synergyGroup.count : null}
+                              />
+                          );
+                      })}
             </div>
             <div className={styles.row}>
                 {isMaxLevel && <h3>Max level</h3>}
@@ -211,6 +217,11 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                         <ShowInfo
                             key={`${product.type}:${product.value}`}
                             gameStyle={true}
+                            style={
+                                {
+                                    opacity: unaffordableProduction.has(product.type.toLowerCase()) ? ".2" : "1",
+                                } as React.CSSProperties
+                            }
                             left={
                                 <div className={`${styles.icon} icon`}>
                                     {product.type.toLowerCase() == "energy"

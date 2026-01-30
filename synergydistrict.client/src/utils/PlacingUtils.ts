@@ -488,7 +488,15 @@ export const GetUnaffordableResources = (building: BuildingType, variables: Game
         unaffordable.add("moneyBalance");
     }
 
-    for (const product of building.baseProduction || []) {
+    GetUnaffordableProduction(building.baseProduction, variables).forEach((res) => unaffordable.add(res));
+
+    return unaffordable;
+};
+
+export const GetUnaffordableProduction = (production: Production[], variables: GameResources): Set<string> => {
+    const unaffordable = new Set<string>();
+
+    for (const product of production || []) {
         const resourceKey = product.type.toLowerCase() as keyof GameResources;
         const currentValue = variables[resourceKey];
 

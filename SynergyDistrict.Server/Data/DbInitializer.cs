@@ -555,7 +555,7 @@ namespace SynergyDistrict.Server.Data
             foreach (var building in buildings)
             {
                 // Park broadcast
-                if (building.SynergyItem.Name != "Park")
+                if (building.SynergyItem.Name != "Park" && building.SynergyItem.Name != "House")
                 {
                     synergies.Add(new Synergy
                     {
