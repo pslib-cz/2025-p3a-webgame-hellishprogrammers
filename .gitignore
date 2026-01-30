@@ -5,6 +5,8 @@
 
 # databse
 *.sqlite
+*.sqlite-shm
+*.sqlite-wal
 
 # dotenv files
 .env
