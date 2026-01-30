@@ -4,6 +4,7 @@ import { Layer, Image, Group, Shape, Circle, Text } from "react-konva";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
 import { useBuildingsBitmap } from "../../../hooks/providers/useBuildingsBitmap";
 import { useImageBitmap } from "../../../hooks/useImage";
+import useFont from "../../../hooks/useFont";
 
 type BuildingsLayerProps = {
     buildings: MapBuilding[];
@@ -16,6 +17,7 @@ const BUILDING_LEVEL_NUMBER = "#FEFAE0";
 const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
     const { TILE_SIZE } = useGameProperties();
     const { buildingsBitmap } = useBuildingsBitmap();
+    useFont("700 16px Space Mono");
 
     const { bitmap: err, loading } = useImageBitmap("/images/err.jpg");
 
@@ -60,6 +62,8 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
                                         text={building.level.toString()}
                                         fill={BUILDING_LEVEL_NUMBER}
                                         fontSize={TILE_SIZE / 6}
+                                        fontFamily="Space Mono"
+                                        fontStyle="bold"
                                         align="center"
                                         verticalAlign="middle"
                                     />

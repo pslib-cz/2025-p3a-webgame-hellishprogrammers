@@ -259,7 +259,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                 </div>
             </div>
             <div className={styles.synergies}>
-                {synergies.map((synergyGroup) => {
+                {synergies.length === 0 ? "No synergies found" : synergies.map((synergyGroup) => {
                     const name = synergyGroup.otherBuilding
                         ? synergyGroup.otherBuilding.buildingType.name
                         : synergyGroup.naturalFeature?.type || "Unknown";
