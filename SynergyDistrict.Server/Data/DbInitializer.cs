@@ -552,7 +552,7 @@ namespace SynergyDistrict.Server.Data
 
             
             
-            foreach (var building in buildings)
+            /*foreach (var building in buildings)
             {
                 // Park broadcast
                 if (building.SynergyItem.Name != "Park" && building.SynergyItem.Name != "House")
@@ -567,7 +567,7 @@ namespace SynergyDistrict.Server.Data
                         ]
                     });
                 }
-            }
+            }*/
 
             context.BuildingSynergies.AddRange(synergies);
             context.SaveChanges();

@@ -237,7 +237,8 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
                     }
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
-                    {normalizedDisplayedSynergies.map((s) => {
+                    {normalizedDisplayedSynergies.length == 0 && filter == "current" ? <div>No synergies would be created</div>
+                    :normalizedDisplayedSynergies.map((s) => {
                         const otherId = ((): number => {
                             if (filter === "outgoing") return s.targetBuildingId;
                             if (filter === "incoming") return s.sourceBuildingId;
