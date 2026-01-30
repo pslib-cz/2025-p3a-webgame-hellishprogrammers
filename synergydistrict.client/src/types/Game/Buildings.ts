@@ -21,6 +21,7 @@ export type SynergyProjection = {
     sourceBuildingId: number;
     targetBuildingId: number;
     productionProjection: ProductionProjection[]
+    amount: number;
 }
 
 export type Edge = {

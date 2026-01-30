@@ -45,27 +45,28 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
         return s.sourceBuildingId == building.buildingId || s.targetBuildingId == building.buildingId;
     });
 
-    const normalizeSynergyToProjection = (s: any): SynergyProjection => {
+    const normalizeSynergyToProjection = (s: any, amount: number = 1): SynergyProjection => {
         const productionProjection: ProductionProjection[] = (s.synergyProductions || []).map((p: Production) => {
             const resourceKey = p.type.toLowerCase() as keyof typeof GameResources;
             const currentValue = (GameResources as any)[resourceKey];
             let detlaValue = 0;
+            const totalValue = p.value * amount;
 
             if (typeof currentValue === "number") {
-                if (resourceKey === "energy" && p.value < 0) {
-                    const usedAfter = GameResources.energyUsed - p.value;
+                if (resourceKey === "energy" && totalValue < 0) {
+                    const usedAfter = GameResources.energyUsed - totalValue;
                     detlaValue = Math.max(0, usedAfter - GameResources.energy);
-                } else if (resourceKey === "people" && p.value < 0) {
-                    const usedAfter = GameResources.peopleUsed - p.value;
+                } else if (resourceKey === "people" && totalValue < 0) {
+                    const usedAfter = GameResources.peopleUsed - totalValue;
                     detlaValue = Math.max(0, usedAfter - GameResources.people);
                 } else {
-                    const after = currentValue + p.value;
+                    const after = currentValue + totalValue;
                     detlaValue = after < 0 ? -after : 0;
                 }
             }
 
             return {
-                production: p,
+                production: { ...p, value: totalValue },
                 detlaValue,
             } as ProductionProjection;
         });
@@ -119,10 +120,32 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
         }
     });
 
-    // Normalize non-current synergies to SynergyProjection[] for rendering
-    const normalizedDisplayedSynergies: SynergyProjection[] = filter === "current"
-        ? (displayedSynergies as SynergyProjection[])
-        : (displayedSynergies as any[]).map(normalizeSynergyToProjection);
+    // Normalize synergies to SynergyProjection[] for rendering and group duplicates by otherId
+    type ExtendedSynergyProjection = SynergyProjection & { amount?: number };
+
+    let normalizedDisplayedSynergies: ExtendedSynergyProjection[] = [];
+
+    if (filter === "current") {
+        // `displayedSynergies` comes from GetPreviewSynergies and already contains correct `amount`
+        normalizedDisplayedSynergies = (displayedSynergies as SynergyProjection[]).map((s) => ({ ...(s as SynergyProjection) }));
+    } else {
+        const groupMap = new Map<number, { sample: any; count: number }>();
+        (displayedSynergies as any[]).forEach((s) => {
+            const otherId = ((): number => {
+                if (filter === "outgoing") return s.targetBuildingId;
+                if (filter === "incoming") return s.sourceBuildingId;
+                return s.sourceBuildingId === building.buildingId ? s.targetBuildingId : s.sourceBuildingId;
+            })();
+            const existing = groupMap.get(otherId);
+            if (existing) existing.count += 1;
+            else groupMap.set(otherId, { sample: s, count: 1 });
+        });
+
+        normalizedDisplayedSynergies = Array.from(groupMap.values()).map(({ sample }) => {
+            const proj = normalizeSynergyToProjection(sample, 1);
+            return { ...(proj as SynergyProjection) } as ExtendedSynergyProjection;
+        });
+    }
 
     return (
         <div className={styles.buildingDocs} style={{ userSelect: "none" }}>
@@ -229,7 +252,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
                                 key={Math.random()}
                                 id={otherId.toString()}
                                 name={other}
-                                amount={null}
+                                amount={filter === "current" ? (s.amount ?? null) : null}
                                 productions={s.productionProjection}
                                 highlight={filter == "current"}
                             />
