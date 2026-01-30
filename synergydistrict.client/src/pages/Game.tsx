@@ -31,7 +31,7 @@ const Game = () => {
     const [selectedBuilding, setSelectedBuilding] = useState<MapBuilding | null>(null);
     const [buildingPreview, setBuildingPreview] = useState<MapBuilding | null>(null);
     const [buildingPreviewPosition, setBuildingPreviewPosition] = useState<Position | null>(null);
-    const [buildingPreviewPlaceable, setBuildingPreviewPlaceable] = useState<boolean>(false);
+    const [, setBuildingPreviewPlaceable] = useState<boolean>(false);
     const [isPaused, setIsPaused] = useState(false);
     const { options } = useGameOptions();
     const { GameMapData, setGameMapData } = useGameMapData();
@@ -50,7 +50,7 @@ const Game = () => {
 
     const previewSynergies = useMemo(() => {
         if (!activeBuildingType || !buildingPreview || !buildingPreviewPosition)
-            return [] as import("../types/Game/Buildings").BuildingSynergy[];
+            return [] as import("../types/Game/Buildings").SynergyProjection[];
 
         return GetPreviewSynergies(
             buildingPreview.buildingType,
@@ -59,6 +59,7 @@ const Game = () => {
             naturalFeatures,
             synergies,
             GameMapData.loadedMapTiles,
+            GameResources,
         );
     }, [
         activeBuildingType,

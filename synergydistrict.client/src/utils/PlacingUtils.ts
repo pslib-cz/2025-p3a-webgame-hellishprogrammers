@@ -1,5 +1,5 @@
 import type { BuildingTileType, TileType } from "../types";
-import type { BuildingSynergy, BuildingType, Edge, Production } from "../types/Game/Buildings";
+import type { BuildingSynergy, BuildingType, Edge, Production, SynergyProjection, ProductionProjection } from "../types/Game/Buildings";
 import type { GameResources } from "../types/Game/GameResources";
 import type { ActiveSynergies, EdgeSide, MapBuilding, MapTile, NaturalFeature, Position } from "../types/Game/Grid";
 
@@ -498,7 +498,7 @@ export const GetUnaffordableResources = (building: BuildingType, variables: Game
     const unaffordable = new Set<string>();
 
     if (building.cost > variables.moneyBalance) {
-        unaffordable.add("money");
+        unaffordable.add("moneyBalance");
     }
 
     for (const product of building.baseProduction || []) {
@@ -535,8 +535,9 @@ export const GetPreviewSynergies = (
     naturalFeatures: { synergyItemId: number; name: string }[] | undefined,
     synergies: BuildingSynergy[],
     loadedMapTiles: Record<string, MapTile>,
-): BuildingSynergy[] => {
-    const found = new Set<BuildingSynergy>();
+    variables: GameResources,
+): SynergyProjection[] => {
+    const found = new Map<string, SynergyProjection>();
 
     const possibleSynergies = synergies.filter(
         (s) => s.sourceBuildingId === buildingType.buildingId || s.targetBuildingId === buildingType.buildingId,
@@ -575,7 +576,38 @@ export const GetPreviewSynergies = (
 
                 for (const s of possibleSynergies) {
                     if (s.sourceBuildingId === id || s.targetBuildingId === id) {
-                        found.add(s);
+                        const key = `${s.sourceBuildingId}-${s.targetBuildingId}`;
+                        if (!found.has(key)) {
+                            const productionProjection: ProductionProjection[] = (s.synergyProductions || []).map((p) => {
+                                const resourceKey = p.type.toLowerCase() as keyof GameResources;
+                                const currentValue = (variables as any)[resourceKey];
+                                let detlaValue = 0;
+
+                                if (typeof currentValue === "number") {
+                                    if (resourceKey === "energy" && p.value < 0) {
+                                        const usedAfter = variables.energyUsed - p.value;
+                                        detlaValue = Math.max(0, usedAfter - variables.energy);
+                                    } else if (resourceKey === "people" && p.value < 0) {
+                                        const usedAfter = variables.peopleUsed - p.value;
+                                        detlaValue = Math.max(0, usedAfter - variables.people);
+                                    } else {
+                                        const after = currentValue + p.value;
+                                        detlaValue = after < 0 ? -after : 0;
+                                    }
+                                }
+
+                                return {
+                                    production: p,
+                                    detlaValue,
+                                } as ProductionProjection;
+                            });
+
+                            found.set(key, {
+                                sourceBuildingId: s.sourceBuildingId,
+                                targetBuildingId: s.targetBuildingId,
+                                productionProjection,
+                            });
+                        }
                     }
                 }
             }
@@ -585,14 +617,42 @@ export const GetPreviewSynergies = (
         for (const s of possibleSynergies) {
             const bId = buildingType.buildingId;
             const nId = neighbor.buildingType.buildingId;
-            if (
-                (s.sourceBuildingId === bId && s.targetBuildingId === nId) ||
-                (s.sourceBuildingId === nId && s.targetBuildingId === bId)
-            ) {
-                found.add(s);
+            if ((s.sourceBuildingId === bId && s.targetBuildingId === nId) || (s.sourceBuildingId === nId && s.targetBuildingId === bId)) {
+                const key = `${s.sourceBuildingId}-${s.targetBuildingId}`;
+                if (!found.has(key)) {
+                    const productionProjection: ProductionProjection[] = (s.synergyProductions || []).map((p) => {
+                        const resourceKey = p.type.toLowerCase() as keyof GameResources;
+                        const currentValue = (variables as any)[resourceKey];
+                        let detlaValue = 0;
+
+                        if (typeof currentValue === "number") {
+                            if (resourceKey === "energy" && p.value < 0) {
+                                const usedAfter = variables.energyUsed - p.value;
+                                detlaValue = Math.max(0, usedAfter - variables.energy);
+                            } else if (resourceKey === "people" && p.value < 0) {
+                                const usedAfter = variables.peopleUsed - p.value;
+                                detlaValue = Math.max(0, usedAfter - variables.people);
+                            } else {
+                                const after = currentValue + p.value;
+                                detlaValue = after < 0 ? -after : 0;
+                            }
+                        }
+
+                        return {
+                            production: p,
+                            detlaValue,
+                        } as ProductionProjection;
+                    });
+
+                    found.set(key, {
+                        sourceBuildingId: s.sourceBuildingId,
+                        targetBuildingId: s.targetBuildingId,
+                        productionProjection,
+                    });
+                }
             }
         }
     }
 
-    return Array.from(found);
+    return Array.from(found.values());
 };

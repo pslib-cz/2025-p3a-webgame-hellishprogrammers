@@ -2,7 +2,7 @@ import { type FC, useEffect, useRef, useState } from "react";
 import ProductionListing from "../../../components/Game/ProductionListing/ProductionListing";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import ShowInfo from "../../../components/ShowInfo/ShowInfo";
-import type { BuildingSynergy, BuildingType } from "../../../types/Game/Buildings";
+import type { BuildingType, SynergyProjection, ProductionProjection, Production } from "../../../types/Game/Buildings";
 import styles from "./BuildingDocs.module.css";
 import { useBuildingsBitmap } from "../../../hooks/providers/useBuildingsBitmap";
 import TextButton from "../../../components/Buttons/TextButton/TextButton";
@@ -23,7 +23,7 @@ const buildingCategories: BuildingCategory[] = [
 
 type BuildingDocsProps = {
     building: BuildingType;
-    activeSynergies: BuildingSynergy[]
+    activeSynergies: SynergyProjection[]
 };
 
 type SynergyFilter = "incoming" | "outgoing" | "current"
@@ -45,18 +45,45 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
         return s.sourceBuildingId == building.buildingId || s.targetBuildingId == building.buildingId;
     });
 
+    const normalizeSynergyToProjection = (s: any): SynergyProjection => {
+        const productionProjection: ProductionProjection[] = (s.synergyProductions || []).map((p: Production) => {
+            const resourceKey = p.type.toLowerCase() as keyof typeof GameResources;
+            const currentValue = (GameResources as any)[resourceKey];
+            let detlaValue = 0;
+
+            if (typeof currentValue === "number") {
+                if (resourceKey === "energy" && p.value < 0) {
+                    const usedAfter = GameResources.energyUsed - p.value;
+                    detlaValue = Math.max(0, usedAfter - GameResources.energy);
+                } else if (resourceKey === "people" && p.value < 0) {
+                    const usedAfter = GameResources.peopleUsed - p.value;
+                    detlaValue = Math.max(0, usedAfter - GameResources.people);
+                } else {
+                    const after = currentValue + p.value;
+                    detlaValue = after < 0 ? -after : 0;
+                }
+            }
+
+            return {
+                production: p,
+                detlaValue,
+            } as ProductionProjection;
+        });
+
+        return {
+            sourceBuildingId: s.sourceBuildingId,
+            targetBuildingId: s.targetBuildingId,
+            productionProjection,
+        } as SynergyProjection;
+    };
+
     useEffect(() => {
-        // Auto-switch to "current" when preview synergies are available.
-        // Only block auto-switch if the user explicitly selected "current" themselves.
         if (userSelectedFilter === "current") return;
 
         if (activeSynergies && activeSynergies.length > 0) {
             if (filter !== "current") setFilter("current");
             return;
         }
-
-        // If there are no active synergies and the user didn't lock to "current",
-        // revert to the default outgoing view.
         if (filter === "current") setFilter("outgoing");
     }, [activeSynergies, userSelectedFilter, filter]);
 
@@ -76,7 +103,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
         }
     }, [canvasRef, building]);
 
-    const displayedSynergies = filter == "current" ? activeSynergies
+    const displayedSynergies = filter == "current" ? (activeSynergies as SynergyProjection[])
     : possibleSynergies.filter((s) => {
         const otherId = ((): number => {
             if (filter === "outgoing") return s.targetBuildingId;
@@ -92,6 +119,11 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
         }
     });
 
+    // Normalize non-current synergies to SynergyProjection[] for rendering
+    const normalizedDisplayedSynergies: SynergyProjection[] = filter === "current"
+        ? (displayedSynergies as SynergyProjection[])
+        : (displayedSynergies as any[]).map(normalizeSynergyToProjection);
+
     return (
         <div className={styles.buildingDocs} style={{ userSelect: "none" }}>
             <div className={styles.title}>
@@ -99,7 +131,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
                 <span className={`${styles.icon} icon`}>{building.iconKey}</span>
             </div>
             <p>{building.description}</p>
-            <ProductionListing title="Cost" style={{ opacity: unaffordableResources.has("money") ? ".2" : "1" } as React.CSSProperties}>
+            <ProductionListing title="Cost" style={{ opacity: unaffordableResources.has("moneyBalance") ? ".2" : "1" } as React.CSSProperties}>
                 <ValuesBox
                     iconKey="money"
                     text={building.cost.toString()}
@@ -162,7 +194,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
                         ></TextButton>
                     ))}
                     {
-                        possibleSynergies.some(s => {
+                        filter == "current" ? null :(possibleSynergies.some(s => {
                             const otherId = ((): number => {
                                 if (filter === "outgoing") return s.targetBuildingId;
                                 if (filter === "incoming") return s.sourceBuildingId;
@@ -177,11 +209,11 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
                                 bacgroundColor={`--forest--dark`}
                                 textAlign="left"
                                 onClick={() => setSelectedCategory("NaturalFeatures")}
-                            ></TextButton> : null
+                            ></TextButton> : null)
                     }
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: ".5rem" }}>
-                    {displayedSynergies.map((s) => {
+                    {normalizedDisplayedSynergies.map((s) => {
                         const otherId = ((): number => {
                             if (filter === "outgoing") return s.targetBuildingId;
                             if (filter === "incoming") return s.sourceBuildingId;
@@ -199,7 +231,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
                                 id={otherId.toString()}
                                 name={other}
                                 amount={null}
-                                productions={s.synergyProductions}
+                                productions={s.productionProjection}
                                 highlight={filter == "current"}
                             />
                         );

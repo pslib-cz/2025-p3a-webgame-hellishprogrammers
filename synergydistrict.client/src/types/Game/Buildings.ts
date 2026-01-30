@@ -12,6 +12,17 @@ export type Production = {
     value: number;
 };
 
+export type ProductionProjection = {
+    production: Production
+    detlaValue: number
+}
+
+export type SynergyProjection = {
+    sourceBuildingId: number;
+    targetBuildingId: number;
+    productionProjection: ProductionProjection[]
+}
+
 export type Edge = {
     position: Position;
     side: EdgeSide;
