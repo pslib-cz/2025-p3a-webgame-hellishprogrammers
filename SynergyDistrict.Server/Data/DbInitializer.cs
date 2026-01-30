@@ -56,6 +56,39 @@ namespace SynergyDistrict.Server.Data
                     [
                         new BuildingProduction { Type = BuildingProductionType.People, Value = -3 },
                         new BuildingProduction { Type = BuildingProductionType.Industry, Value = 1 },
+                    ],
+                    Upgrades =
+                    [
+                        new BuildingUpgrade {
+                            UpgradeCost = 150,
+                            DeleteCost = 50,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = -3 },
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = 1 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -1 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 600,
+                            DeleteCost = 200,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = -3 },
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = 1 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -2 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 1000,
+                            DeleteCost = 350,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = -3 },
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = 1 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -3 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            DeleteCost = 500,
+                        },
                     ]
                 },
                 new Building
@@ -74,6 +107,39 @@ namespace SynergyDistrict.Server.Data
                     [
                         new BuildingProduction { Type = BuildingProductionType.People, Value = -5 },
                         new BuildingProduction { Type = BuildingProductionType.Industry, Value = 4 },
+                    ],
+                    Upgrades =
+                    [
+                        new BuildingUpgrade {
+                            UpgradeCost = 450,
+                            DeleteCost = 150,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = -5 },
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = 4 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -1 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 1800,
+                            DeleteCost = 600,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = -5 },
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = 4 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -2 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 3000,
+                            DeleteCost = 1050,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = -5 },
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = 4 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -3 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            DeleteCost = 1500,
+                        },
                     ]
                 },
                 new Building
@@ -92,6 +158,39 @@ namespace SynergyDistrict.Server.Data
                     [
                         new BuildingProduction { Type = BuildingProductionType.People, Value = -10 },
                         new BuildingProduction { Type = BuildingProductionType.Industry, Value = 2 },
+                    ],
+                    Upgrades =
+                    [
+                        new BuildingUpgrade {
+                            UpgradeCost = 75,
+                            DeleteCost = 25,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = -10 },
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = 2 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -1 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 300,
+                            DeleteCost = 100,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = -10 },
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = 2 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -2 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 500,
+                            DeleteCost = 175,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = -10 },
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = 2 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -3 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            DeleteCost = 250,
+                        },
                     ]
                 },
                 new Building
@@ -110,6 +209,42 @@ namespace SynergyDistrict.Server.Data
                         new BuildingProduction { Type = BuildingProductionType.People, Value = -15 },
                         new BuildingProduction { Type = BuildingProductionType.Industry, Value = -50 },
                         new BuildingProduction { Type = BuildingProductionType.Money, Value = 20 },
+                    ],
+                    Upgrades =
+                    [
+                        new BuildingUpgrade {
+                            UpgradeCost = 1500,
+                            DeleteCost = 500,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = -15 },
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = -50 },
+                                new BuildingProduction { Type = BuildingProductionType.Money, Value = 20 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -1 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 6000,
+                            DeleteCost = 2000,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = -15 },
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = -50 },
+                                new BuildingProduction { Type = BuildingProductionType.Money, Value = 20 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -2 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 10000,
+                            DeleteCost = 3500,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = -15 },
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = -50 },
+                                new BuildingProduction { Type = BuildingProductionType.Money, Value = 20 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -3 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            DeleteCost = 5000,
+                        },
                     ]
                 },
                 new Building
@@ -128,6 +263,39 @@ namespace SynergyDistrict.Server.Data
                     [
                         new BuildingProduction { Type = BuildingProductionType.People, Value = 2 },
                         new BuildingProduction { Type = BuildingProductionType.Happiness, Value = -5 },
+                    ],
+                    Upgrades =
+                    [
+                        new BuildingUpgrade {
+                            UpgradeCost = 150,
+                            DeleteCost = 50,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = 2 },
+                                new BuildingProduction { Type = BuildingProductionType.Happiness, Value = -5 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -1 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 600,
+                            DeleteCost = 200,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = 2 },
+                                new BuildingProduction { Type = BuildingProductionType.Happiness, Value = -5 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -2 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 1000,
+                            DeleteCost = 350,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.People, Value = 2 },
+                                new BuildingProduction { Type = BuildingProductionType.Happiness, Value = -5 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -3 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            DeleteCost = 500,
+                        },
                     ]
                 },
                 new Building
@@ -146,6 +314,39 @@ namespace SynergyDistrict.Server.Data
                     [
                         new BuildingProduction { Type = BuildingProductionType.Money, Value = -3 },
                         new BuildingProduction { Type = BuildingProductionType.Happiness, Value = 2 },
+                    ],
+                    Upgrades =
+                    [
+                        new BuildingUpgrade {
+                            UpgradeCost = 750,
+                            DeleteCost = 250,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.Money, Value = -3 },
+                                new BuildingProduction { Type = BuildingProductionType.Happiness, Value = 2 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -1 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 3000,
+                            DeleteCost = 1000,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.Money, Value = -3 },
+                                new BuildingProduction { Type = BuildingProductionType.Happiness, Value = 2 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -2 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 5000,
+                            DeleteCost = 1750,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.Money, Value = -3 },
+                                new BuildingProduction { Type = BuildingProductionType.Happiness, Value = 2 },
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -3 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            DeleteCost = 2500,
+                        },
                     ]
                 },
                 new Building
@@ -154,7 +355,7 @@ namespace SynergyDistrict.Server.Data
                     Type = BuildingType.Commercial,
                     Description = "Administrative center of Synergy District. Coordinates city-wide efficiency and provides the initial power grid setup.",
                     IconKey = "townhall",
-                    Cost = 0,
+                    Cost = 300,
                     Shape =
                     [
                         [BuildingTileType.Icon, BuildingTileType.Solid],
@@ -164,6 +365,39 @@ namespace SynergyDistrict.Server.Data
                     [
                         new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },
                         new BuildingProduction { Type = BuildingProductionType.Money, Value = 1}
+                    ],
+                    Upgrades =
+                    [
+                        new BuildingUpgrade {
+                            UpgradeCost = 200,
+                            DeleteCost = 100,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },
+                                new BuildingProduction { Type = BuildingProductionType.Money, Value = 1},
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -1 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 800,
+                            DeleteCost = 400,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },
+                                new BuildingProduction { Type = BuildingProductionType.Money, Value = 1},
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -2 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 1500,
+                            DeleteCost = 750,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },
+                                new BuildingProduction { Type = BuildingProductionType.Money, Value = 1},
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -3 },
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            DeleteCost = 1500,
+                        },
                     ]
                 },
                 new Building
@@ -180,7 +414,34 @@ namespace SynergyDistrict.Server.Data
                     ],
                     BaseProduction =
                     [
-
+                        
+                    ],
+                    Upgrades =
+                    [
+                        new BuildingUpgrade {
+                            UpgradeCost = 750,
+                            DeleteCost = 250,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -1 }
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 3000,
+                            DeleteCost = 1000,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -2 }
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 5000,
+                            DeleteCost = 1750,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -3 }
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            DeleteCost = 2500,
+                        },
                     ]
                 },
             };

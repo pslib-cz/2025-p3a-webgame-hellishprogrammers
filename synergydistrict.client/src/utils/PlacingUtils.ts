@@ -96,13 +96,6 @@ export const MaterializeNaturalFeatures = (
 };
 
 export const CanAfford = (building: BuildingType, variables: GameResources, placedBuildings: MapBuilding[] = []) => {
-    if (building.name === "Town Hall") {
-        const townHallExists = placedBuildings.some(
-            (placedBuilding) => placedBuilding.buildingType.name === "Town Hall"
-        );
-        if (townHallExists) return false;
-    }
-
     if (building.cost > variables.moneyBalance) return false;
 
     if (!CanAddProdution(building.baseProduction || [], variables)) return false;
@@ -592,7 +585,10 @@ export const GetPreviewSynergies = (
         for (const s of possibleSynergies) {
             const bId = buildingType.buildingId;
             const nId = neighbor.buildingType.buildingId;
-            if ((s.sourceBuildingId === bId && s.targetBuildingId === nId) || (s.sourceBuildingId === nId && s.targetBuildingId === bId)) {
+            if (
+                (s.sourceBuildingId === bId && s.targetBuildingId === nId) ||
+                (s.sourceBuildingId === nId && s.targetBuildingId === bId)
+            ) {
                 found.add(s);
             }
         }
@@ -600,5 +596,3 @@ export const GetPreviewSynergies = (
 
     return Array.from(found);
 };
-
-

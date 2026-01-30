@@ -17,6 +17,12 @@ export type Edge = {
     side: EdgeSide;
 };
 
+export type BuildingUpgrades = {
+    upgradeCost: number;
+    deleteCost: number;
+    upgradeProductions: Production[];
+};
+
 export type BuildingType = {
     buildingId: number;
     name: string;
@@ -26,5 +32,6 @@ export type BuildingType = {
     cost: number;
     shape: BuildingTileType[][];
     baseProduction: Production[];
+    upgrades: BuildingUpgrades[];
     edges: Edge[];
 };

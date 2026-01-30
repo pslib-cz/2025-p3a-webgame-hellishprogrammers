@@ -38,6 +38,16 @@ namespace SynergyDistrict.Server.Controllers
                     {
                         Value = p.Value,
                         Type = p.Type,
+                    }),
+                    Upgrades = b.Upgrades.Select(u => new BuildingUpgradeDTO
+                    {
+                        UpgradeCost = u.UpgradeCost,
+                        DeleteCost = u.DeleteCost,
+                        UpgradeProductions = u.UpgradeProductions.Select(p => new BuildingProductionDTO
+                        {
+                            Value = p.Value,
+                            Type = p.Type,
+                        })
                     })
                 })
                 .ToList();

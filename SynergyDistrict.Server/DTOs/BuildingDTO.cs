@@ -12,5 +12,6 @@ namespace SynergyDistrict.Server.DTOs
         public int Cost { get; set; }
         public required BuildingTileType[][] Shape { get; set; }
         public IEnumerable<BuildingProductionDTO> BaseProduction { get; set; } = [];
+        public IEnumerable<BuildingUpgradeDTO> Upgrades { get; set; } = [];
     }
 }

@@ -13,6 +13,7 @@ namespace SynergyDistrict.Server.Data
 
         public DbSet<Building> Buildings { get; set; }
         public DbSet<BuildingProduction> BuildingProductions { get; set; }
+        public DbSet<BuildingUpgrade> BuildingUpgrades { get; set; }
         public DbSet<Synergy> BuildingSynergies { get; set; }
 
         public DbSet<SynergyItem> SynergyItems { get; set; }

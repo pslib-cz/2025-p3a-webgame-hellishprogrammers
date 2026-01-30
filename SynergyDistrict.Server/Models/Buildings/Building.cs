@@ -25,6 +25,7 @@ namespace SynergyDistrict.Server.Models.Buildings
         public string ShapeSerialized { get; set; } = string.Empty;
 
         public ICollection<BuildingProduction> BaseProduction { get; set; } = [];
+        public ICollection<BuildingUpgrade> Upgrades { get; set; } = [];
     }
 
     public enum BuildingType
