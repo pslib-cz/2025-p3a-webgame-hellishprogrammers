@@ -46,7 +46,7 @@ namespace SynergyDistrict.Server.Data
                     Type = BuildingType.Extractional,
                     Description = "Automated logging unit. Harvests resources from nearby woodlands. Warning: High decibel output affects residential zones.",
                     IconKey = "lumberjack",
-                    Cost = 100,
+                    Cost = 500,
                     Shape =
                     [
                         [BuildingTileType.Solid, BuildingTileType.Icon, BuildingTileType.Empty],
@@ -97,7 +97,7 @@ namespace SynergyDistrict.Server.Data
                     Type = BuildingType.Extractional,
                     Description = "Deep-crust drilling operation. Maximizes raw material output. Causes severe happiness penalty in the immediate vicinity.",
                     IconKey = "mine",
-                    Cost = 300,
+                    Cost = 1500,
                     Shape =
                     [
                         [BuildingTileType.Solid, BuildingTileType.Icon],
@@ -148,7 +148,7 @@ namespace SynergyDistrict.Server.Data
                     Type = BuildingType.Extractional,
                     Description = "Sustainable agricultural zone. Essential for maintaining workforce levels. Benefits from adjacency to other farming units.",
                     IconKey = "farm",
-                    Cost = 50,
+                    Cost = 450,
                     Shape =
                     [
                         [BuildingTileType.Empty, BuildingTileType.Icon, BuildingTileType.Solid],
@@ -199,7 +199,7 @@ namespace SynergyDistrict.Server.Data
                     Type = BuildingType.Industrial,
                     Description = "Processing facility for raw materials. Generates significant economic value but emits pollutants. Requires stable power connection.",
                     IconKey = "factory",
-                    Cost = 1000,
+                    Cost = 3500,
                     Shape =
                     [
                         [BuildingTileType.Solid, BuildingTileType.Icon, BuildingTileType.Solid, BuildingTileType.Solid]
@@ -253,7 +253,7 @@ namespace SynergyDistrict.Server.Data
                     Type = BuildingType.Residential,
                     Description = "Standard living quarters for the workforce. Tax revenue scales dynamically with the satisfaction level of tenants.",
                     IconKey = "house",
-                    Cost = 100,
+                    Cost = 1750,
                     Shape =
                     [
                         [BuildingTileType.Solid, BuildingTileType.Icon, BuildingTileType.Solid],
@@ -304,7 +304,7 @@ namespace SynergyDistrict.Server.Data
                     Type = BuildingType.Recreational,
                     Description = "Designated recreational area. Counteracts the negative psychological effects of industrialization. Requires daily upkeep.",
                     IconKey = "park",
-                    Cost = 500,
+                    Cost = 800,
                     Shape =
                     [
                         [BuildingTileType.Solid, BuildingTileType.Solid, BuildingTileType.Icon],
@@ -355,7 +355,7 @@ namespace SynergyDistrict.Server.Data
                     Type = BuildingType.Commercial,
                     Description = "Administrative center of Synergy District. Coordinates city-wide efficiency and provides the initial power grid setup.",
                     IconKey = "townhall",
-                    Cost = 300,
+                    Cost = 1200,
                     Shape =
                     [
                         [BuildingTileType.Icon, BuildingTileType.Solid],
@@ -374,7 +374,6 @@ namespace SynergyDistrict.Server.Data
                             UpgradeProductions = [
                                 new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },
                                 new BuildingProduction { Type = BuildingProductionType.Money, Value = 1},
-                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -1 },
                             ]
                         },
                         new BuildingUpgrade {
@@ -383,7 +382,6 @@ namespace SynergyDistrict.Server.Data
                             UpgradeProductions = [
                                 new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },
                                 new BuildingProduction { Type = BuildingProductionType.Money, Value = 1},
-                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -2 },
                             ]
                         },
                         new BuildingUpgrade {
@@ -392,7 +390,6 @@ namespace SynergyDistrict.Server.Data
                             UpgradeProductions = [
                                 new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },
                                 new BuildingProduction { Type = BuildingProductionType.Money, Value = 1},
-                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = -3 },
                             ]
                         },
                         new BuildingUpgrade {
@@ -406,7 +403,7 @@ namespace SynergyDistrict.Server.Data
                     Type = BuildingType.Commercial,
                     Description = "Small-scale commercial outlet. Provides goods for local residents. Operational only when placed near populated areas.",
                     IconKey = "shop",
-                    Cost = 500,
+                    Cost = 800,
                     Shape =
                     [
                         [BuildingTileType.Empty, BuildingTileType.Solid, BuildingTileType.Solid],
@@ -496,7 +493,8 @@ namespace SynergyDistrict.Server.Data
                     TargetSynergyItem = buildingMap["House"].SynergyItem,
                     SynergyProductions =
                     [
-                        new BuildingProduction { Type = BuildingProductionType.People, Value = 1 }
+                        new BuildingProduction { Type = BuildingProductionType.People, Value = 1 },
+                        new BuildingProduction { Type = BuildingProductionType.Happiness, Value= - 1 }
                     ]
                 },
                 new Synergy
