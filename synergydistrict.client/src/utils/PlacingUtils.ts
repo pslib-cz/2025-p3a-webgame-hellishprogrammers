@@ -95,7 +95,7 @@ export const MaterializeNaturalFeatures = (
     return materializedFeatures;
 };
 
-export const CanAfford = (building: BuildingType, variables: GameResources, placedBuildings: MapBuilding[] = []) => {
+export const CanAfford = (building: BuildingType, variables: GameResources, _placedBuildings: MapBuilding[] = []) => {
     if (building.cost > variables.moneyBalance) return false;
 
     if (!CanAddProdution(building.baseProduction || [], variables)) return false;
@@ -534,6 +534,40 @@ export const GetPreviewSynergies = (
 ): SynergyProjection[] => {
     const found = new Map<string, SynergyProjection>();
 
+    const computeProjection = (s: BuildingSynergy, amount: number): SynergyProjection => {
+        const productionProjection: ProductionProjection[] = (s.synergyProductions || []).map((p) => {
+            const resourceKey = p.type.toLowerCase() as keyof GameResources;
+            const currentValue = (variables as any)[resourceKey];
+            let detlaValue = 0;
+            const totalValue = p.value * amount;
+
+            if (typeof currentValue === "number") {
+                if (resourceKey === "energy" && totalValue < 0) {
+                    const usedAfter = variables.energyUsed - totalValue;
+                    detlaValue = Math.max(0, usedAfter - variables.energy);
+                } else if (resourceKey === "people" && totalValue < 0) {
+                    const usedAfter = variables.peopleUsed - totalValue;
+                    detlaValue = Math.max(0, usedAfter - variables.people);
+                } else {
+                    const after = currentValue + totalValue;
+                    detlaValue = after < 0 ? -after : 0;
+                }
+            }
+
+            return {
+                production: { ...p, value: totalValue },
+                detlaValue,
+            } as ProductionProjection;
+        });
+
+        return {
+            sourceBuildingId: s.sourceBuildingId,
+            targetBuildingId: s.targetBuildingId,
+            productionProjection,
+            amount,
+        } as SynergyProjection;
+    };
+
     const possibleSynergies = synergies.filter(
         (s) => s.sourceBuildingId === buildingType.buildingId || s.targetBuildingId === buildingType.buildingId,
     );
@@ -565,44 +599,20 @@ export const GetPreviewSynergies = (
             const neighborTileKey = `${neighborPosX};${neighborPosY}`;
             const neighborTile = loadedMapTiles[neighborTileKey];
 
-            if (neighborTile && neighborTile.hasIcon && naturalFeatures) {
+                if (neighborTile && neighborTile.hasIcon && naturalFeatures) {
                 const id = naturalFeatures.find((n) => n.name === neighborTile.tileType.toString())?.synergyItemId;
                 if (id == null) continue;
 
                 for (const s of possibleSynergies) {
                     if (s.sourceBuildingId === id || s.targetBuildingId === id) {
-                        const key = `${s.sourceBuildingId}-${s.targetBuildingId}`;
-                        if (!found.has(key)) {
-                            const productionProjection: ProductionProjection[] = (s.synergyProductions || []).map((p) => {
-                                const resourceKey = p.type.toLowerCase() as keyof GameResources;
-                                const currentValue = (variables as any)[resourceKey];
-                                let detlaValue = 0;
-
-                                if (typeof currentValue === "number") {
-                                    if (resourceKey === "energy" && p.value < 0) {
-                                        const usedAfter = variables.energyUsed - p.value;
-                                        detlaValue = Math.max(0, usedAfter - variables.energy);
-                                    } else if (resourceKey === "people" && p.value < 0) {
-                                        const usedAfter = variables.peopleUsed - p.value;
-                                        detlaValue = Math.max(0, usedAfter - variables.people);
-                                    } else {
-                                        const after = currentValue + p.value;
-                                        detlaValue = after < 0 ? -after : 0;
-                                    }
-                                }
-
-                                return {
-                                    production: p,
-                                    detlaValue,
-                                } as ProductionProjection;
-                            });
-
-                            found.set(key, {
-                                sourceBuildingId: s.sourceBuildingId,
-                                targetBuildingId: s.targetBuildingId,
-                                productionProjection,
-                            });
-                        }
+                            const key = `${s.sourceBuildingId}-${s.targetBuildingId}`;
+                            if (!found.has(key)) {
+                                found.set(key, computeProjection(s, 1));
+                            } else {
+                                const existing = found.get(key)!;
+                                const newAmount = existing.amount + 1;
+                                found.set(key, computeProjection(s, newAmount));
+                            }
                     }
                 }
             }
@@ -615,35 +625,11 @@ export const GetPreviewSynergies = (
             if ((s.sourceBuildingId === bId && s.targetBuildingId === nId) || (s.sourceBuildingId === nId && s.targetBuildingId === bId)) {
                 const key = `${s.sourceBuildingId}-${s.targetBuildingId}`;
                 if (!found.has(key)) {
-                    const productionProjection: ProductionProjection[] = (s.synergyProductions || []).map((p) => {
-                        const resourceKey = p.type.toLowerCase() as keyof GameResources;
-                        const currentValue = (variables as any)[resourceKey];
-                        let detlaValue = 0;
-
-                        if (typeof currentValue === "number") {
-                            if (resourceKey === "energy" && p.value < 0) {
-                                const usedAfter = variables.energyUsed - p.value;
-                                detlaValue = Math.max(0, usedAfter - variables.energy);
-                            } else if (resourceKey === "people" && p.value < 0) {
-                                const usedAfter = variables.peopleUsed - p.value;
-                                detlaValue = Math.max(0, usedAfter - variables.people);
-                            } else {
-                                const after = currentValue + p.value;
-                                detlaValue = after < 0 ? -after : 0;
-                            }
-                        }
-
-                        return {
-                            production: p,
-                            detlaValue,
-                        } as ProductionProjection;
-                    });
-
-                    found.set(key, {
-                        sourceBuildingId: s.sourceBuildingId,
-                        targetBuildingId: s.targetBuildingId,
-                        productionProjection,
-                    });
+                    found.set(key, computeProjection(s, 1));
+                } else {
+                    const existing = found.get(key)!;
+                    const newAmount = existing.amount + 1;
+                    found.set(key, computeProjection(s, newAmount));
                 }
             }
         }
