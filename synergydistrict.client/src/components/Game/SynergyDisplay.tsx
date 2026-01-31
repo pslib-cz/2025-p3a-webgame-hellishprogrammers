@@ -8,9 +8,11 @@ type SynergyDisplayProps = {
     name: string;
     productions: ProductionProjection[];
     highlight?: boolean;
+    onMouseEnter?: (id: string) => void;
+    onMouseLeave?: () => void;
 };
 
-const SynergyDisplay: React.FC<SynergyDisplayProps> = ({ id, amount, name, productions, highlight }) => {
+const SynergyDisplay: React.FC<SynergyDisplayProps> = ({ id, amount, name, productions, highlight, onMouseEnter, onMouseLeave }) => {
     const highlightStyle: React.CSSProperties | undefined = highlight
         ? {
               boxShadow: "0 0 .8rem var(--text)",
@@ -18,7 +20,13 @@ const SynergyDisplay: React.FC<SynergyDisplayProps> = ({ id, amount, name, produ
         : undefined;
 
     return (
-        <ProductionListing key={`incoming-${id}`} title={`${name} ${amount ? `${amount}x` : ""}`} style={{...highlightStyle, opacity: productions.every(p => p.detlaValue > 0) ? 0.3 : 1}}>
+        <ProductionListing 
+            key={`incoming-${id}`} 
+            title={`${name} ${amount ? `${amount}x` : ""}`} 
+            style={{...highlightStyle, opacity: productions.every(p => p.detlaValue > 0) ? 0.3 : 1}}
+            onMouseEnter={() => onMouseEnter?.(id)}
+            onMouseLeave={() => onMouseLeave?.()}
+        >
             {productions.map((proj) => {
                 const product = proj.production;
                 const isUnaffordable = proj.detlaValue > 0;

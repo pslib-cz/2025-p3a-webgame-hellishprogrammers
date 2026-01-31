@@ -9,7 +9,7 @@ import { prepareGrid } from "./Shapes/GridShape";
 import useFont from "../../../hooks/useFont";
 import useStageTransform from "../../../hooks/useStateTransform";
 import useChunkLoader from "../../../hooks/useChunkLoader";
-import type { MapBuilding, MapTile, Position } from "../../../types/Game/Grid";
+import type { MapBuilding, MapTile, Position, ActiveSynergies } from "../../../types/Game/Grid";
 import BuildingsLayer from "./BuildingsLayer";
 import PreviewLayer from "./PreviewLayer";
 import { CalculateValues, CanPlaceBuilding } from "../../../utils/PlacingUtils";
@@ -38,6 +38,7 @@ type GameCanvasProps = {
     onBuildingClick: (building: MapBuilding | null) => void;
     previewBuilding: MapBuilding | null;
     onPreviewMove?: (position: Position | null, isPlaceable: boolean) => void;
+    highlightedEdges?: ActiveSynergies[];
 };
 
 const GameCanvas: FC<GameCanvasProps> = ({
@@ -47,6 +48,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
     previewBuilding,
     onPreviewMove,
     onBuildingClick,
+    highlightedEdges = [],
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -385,7 +387,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
                     chunkBitmaps={chunkBitmaps}
                 />
                 <GridLayer gridImage={gridBitmapRef.current} />
-                <BuildingsLayer buildings={GameMapData.placedBuildings} />
+                <BuildingsLayer buildings={GameMapData.placedBuildings} highlightedEdges={highlightedEdges} />
                 <PreviewLayer
                     previewBuilding={previewBuilding}
                     position={previewTile}

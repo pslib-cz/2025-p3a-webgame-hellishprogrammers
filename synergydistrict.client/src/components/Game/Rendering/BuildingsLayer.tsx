@@ -1,22 +1,23 @@
 import type { FC } from "react";
-import type { MapBuilding } from "../../../types/Game/Grid";
-import { Layer, Image, Group, Shape, Circle, Text } from "react-konva";
+import type { MapBuilding, ActiveSynergies } from "../../../types/Game/Grid";
+import { Layer, Image, Group, Shape, Circle, Text, Line } from "react-konva";
 import useGameProperties from "../../../hooks/providers/useGameProperties";
 import { useBuildingsBitmap } from "../../../hooks/providers/useBuildingsBitmap";
 import { useImageBitmap } from "../../../hooks/useImage";
 import useFont from "../../../hooks/useFont";
-import type { BuildingTileType } from "../../../types";
-import { getCubicArcLength } from "konva/lib/BezierFunctions";
 
 type BuildingsLayerProps = {
     buildings: MapBuilding[];
+    highlightedEdges?: ActiveSynergies[];
 };
 
-const SELECTION_OUTLINE_COLOR = "#FEFAE0";
+const SELECTION_OUTLINE_COLOR = "#191919";
 const BUILDING_LEVEL_BACKGROUND = "#191919";
 const BUILDING_LEVEL_NUMBER = "#FEFAE0";
+const HIGHLIGHT_EDGE_COLOR = "#FEFAE0";
+const OUTLINE_WIDTH = 4;
 
-const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
+const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges = [] }) => {
     const { TILE_SIZE } = useGameProperties();
     const { buildingsBitmap } = useBuildingsBitmap();
     useFont("700 16px Space Mono");
@@ -71,7 +72,7 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
                         y={baseY}
                         listening={false}
                         stroke={SELECTION_OUTLINE_COLOR}
-                        strokeWidth={outlineStrokeWidth}
+                        strokeWidth={OUTLINE_WIDTH}
                         perfectDrawEnabled={false}
                         sceneFunc={(context, shape) => {
                             context.beginPath();
@@ -126,6 +127,64 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
         );
     }
 
+    const renderHighlightedEdges = () => {
+        if (highlightedEdges.length === 0) return null;
+
+        return highlightedEdges.map((synergy, idx) => {
+            const sourceBuilding = buildings.find(b => b.MapBuildingId === synergy.sourceBuildingId);
+            
+            if (!sourceBuilding) return null;
+
+            const edge = synergy.edge;
+            const baseX = sourceBuilding.position.x * TILE_SIZE;
+            const baseY = sourceBuilding.position.y * TILE_SIZE;
+            
+            const relX = edge.position.x * TILE_SIZE;
+            const relY = edge.position.y * TILE_SIZE;
+            
+            let startX = baseX + relX;
+            let startY = baseY + relY;
+            let endX = startX;
+            let endY = startY;
+            
+            switch (edge.side) {
+                case "top":
+                    startY = baseY + relY;
+                    endY = baseY + relY;
+                    endX = startX + TILE_SIZE;
+                    break;
+                case "right":
+                    startX = baseX + relX + TILE_SIZE;
+                    endX = baseX + relX + TILE_SIZE;
+                    endY = startY + TILE_SIZE;
+                    break;
+                case "bottom":
+                    startY = baseY + relY + TILE_SIZE;
+                    endY = baseY + relY + TILE_SIZE;
+                    endX = startX + TILE_SIZE;
+                    break;
+                case "left":
+                    startX = baseX + relX;
+                    endX = baseX + relX;
+                    endY = startY + TILE_SIZE;
+                    break;
+            }
+            
+            const strokeWidth = OUTLINE_WIDTH;
+            
+            return (
+                <Line
+                    key={`highlight-${idx}-${synergy.sourceBuildingId}-${synergy.targetBuildingId}`}
+                    points={[startX, startY, endX, endY]}
+                    stroke={HIGHLIGHT_EDGE_COLOR}
+                    strokeWidth={strokeWidth}
+                    lineCap="round"
+                    listening={false}
+                />
+            );
+        });
+    };
+
     return (
         <Layer listening={false}>
             {loading ? (
@@ -142,8 +201,8 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings }) => {
                     return getBuilding(b)
                 })
             }
+            {renderHighlightedEdges()}
         </Layer>
     );
 };
-
 export default BuildingsLayer;

@@ -1,7 +1,7 @@
 import { useState, type FC } from "react";
 import styles from "./BuildingDetails.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
-import type { MapBuilding } from "../../../types/Game/Grid";
+import type { MapBuilding, ActiveSynergies } from "../../../types/Game/Grid";
 import { IconClose } from "../../../components/Icons";
 import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
@@ -24,9 +24,10 @@ import { getGroupedSynergies, sumProduction } from "../../../utils/upgradeUtils"
 type BuildingDetailsProps = {
     building: MapBuilding;
     CloseBar: () => void;
+    onHighlightEdges?: (edges: ActiveSynergies[]) => void;
 };
 
-const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
+const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighlightEdges }) => {
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
     const [IO, setIO] = useState<boolean>(false);
@@ -62,6 +63,22 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
     const totalIncomingProduction = sumProduction(incomingSynergiesList.flatMap((group) => group.productions));
 
     const totalOutgoingProduction = sumProduction(outgoingSynergiesList.flatMap((group) => group.productions));
+
+    const handleSynergyHover = (id: string) => {
+        const relevantSynergies = GameMapData.activeSynergies.filter((s) => {
+            if (IO) {
+                return s.sourceBuildingId === building.MapBuildingId && s.targetBuildingId === id;
+            } else {
+                return s.sourceBuildingId === id && s.targetBuildingId === building.MapBuildingId;
+            }
+        });
+        
+        onHighlightEdges?.(relevantSynergies);
+    };
+
+    const handleSynergyLeave = () => {
+        onHighlightEdges?.([]);
+    };
 
     const totalLevelProduction = currentBuilding.buildingType.upgrades
         .filter((u) => currentBuilding.buildingType.upgrades.indexOf(u) < currentBuilding.level - 1)
@@ -198,6 +215,8 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar }) => {
                                       };
                                   })}
                                   amount={synergyGroup.count > 1 ? synergyGroup.count : null}
+                                  onMouseEnter={handleSynergyHover}
+                                  onMouseLeave={handleSynergyLeave}
                               />
                           );
                       })}

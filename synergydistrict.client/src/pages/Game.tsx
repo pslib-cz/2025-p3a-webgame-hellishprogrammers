@@ -4,7 +4,7 @@ import GameCanvas from "../components/Game/Rendering/GameCanvas";
 import GameBar from "./Game/GameBar/GameBar";
 import { BuildingsBitmapProvider } from "../provider/BuildingsBitmapProvider";
 import { useGameOptions } from "../hooks/providers/useGameOptions";
-import type { MapBuilding, Position } from "../types/Game/Grid";
+import type { MapBuilding, Position, ActiveSynergies } from "../types/Game/Grid";
 import {
     CanPlaceBuilding,
     createEgdesForShape,
@@ -33,6 +33,7 @@ const Game = () => {
     const [buildingPreviewPosition, setBuildingPreviewPosition] = useState<Position | null>(null);
     const [, setBuildingPreviewPlaceable] = useState<boolean>(false);
     const [isPaused, setIsPaused] = useState(false);
+    const [highlightedEdges, setHighlightedEdges] = useState<ActiveSynergies[]>([]);
     const { options } = useGameOptions();
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
@@ -215,6 +216,10 @@ const Game = () => {
         setSelectedBuilding((prev) =>
             prev && building && prev.MapBuildingId === building.MapBuildingId ? null : building,
         );
+        
+        if (!building) {
+            setHighlightedEdges([]);
+        }
 
         setGameMapData((prev) => ({
             ...prev,
@@ -236,6 +241,7 @@ const Game = () => {
                         setBuildingPreviewPlaceable(!!isPlaceable);
                     }}
                     onBuildingClick={OnBuildingClick}
+                    highlightedEdges={highlightedEdges}
                 />
                 {!gameControl.isEnd && activeBuildingType && (
                     <BuildingDocs building={activeBuildingType} activeSynergies={previewSynergies} />
@@ -245,7 +251,11 @@ const Game = () => {
                 <div className={styles.nowPlaying}>Now Playing: {currentTrack}</div>
             )}
             {!gameControl.isEnd && selectedBuilding && (
-                <BuildingDetails building={selectedBuilding} CloseBar={() => OnBuildingClick(null)} />
+                <BuildingDetails 
+                    building={selectedBuilding} 
+                    CloseBar={() => OnBuildingClick(null)} 
+                    onHighlightEdges={setHighlightedEdges}
+                />
             )}
             {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}
             {gameControl.isEnd && <EndScreen />}
