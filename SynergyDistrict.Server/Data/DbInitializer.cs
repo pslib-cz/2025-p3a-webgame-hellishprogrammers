@@ -369,7 +369,7 @@ namespace SynergyDistrict.Server.Data
                     Upgrades =
                     [
                         new BuildingUpgrade {
-                            UpgradeCost = 200,
+                            UpgradeCost = 500,
                             DeleteCost = 100,
                             UpgradeProductions = [
                                 new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },
@@ -377,7 +377,7 @@ namespace SynergyDistrict.Server.Data
                             ]
                         },
                         new BuildingUpgrade {
-                            UpgradeCost = 800,
+                            UpgradeCost = 1000,
                             DeleteCost = 400,
                             UpgradeProductions = [
                                 new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },
@@ -385,7 +385,7 @@ namespace SynergyDistrict.Server.Data
                             ]
                         },
                         new BuildingUpgrade {
-                            UpgradeCost = 1500,
+                            UpgradeCost = 2000,
                             DeleteCost = 750,
                             UpgradeProductions = [
                                 new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },

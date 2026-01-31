@@ -32,7 +32,8 @@ const synergyFilter: SynergyFilter[] = ["incoming", "outgoing", "current"];
 const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
     const { buildingsBitmap } = useBuildingsBitmap();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState<BuildingCategory | "NaturalFeatures">("Residential");
+    const [selectedCategoryOutgoing, setSelectedCategoryOutgoing] = useState<BuildingCategory | "NaturalFeatures">("Residential");
+    const [selectedCategoryIncoming, setSelectedCategoryIncoming] = useState<BuildingCategory | "NaturalFeatures">("Residential");
     const { synergies, buildings, naturalFeatures } = useGameData();
     const { GameResources } = useGameResources();
     const unaffordableResources = GetUnaffordableResources(building, GameResources);
@@ -104,6 +105,46 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
         }
     }, [canvasRef, building]);
 
+    useEffect(() => {
+        const updateFor = (
+            possibleList: any[],
+            selected: BuildingCategory | "NaturalFeatures",
+            setSelected: (c: BuildingCategory | "NaturalFeatures") => void,
+        ) => {
+            const cats = buildingCategories.filter((c) => {
+                return possibleList.some((s) => {
+                    const otherId = s.sourceBuildingId === building.buildingId ? s.targetBuildingId : s.sourceBuildingId;
+                    const other = buildings.find((b) => b.buildingId == otherId);
+                    return other?.type.toLowerCase() == c.toLowerCase();
+                });
+            });
+
+            const hasNatural = possibleList.some((s) => {
+                const otherId = s.sourceBuildingId === building.buildingId ? s.targetBuildingId : s.sourceBuildingId;
+                return !!naturalFeatures.find((n) => n.synergyItemId == otherId);
+            });
+
+            const selectedIsValid = ((): boolean => {
+                if (selected === "NaturalFeatures") return hasNatural;
+                return cats.includes(selected as BuildingCategory);
+            })();
+
+            if (!selectedIsValid) {
+                if (cats.length > 0) setSelected(cats[0]);
+                else if (hasNatural) setSelected("NaturalFeatures");
+                else setSelected(buildingCategories[0]);
+            }
+        };
+
+        const possibleOutgoing = synergies.filter((s) => s.sourceBuildingId == building.buildingId);
+        const possibleIncoming = synergies.filter((s) => s.targetBuildingId == building.buildingId);
+
+        updateFor(possibleOutgoing, selectedCategoryOutgoing, setSelectedCategoryOutgoing);
+        updateFor(possibleIncoming, selectedCategoryIncoming, setSelectedCategoryIncoming);
+    }, [building.buildingId, synergies, buildings, naturalFeatures, selectedCategoryOutgoing, selectedCategoryIncoming]);
+
+    const selectedCategoryForFilter = filter === "outgoing" ? selectedCategoryOutgoing : selectedCategoryIncoming;
+
     const displayedSynergies = filter == "current" ? (activeSynergies as SynergyProjection[])
     : possibleSynergies.filter((s) => {
         const otherId = ((): number => {
@@ -112,11 +153,11 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
             return s.sourceBuildingId === building.buildingId ? s.targetBuildingId : s.sourceBuildingId;
         })();
 
-        if (selectedCategory == "NaturalFeatures") {
+        if (selectedCategoryForFilter == "NaturalFeatures") {
             return !!naturalFeatures.find(n => n.synergyItemId == otherId);
         } else {
             const other = buildings.find((b) => b.buildingId == otherId);
-            return other?.type == selectedCategory;
+            return other?.type == selectedCategoryForFilter;
         }
     });
 
@@ -210,11 +251,14 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
                     ).map((category) => (
                         <TextButton
                             key={category}
-                            isActive={selectedCategory === category}
+                            isActive={selectedCategoryForFilter === category}
                             text={category}
                             bacgroundColor={`--${category.toLowerCase()}`}
                             textAlign="left"
-                            onClick={() => setSelectedCategory(category)}
+                            onClick={() => {
+                                if (filter === "outgoing") setSelectedCategoryOutgoing(category);
+                                else setSelectedCategoryIncoming(category);
+                            }}
                         ></TextButton>
                     ))}
                     {
@@ -228,11 +272,14 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
                         }) ?
                             <TextButton
                                 key={"n"}
-                                isActive={selectedCategory === "NaturalFeatures"}
+                                isActive={selectedCategoryForFilter === "NaturalFeatures"}
                                 text={"Natural Features"}
                                 bacgroundColor={`--forest--dark`}
                                 textAlign="left"
-                                onClick={() => setSelectedCategory("NaturalFeatures")}
+                                onClick={() => {
+                                    if (filter === "outgoing") setSelectedCategoryOutgoing("NaturalFeatures");
+                                    else setSelectedCategoryIncoming("NaturalFeatures");
+                                }}
                             ></TextButton> : null)
                     }
                 </div>
