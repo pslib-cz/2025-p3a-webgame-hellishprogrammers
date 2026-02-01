@@ -27,3 +27,8 @@ button {
 .linkUppercase {
   text-transform: uppercase;
 }
+
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

@@ -67,8 +67,9 @@ const PlayMenu = () => {
                 <h3>Gamemode</h3>
                 <ToggleButton
                     options={["Time presure", "Survival"]}
-                    selectedIndex={options.gameMode === "timePresure" ? 0 : 1}
-                    onChange={(index) => setOptions({ ...options, gameMode: index === 0 ? "timePresure" : "survival" })}
+                    selectedIndex={0}
+                    onChange={(index) => index === 0 && setOptions({ ...options, gameMode: "timePresure" })}
+                    disabledIndices={[1]}
                 />
                 <h3>Options</h3>
                 <InputValue

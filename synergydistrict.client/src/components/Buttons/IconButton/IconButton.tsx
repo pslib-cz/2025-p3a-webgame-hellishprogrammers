@@ -5,11 +5,12 @@ type IconButtonProps = {
     iconKey: string;
     hasBorder?: boolean;
     OnClick: () => void;
+    disabled?: boolean;
 };
 
-export const IconButton: FC<IconButtonProps> = ({ isActive, OnClick, iconKey }) => {
+export const IconButton: FC<IconButtonProps> = ({ isActive, OnClick, iconKey, disabled = false }) => {
     return (
-        <button onClick={OnClick} className={`${styles.button} ${isActive ? styles.active : ""}`}>
+        <button disabled={disabled} onClick={disabled ? undefined : OnClick} className={`${styles.button} ${isActive ? styles.active : ""} ${disabled ? styles.disabled : ""}`}>
             <span className={"icon"}>{iconKey}</span>
         </button>
     );
