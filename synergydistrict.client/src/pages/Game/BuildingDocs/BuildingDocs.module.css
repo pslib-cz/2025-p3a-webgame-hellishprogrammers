@@ -1,3 +1,25 @@
+@keyframes slideInFromLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutToLeft {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
 .buildingDocs{
     position: absolute;
     top: 0;
@@ -11,6 +33,11 @@
     gap: 1rem;
     overflow: scroll;
     scrollbar-width: none;
+    animation: slideInFromLeft 0.3s ease-out forwards;
+}
+
+.buildingDocs.exit {
+    animation: slideOutToLeft 0.3s ease-in forwards;
 }
 .icon{
     font-size: 1.5rem;
