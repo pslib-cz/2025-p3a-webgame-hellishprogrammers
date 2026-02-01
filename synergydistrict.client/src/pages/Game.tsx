@@ -25,6 +25,7 @@ import BuildingDetails from "./Game/BuildingDetails/BuildingDetails";
 import { useSettings } from "../hooks/providers/useSettings";
 import useMusic from "../hooks/useMusic";
 import PauseMenu from "./Game/PauseMenu/PauseMenu";
+import VersionDisplay from "../components/VersionDisplay/VersionDisplay";
 
 const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
@@ -34,6 +35,12 @@ const Game = () => {
     const [, setBuildingPreviewPlaceable] = useState<boolean>(false);
     const [isPaused, setIsPaused] = useState(false);
     const [highlightedEdges, setHighlightedEdges] = useState<ActiveSynergies[]>([]);
+    const [isDocsExiting, setIsDocsExiting] = useState(false);
+    const [isDetailsExiting, setIsDetailsExiting] = useState(false);
+    const [shouldRenderDocs, setShouldRenderDocs] = useState(false);
+    const [shouldRenderDetails, setShouldRenderDetails] = useState(false);
+    const [lastActiveBuildingType, setLastActiveBuildingType] = useState<BuildingType | null>(null);
+    const [lastSelectedBuilding, setLastSelectedBuilding] = useState<MapBuilding | null>(null);
     const { options } = useGameOptions();
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
@@ -79,6 +86,36 @@ const Game = () => {
         setActiveBuildingType(null);
         setBuildingPreview(null);
     }, [gameControl.isEnd]);
+
+    useEffect(() => {
+        if (!gameControl.isEnd && activeBuildingType) {
+            setLastActiveBuildingType(activeBuildingType);
+            setShouldRenderDocs(true);
+            setIsDocsExiting(false);
+        } else if (shouldRenderDocs) {
+            setIsDocsExiting(true);
+            const timer = setTimeout(() => {
+                setShouldRenderDocs(false);
+                setIsDocsExiting(false);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [activeBuildingType, gameControl.isEnd]);
+
+    useEffect(() => {
+        if (!gameControl.isEnd && selectedBuilding) {
+            setLastSelectedBuilding(selectedBuilding);
+            setShouldRenderDetails(true);
+            setIsDetailsExiting(false);
+        } else if (shouldRenderDetails) {
+            setIsDetailsExiting(true);
+            const timer = setTimeout(() => {
+                setShouldRenderDetails(false);
+                setIsDetailsExiting(false);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
+    }, [selectedBuilding, gameControl.isEnd]);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -230,6 +267,7 @@ const Game = () => {
 
     return (
         <div className={styles.game}>
+            <VersionDisplay />
             <BuildingsBitmapProvider>
                 <GameCanvas
                     disableDynamicLoading={!options.infiniteMap}
@@ -243,18 +281,23 @@ const Game = () => {
                     onBuildingClick={OnBuildingClick}
                     highlightedEdges={highlightedEdges}
                 />
-                {!gameControl.isEnd && activeBuildingType && (
-                    <BuildingDocs building={activeBuildingType} activeSynergies={previewSynergies} />
+                {shouldRenderDocs && lastActiveBuildingType && (
+                    <BuildingDocs 
+                        building={lastActiveBuildingType} 
+                        activeSynergies={previewSynergies} 
+                        isExiting={isDocsExiting}
+                    />
                 )}
             </BuildingsBitmapProvider>
             {!gameControl.isEnd && currentTrack && gameSettings.isMusic && (
                 <div className={styles.nowPlaying}>Now Playing: {currentTrack}</div>
             )}
-            {!gameControl.isEnd && selectedBuilding && (
+            {shouldRenderDetails && lastSelectedBuilding && (
                 <BuildingDetails 
-                    building={selectedBuilding} 
+                    building={lastSelectedBuilding} 
                     CloseBar={() => OnBuildingClick(null)} 
                     onHighlightEdges={setHighlightedEdges}
+                    isExiting={isDetailsExiting}
                 />
             )}
             {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}

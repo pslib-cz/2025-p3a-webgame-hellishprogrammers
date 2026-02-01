@@ -11,19 +11,21 @@ type TextButtonProps = {
     bacgroundColor?: string;
     children?: ReactElement;
     textAlign?: "left" | "center" | "right";
+    disabled?: boolean;
 };
 
-export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActive = false, bacgroundColor, children, textAlign = "center" }) => {
+export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActive = false, bacgroundColor, children, textAlign = "center", disabled = false }) => {
     const [isHovered, setIsHovered] = useState(false);
 
     const renderContext = () => {
         if (!linkTo) {
             return (
                 <button
-                    onClick={onClick}
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => setIsHovered(false)}
-                    className={`${styles.link} ${styles.linkUppercase} ${isActive && !bacgroundColor ? styles.linkActive : ""} ${children ? styles.row : ""}`}
+                    onClick={disabled ? undefined : onClick}
+                    onMouseEnter={() => !disabled && setIsHovered(true)}
+                    onMouseLeave={() => !disabled && setIsHovered(false)}
+                    disabled={disabled}
+                    className={`${styles.link} ${styles.linkUppercase} ${isActive && !bacgroundColor ? styles.linkActive : ""} ${children ? styles.row : ""} ${disabled ? styles.disabled : ""}`}
                     style={{backgroundColor:`${(isActive || isHovered) && bacgroundColor ? `var(${bacgroundColor})` : ""}`, color:`${(isActive || isHovered) && bacgroundColor ? `var(--text)` : ""}`, textAlign: textAlign}}
                 >
                     <ToggleableText text={text} isActive={isActive} />
@@ -35,9 +37,9 @@ export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActiv
                 <NavLink
                     to={linkTo}
                     className={({ isActive }) =>
-                        `${styles.link} ${styles.linkUppercase} ${isActive ? styles.linkActive : ""}`
+                        `${styles.link} ${styles.linkUppercase} ${isActive ? styles.linkActive : ""} ${disabled ? styles.disabled : ""}`
                     }
-                    onClick={onClick}
+                    onClick={disabled ? undefined : onClick}
                 >
                     {({ isActive }) => <ToggleableText text={text} isActive={isActive} />}
                 </NavLink>

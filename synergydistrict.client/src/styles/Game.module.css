@@ -6,6 +6,11 @@
 
 .canvas {
     flex-grow: 1;
+    cursor: grab;
+}
+
+.canvas.grabbing{
+  cursor: grabbing;
 }
 
 .overlay {

@@ -56,6 +56,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
     const chunkBitmapRef = useRef<Record<string, PreparedChunkCanvas>>({});
     const gridBitmapRef = useRef<ImageBitmap | null>(null);
     const lastPreviewRef = useRef<{ key: string | null; placeable: boolean }>({ key: null, placeable: false });
+    const [grabbing, setGrabbing] = useState(false);
 
     const { CHUNK_SIZE, SCALE_BY, MIN_SCALE, MAX_SCALE, TILE_SIZE, RENDER_DISTANCE_CHUNKS, MAX_LOADED_CHUNKS } =
         useGameProperties();
@@ -268,6 +269,10 @@ const GameCanvas: FC<GameCanvasProps> = ({
         [handleWheel, updatePreviewFromPointer, isPointerOverStage],
     );
 
+    const handleStageDragStart = useCallback(() => {
+        setGrabbing(true);
+    },[])
+
     const handleStageDragMove = useCallback(() => {
         if (!isPointerOverStage) return;
         updatePreviewFromPointer();
@@ -275,6 +280,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
 
     const handleStageDragEnd = useCallback(() => {
         handleDragEnd();
+        setGrabbing(false);
         if (!isPointerOverStage) return;
         requestAnimationFrame(() => updatePreviewFromPointer());
     }, [handleDragEnd, updatePreviewFromPointer, isPointerOverStage]);
@@ -358,7 +364,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
     }, []);
 
     return (
-        <div ref={containerRef} className={styles.canvas}>
+        <div ref={containerRef} className={`${styles.canvas} ${grabbing ? styles.grabbing : ""}`}>
             <Stage
                 ref={stageRef}
                 width={dimensions.width}
@@ -372,6 +378,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
                 onMouseEnter={handleStageMouseEnter}
                 onMouseMove={handleStageMouseMove}
                 onMouseLeave={handleStageMouseLeave}
+                onDragStart={handleStageDragStart}
                 onDragMove={handleStageDragMove}
                 onDragEnd={handleStageDragEnd}
                 onClick={handleStageOnClick}
@@ -387,7 +394,11 @@ const GameCanvas: FC<GameCanvasProps> = ({
                     chunkBitmaps={chunkBitmaps}
                 />
                 <GridLayer gridImage={gridBitmapRef.current} />
-                <BuildingsLayer buildings={GameMapData.placedBuildings} highlightedEdges={highlightedEdges} />
+                <BuildingsLayer 
+                    buildings={GameMapData.placedBuildings} 
+                    highlightedEdges={highlightedEdges}
+                    onBuildingClick={onBuildingClick}
+                />
                 <PreviewLayer
                     previewBuilding={previewBuilding}
                     position={previewTile}

@@ -23,13 +23,14 @@ const buildingCategories: BuildingCategory[] = [
 
 type BuildingDocsProps = {
     building: BuildingType;
-    activeSynergies: SynergyProjection[]
+    activeSynergies: SynergyProjection[];
+    isExiting?: boolean;
 };
 
 type SynergyFilter = "incoming" | "outgoing" | "current"
 const synergyFilter: SynergyFilter[] = ["incoming", "outgoing", "current"];
 
-const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
+const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies, isExiting }) => {
     const { buildingsBitmap } = useBuildingsBitmap();
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [selectedCategoryOutgoing, setSelectedCategoryOutgoing] = useState<BuildingCategory | "NaturalFeatures">("Residential");
@@ -189,7 +190,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies }) => {
     }
 
     return (
-        <div className={styles.buildingDocs} style={{ userSelect: "none" }}>
+        <div className={`${styles.buildingDocs} ${isExiting ? styles.exit : ''}`} style={{ userSelect: "none" }}>
             <div className={styles.title}>
                 <h2>{building.name.toUpperCase()}_</h2>
                 <span className={`${styles.icon} icon`}>{building.iconKey}</span>
