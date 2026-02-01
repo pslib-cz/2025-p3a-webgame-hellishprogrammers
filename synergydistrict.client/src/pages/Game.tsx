@@ -25,6 +25,7 @@ import BuildingDetails from "./Game/BuildingDetails/BuildingDetails";
 import { useSettings } from "../hooks/providers/useSettings";
 import useMusic from "../hooks/useMusic";
 import PauseMenu from "./Game/PauseMenu/PauseMenu";
+import VersionDisplay from "../components/VersionDisplay/VersionDisplay";
 
 const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
@@ -230,6 +231,7 @@ const Game = () => {
 
     return (
         <div className={styles.game}>
+            <VersionDisplay />
             <BuildingsBitmapProvider>
                 <GameCanvas
                     disableDynamicLoading={!options.infiniteMap}

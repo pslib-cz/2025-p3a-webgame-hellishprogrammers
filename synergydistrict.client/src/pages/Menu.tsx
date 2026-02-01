@@ -5,6 +5,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { IconClose } from "../components/Icons";
 import { useSettings } from "../hooks/providers/useSettings";
 import useMusic from "../hooks/useMusic";
+import VersionDisplay from "../components/VersionDisplay/VersionDisplay";
 
 const Menu = () => {
     const { gameSettings } = useSettings();
@@ -18,8 +19,10 @@ const Menu = () => {
     });
 
     return (
-        <div className={styles.menu}>
-            <div className={styles.menuSide}>
+        <>
+            <VersionDisplay />
+            <div className={styles.menu}>
+                <div className={styles.menuSide}>
                 <div className={`${styles.menuContainer} ${styles.menuNarrow}`}>
                     <NavLink to="/menu">
                         <h1 className={underscore.parent}>Synergy District</h1>
@@ -53,6 +56,7 @@ const Menu = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 };
 
