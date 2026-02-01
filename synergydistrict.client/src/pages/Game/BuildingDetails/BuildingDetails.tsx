@@ -72,7 +72,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
                 return s.sourceBuildingId === id && s.targetBuildingId === building.MapBuildingId;
             }
         });
-        
+
         onHighlightEdges?.(relevantSynergies);
     };
 
@@ -263,7 +263,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
                 )}
 
                 <div className={styles.button} style={{ opacity: isDeletable() ? 1 : 0.2 }}>
-                    <TextButton text="demolish" onClick={deleteBuilding}>
+                    <TextButton text="demolish" onClick={deleteBuilding} sound="DELETE">
                         <ValuesBox iconKey="money" text={currentLevel.deleteCost.toString()} />
                     </TextButton>
                 </div>

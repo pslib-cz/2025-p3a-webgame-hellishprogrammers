@@ -2,6 +2,7 @@ import { type FC, type ReactElement, useState } from "react";
 import { NavLink } from "react-router-dom";
 import styles from "./TextButton.module.css";
 import ToggleableText from "../../ToggleableText";
+import { useSound, type SoundPath } from "../../../hooks/useSound";
 
 type TextButtonProps = {
     text: string;
@@ -11,20 +12,42 @@ type TextButtonProps = {
     bacgroundColor?: string;
     children?: ReactElement;
     textAlign?: "left" | "center" | "right";
+    sound?: SoundPath;
 };
 
-export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActive = false, bacgroundColor, children, textAlign = "center" }) => {
+export const TextButton: FC<TextButtonProps> = ({
+    text,
+    linkTo,
+    onClick,
+    isActive = false,
+    bacgroundColor,
+    children,
+    textAlign = "center",
+    sound = "CLICK",
+}) => {
     const [isHovered, setIsHovered] = useState(false);
+    const playSound = useSound(sound);
+    const playHover = useSound("HOVER");
 
     const renderContext = () => {
         if (!linkTo) {
             return (
                 <button
-                    onClick={onClick}
-                    onMouseEnter={() => setIsHovered(true)}
+                    onClick={() => {
+                        playSound();
+                        onClick?.();
+                    }}
+                    onMouseEnter={() => {
+                        setIsHovered(true);
+                        playHover();
+                    }}
                     onMouseLeave={() => setIsHovered(false)}
                     className={`${styles.link} ${styles.linkUppercase} ${isActive && !bacgroundColor ? styles.linkActive : ""} ${children ? styles.row : ""}`}
-                    style={{backgroundColor:`${(isActive || isHovered) && bacgroundColor ? `var(${bacgroundColor})` : ""}`, color:`${(isActive || isHovered) && bacgroundColor ? `var(--text)` : ""}`, textAlign: textAlign}}
+                    style={{
+                        backgroundColor: `${(isActive || isHovered) && bacgroundColor ? `var(${bacgroundColor})` : ""}`,
+                        color: `${(isActive || isHovered) && bacgroundColor ? `var(--text)` : ""}`,
+                        textAlign: textAlign,
+                    }}
                 >
                     <ToggleableText text={text} isActive={isActive} />
                     {children}
@@ -37,7 +60,11 @@ export const TextButton: FC<TextButtonProps> = ({ text, linkTo, onClick, isActiv
                     className={({ isActive }) =>
                         `${styles.link} ${styles.linkUppercase} ${isActive ? styles.linkActive : ""}`
                     }
-                    onClick={onClick}
+                    onClick={() => {
+                        playSound();
+                        onClick?.();
+                    }}
+                    onMouseEnter={() => playHover()}
                 >
                     {({ isActive }) => <ToggleableText text={text} isActive={isActive} />}
                 </NavLink>

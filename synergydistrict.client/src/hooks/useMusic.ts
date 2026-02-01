@@ -142,9 +142,7 @@ const useMusic = (musicOptions: MusicOptions) => {
 };
 
 function loadAudioPaths(songPaths: string[]): string[] {
-    return availableAudioTracks.filter(track => 
-        songPaths.some(p => track.includes(p))
-    );
+    return availableAudioTracks.filter((track) => songPaths.some((p) => track.includes(p)));
 }
 
 export default useMusic;

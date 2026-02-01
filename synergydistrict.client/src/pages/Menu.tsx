@@ -5,23 +5,25 @@ import { NavLink, Outlet } from "react-router-dom";
 import { IconClose } from "../components/Icons";
 import { useSettings } from "../hooks/providers/useSettings";
 import useMusic from "../hooks/useMusic";
+import { useSound } from "../hooks/useSound";
 
 const Menu = () => {
     const { gameSettings } = useSettings();
-    
+    const playClick = useSound("CLICK");
+
     useMusic({
         songsPath: ["/audio/menu_music.mp3"],
         volume: 0.3,
         timeBetweenSongs: 10000,
         isEnabled: gameSettings.isMusic,
-        mode: 'single'
+        mode: "single",
     });
 
     return (
         <div className={styles.menu}>
             <div className={styles.menuSide}>
                 <div className={`${styles.menuContainer} ${styles.menuNarrow}`}>
-                    <NavLink to="/menu">
+                    <NavLink to="/menu" onClick={() => playClick()}>
                         <h1 className={underscore.parent}>Synergy District</h1>
                     </NavLink>
                     <nav>
@@ -44,7 +46,7 @@ const Menu = () => {
             </div>
             <div className={styles.menuSide}>
                 <div className={styles.closeButton}>
-                    <NavLink to="/menu">
+                    <NavLink to="/menu" onClick={() => playClick()}>
                         <IconClose />
                     </NavLink>
                 </div>
