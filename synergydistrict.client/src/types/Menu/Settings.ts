@@ -12,7 +12,7 @@ export type Settings = {
 
 export const defaultSettings: Settings = {
     isMusic: true,
-    isSound: true,
+    isSound: false,
     crtIntensity: 65,
     uiScale: 75,
 };

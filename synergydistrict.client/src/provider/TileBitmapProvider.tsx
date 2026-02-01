@@ -58,7 +58,10 @@ export const TileBitmapProvider: FC<PropsWithChildren> = ({ children }) => {
     const fontsLoaded = useFont('16px "icons"');
 
     useEffect(() => {
-        if (!fontsLoaded) return;
+        if (!fontsLoaded) {
+            setLoading(true);
+            return;
+        }
 
         const tileTypes = ["water", "grass", "mountain", "forest"];
         const bitmaps: Record<string, { bitmap: ImageBitmap; hasIcon: boolean }> = {};

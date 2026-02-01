@@ -14,7 +14,7 @@ const Menu = () => {
 
     useMusic({
         songsPath: ["/audio/menu_music.mp3"],
-        volume: 0.3,
+        volume: 0.2,
         timeBetweenSongs: 10000,
         isEnabled: gameSettings.isMusic,
         mode: "single",

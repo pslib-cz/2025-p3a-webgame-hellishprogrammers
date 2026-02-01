@@ -33,7 +33,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
     const { GameResources, setGameResources } = useGameResources();
     const [IO, setIO] = useState<boolean>(false);
 
-    const currentBuilding = GameMapData.placedBuildings.find((b) => b.MapBuildingId === building.MapBuildingId)!;
+    const currentBuilding = GameMapData.placedBuildings.find((b) => b.MapBuildingId === building.MapBuildingId) || building;
     const currentLevel = currentBuilding.buildingType.upgrades[currentBuilding.level - 1];
     const isMaxLevel = currentBuilding.level >= currentBuilding.buildingType.upgrades.length;
 

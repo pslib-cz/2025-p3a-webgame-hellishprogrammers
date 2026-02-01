@@ -5,7 +5,7 @@ export const SOUNDS = {
     CLICK: "/audio/sfx/click.mp3",
     DELETE: "/audio/sfx/delete.ogg",
     SELECT: "/audio/sfx/select.ogg",
-    HOVER: "/audio/sfx/hover.ogg",
+    HOVER: "/audio/sfx/hover.mp3",
     ERROR: "/audio/sfx/error.mp3",
     SUCCESS: "/audio/sfx/success.mp3",
 } as const;
@@ -14,7 +14,7 @@ export type SoundPath = keyof typeof SOUNDS | (string & {});
 
 const audioCache: Record<string, HTMLAudioElement> = {};
 
-export const useSound = (sound: SoundPath, volume: number = 1.0) => {
+export const useSound = (sound: SoundPath, volume: number = .3) => {
     const { gameSettings } = useSettings();
     const soundPath = sound in SOUNDS ? SOUNDS[sound as keyof typeof SOUNDS] : sound;
 
