@@ -7,17 +7,18 @@ type IconButtonProps = {
     hasBorder?: boolean;
     OnClick: () => void;
     sound?: SoundPath;
+    disabled?: boolean;
 };
 
-export const IconButton: FC<IconButtonProps> = ({ isActive, OnClick, iconKey, sound = "CLICK" }) => {
+export const IconButton: FC<IconButtonProps> = ({ isActive, OnClick, iconKey, sound = "CLICK", disabled = false }) => {
     const playSound = useSound(sound);
     return (
-        <button
-            onClick={() => {
+        <button disabled={disabled}
+            onClick={disabled ? undefined : () => {
                 playSound();
                 OnClick();
             }}
-            className={`${styles.button} ${isActive ? styles.active : ""}`}
+            className={`${styles.button} ${isActive ? styles.active : ""} ${disabled ? styles.disabled : ""}`}
         >
             <span className={"icon"}>{iconKey}</span>
         </button>

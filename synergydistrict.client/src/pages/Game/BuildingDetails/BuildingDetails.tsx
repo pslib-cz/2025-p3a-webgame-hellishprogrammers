@@ -25,9 +25,10 @@ type BuildingDetailsProps = {
     building: MapBuilding;
     CloseBar: () => void;
     onHighlightEdges?: (edges: ActiveSynergies[]) => void;
+    isExiting?: boolean;
 };
 
-const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighlightEdges }) => {
+const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighlightEdges, isExiting }) => {
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
     const [IO, setIO] = useState<boolean>(false);
@@ -157,7 +158,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
     };
 
     return (
-        <div className={styles.buildingDetails} style={{ userSelect: "none" }}>
+        <div className={`${styles.buildingDetails} ${isExiting ? styles.exit : ''}`} style={{ userSelect: "none" }}>
             <div className={styles.row}>
                 <h2 className={underscore.parent}>{building.buildingType.name}</h2>
                 <button onClick={() => CloseBar()} className={styles.close}>

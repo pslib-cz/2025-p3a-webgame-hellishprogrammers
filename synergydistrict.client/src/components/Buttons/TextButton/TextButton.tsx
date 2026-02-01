@@ -12,6 +12,7 @@ type TextButtonProps = {
     bacgroundColor?: string;
     children?: ReactElement;
     textAlign?: "left" | "center" | "right";
+    disabled?: boolean;
     sound?: SoundPath;
 };
 
@@ -23,6 +24,7 @@ export const TextButton: FC<TextButtonProps> = ({
     bacgroundColor,
     children,
     textAlign = "center",
+    disabled = false,
     sound = "CLICK",
 }) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -33,16 +35,17 @@ export const TextButton: FC<TextButtonProps> = ({
         if (!linkTo) {
             return (
                 <button
-                    onClick={() => {
+                    onClick={disabled ? undefined : () => {
                         playSound();
                         onClick?.();
                     }}
-                    onMouseEnter={() => {
+                    onMouseEnter={disabled ? undefined : () => {
                         setIsHovered(true);
                         playHover();
                     }}
-                    onMouseLeave={() => setIsHovered(false)}
-                    className={`${styles.link} ${styles.linkUppercase} ${isActive && !bacgroundColor ? styles.linkActive : ""} ${children ? styles.row : ""}`}
+                    onMouseLeave={() => !disabled && setIsHovered(false)}
+                    disabled={disabled}
+                    className={`${styles.link} ${styles.linkUppercase} ${isActive && !bacgroundColor ? styles.linkActive : ""} ${children ? styles.row : ""} ${disabled ? styles.disabled : ""}`}
                     style={{
                         backgroundColor: `${(isActive || isHovered) && bacgroundColor ? `var(${bacgroundColor})` : ""}`,
                         color: `${(isActive || isHovered) && bacgroundColor ? `var(--text)` : ""}`,
@@ -58,9 +61,9 @@ export const TextButton: FC<TextButtonProps> = ({
                 <NavLink
                     to={linkTo}
                     className={({ isActive }) =>
-                        `${styles.link} ${styles.linkUppercase} ${isActive ? styles.linkActive : ""}`
+                        `${styles.link} ${styles.linkUppercase} ${isActive ? styles.linkActive : ""} ${disabled ? styles.disabled : ""}`
                     }
-                    onClick={() => {
+                    onClick={disabled ? undefined : () => {
                         playSound();
                         onClick?.();
                     }}
