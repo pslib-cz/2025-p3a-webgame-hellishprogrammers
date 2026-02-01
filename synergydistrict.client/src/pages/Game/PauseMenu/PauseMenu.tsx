@@ -27,7 +27,7 @@ const PauseMenu = ({ onResume }: PauseMenuProps) => {
         <div className={styles.overlay} onClick={onResume}>
             <div className={styles.pauseMenu} onClick={(e) => e.stopPropagation()}>
                 <h2>Game Paused</h2>
-                
+
                 <div className={styles.menuSection}>
                     <h3>Settings</h3>
                     <InputToggle
@@ -35,6 +35,12 @@ const PauseMenu = ({ onResume }: PauseMenuProps) => {
                         options={["ON", "OFF"]}
                         selectedIndex={gameSettings.isMusic ? 0 : 1}
                         onChange={(index) => setGameSettings({ ...gameSettings, isMusic: index === 0 })}
+                    />
+                    <InputToggle
+                        text="Sounds"
+                        options={["ON", "OFF"]}
+                        selectedIndex={gameSettings.isSound ? 0 : 1}
+                        onChange={(index) => setGameSettings({ ...gameSettings, isSound: index === 0 })}
                     />
                     <InputValue
                         text="CRT Effect"
@@ -48,7 +54,7 @@ const PauseMenu = ({ onResume }: PauseMenuProps) => {
                     <TextButton text="Resume Game" onClick={onResume} />
                     <TextButton text="Quit to Menu" onClick={handleQuit} bacgroundColor="--commercial" />
                 </div>
-                
+
                 <p className={styles.hint}>Press ESC to resume</p>
             </div>
         </div>

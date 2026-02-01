@@ -35,6 +35,12 @@ const SettingsMenu = () => {
                     selectedIndex={gameSettings.isMusic ? 0 : 1}
                     onChange={(index) => setGameSettings({ ...gameSettings, isMusic: index === 0 })}
                 />
+                <InputToggle
+                    text="Sounds"
+                    options={["ON", "OFF"]}
+                    selectedIndex={gameSettings.isSound ? 0 : 1}
+                    onChange={(index) => setGameSettings({ ...gameSettings, isSound: index === 0 })}
+                />
                 <InputValue
                     text="UI Scale (%)"
                     inputType="number"

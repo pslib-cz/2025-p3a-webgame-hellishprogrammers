@@ -26,6 +26,7 @@ import { useSettings } from "../hooks/providers/useSettings";
 import useMusic from "../hooks/useMusic";
 import PauseMenu from "./Game/PauseMenu/PauseMenu";
 import VersionDisplay from "../components/VersionDisplay/VersionDisplay";
+import { useSound } from "../hooks/useSound";
 
 const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
@@ -47,6 +48,9 @@ const Game = () => {
     const { synergies, naturalFeatures } = useGameData();
     const { gameControl } = useGameControl();
     const { gameSettings } = useSettings();
+    const playClick = useSound("CLICK");
+    const playSelect = useSound("SELECT");
+    const playError = useSound("ERROR");
 
     const { currentTrack } = useMusic({
         songsPath: ["/audio/game-music"],
@@ -134,15 +138,6 @@ const Game = () => {
     const OnMapClick = (position: Position) => {
         if (activeBuildingType === null || buildingPreview === null || gameControl.isEnd) return;
 
-        if (buildingPreview.buildingType.name === "Town Hall") {
-            const townHallExists = GameMapData.placedBuildings.some(
-                (building) => building.buildingType.name === "Town Hall"
-            );
-            if (townHallExists) {
-                return;
-            }
-        }
-
         if (
             CanPlaceBuilding(
                 buildingPreview.buildingType.shape,
@@ -151,6 +146,7 @@ const Game = () => {
                 GameMapData.loadedMapTiles,
             )
         ) {
+            playClick();
             const newBuilding: MapBuilding = {
                 buildingType: buildingPreview.buildingType,
                 MapBuildingId: crypto.randomUUID(),
@@ -200,7 +196,7 @@ const Game = () => {
             }));
 
             if (!CanAfford(buildingPreview!.buildingType, newData.newResources, newBuildings)) setBuildingPreview(null);
-        }
+        } else playError();
     };
 
     const OnPlaceSelect = (building: BuildingType | null) => {
@@ -209,6 +205,9 @@ const Game = () => {
         setActiveBuildingType(building);
 
         if (building === null || !CanAfford(building, GameResources, GameMapData.placedBuildings)) {
+            if (building && !CanAfford(building, GameResources, GameMapData.placedBuildings)) {
+                playError();
+            }
             setBuildingPreview(null);
             return;
         }
@@ -228,6 +227,7 @@ const Game = () => {
     const OnRotate = () => {
         if (buildingPreview === null || gameControl.isEnd) return;
 
+        playClick();
         const newShape = rotateShape(buildingPreview.buildingType.shape, 1);
         const newEdges = createEgdesForShape(newShape);
         setBuildingPreview((prev) => {
@@ -242,6 +242,8 @@ const Game = () => {
     };
 
     const OnBuildingClick = (building: MapBuilding | null) => {
+        if (building) playSelect();
+
         const newBuildings: MapBuilding[] = GameMapData.placedBuildings.map((b) => {
             if (b.isSelected) b.isSelected = false;
             if (building && b.MapBuildingId === building.MapBuildingId) b.isSelected = true;
@@ -253,7 +255,7 @@ const Game = () => {
         setSelectedBuilding((prev) =>
             prev && building && prev.MapBuildingId === building.MapBuildingId ? null : building,
         );
-        
+
         if (!building) {
             setHighlightedEdges([]);
         }
