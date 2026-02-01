@@ -1,19 +1,5 @@
 import type { MapTile, Position } from "../../../../types/Game/Grid";
 
-const BACKGROUND_COLOR_MAP: Record<string, string> = {
-    water: "#5d8a9e",
-    grass: "#8a9e5d",
-    mountain: "#9e7b5d",
-    forest: "#8a9e5d",
-};
-
-const ICON_COLOR_MAP: Record<string, string> = {
-    water: "#124559",
-    grass: "#606C38",
-    mountain: "#8F531D",
-    forest: "#283618",
-};
-
 const TILE_PADDING = 2;
 
 export type PreparedChunkCanvas = {
@@ -27,6 +13,7 @@ type PrepareChunkCanvasParams = {
     chunkOrigin: Position;
     tileSize: number;
     chunkSize: number;
+    tileBitmaps: Record<string, { bitmap: ImageBitmap; hasIcon: boolean }>;
     debug?: boolean;
 };
 
@@ -35,6 +22,7 @@ export const prepareChunk = ({
     chunkOrigin,
     tileSize,
     chunkSize,
+    tileBitmaps,
     debug = false,
 }: PrepareChunkCanvasParams): PreparedChunkCanvas | null => {
     if (tiles.length === 0) {
@@ -54,24 +42,20 @@ export const prepareChunk = ({
     for (const tile of tiles) {
         const relX = (tile.position.x - chunkOrigin.x) * tileSize;
         const relY = (tile.position.y - chunkOrigin.y) * tileSize;
-        const iconOffset = tileSize / 2;
-        context.fillStyle = BACKGROUND_COLOR_MAP[tile.tileType.toLowerCase()] ?? "#ccc";
-        context.fillRect(relX, relY, tileSize + TILE_PADDING, tileSize + TILE_PADDING);
 
-        context.fillStyle = ICON_COLOR_MAP[tile.tileType.toLowerCase()] ?? "#000000";
+        const tileKey = `${tile.tileType.toLowerCase()}_${tile.hasIcon ? 'icon' : 'no_icon'}`;
+        const tileBitmap = tileBitmaps[tileKey];
+
+        if (tileBitmap) {
+            context.drawImage(tileBitmap.bitmap, relX, relY);
+        }
 
         if (debug) {
+            context.fillStyle = "#000000";
             context.textAlign = "start";
             context.textBaseline = "top";
             context.font = "10px Roboto Mono";
             context.fillText(`${tile.position.x};${tile.position.y}`, relX + 4, relY + 4 + TILE_PADDING / 2);
-        }
-
-        if (tile.hasIcon) {
-            context.textAlign = "center";
-            context.textBaseline = "middle";
-            context.font = `${(40 / 64) * tileSize}px icons`;
-            context.fillText(tile.tileType.toLowerCase(), relX + iconOffset, relY + iconOffset);
         }
     }
 

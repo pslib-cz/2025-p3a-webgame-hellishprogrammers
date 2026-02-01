@@ -18,6 +18,7 @@ import useGameMapData from "../../../hooks/providers/useMapData";
 import GridLayer from "./GridLayer";
 import { useGameData } from "../../../hooks/providers/useGameData";
 import useGameResources from "../../../hooks/providers/useGameResources";
+import useTileBitmaps from "../../../hooks/providers/useTileBitmaps";
 
 const findIconOffset = (shape: MapBuilding["buildingType"]["shape"]): Position => {
     for (let y = 0; y < shape.length; y++) {
@@ -73,6 +74,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
     const { GameMapData, setGameMapData } = useGameMapData();
     const { synergies, naturalFeatures } = useGameData();
     const { GameResources } = useGameResources();
+    const { tileBitmaps, loading: tileBitmapsLoading } = useTileBitmaps();
 
     const {
         loadedChunks,
@@ -303,7 +305,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
     const fontsLoaded = useFont('16px "icons"');
 
     useEffect(() => {
-        if (!fontsLoaded) {
+        if (!fontsLoaded || tileBitmapsLoading) {
             return;
         }
 
@@ -321,6 +323,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
                 chunkOrigin,
                 tileSize: TILE_SIZE,
                 chunkSize: CHUNK_SIZE,
+                tileBitmaps,
                 debug: false,
             });
 
@@ -337,7 +340,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
             chunkBitmapRef.current = prepared;
             return prepared;
         });
-    }, [loadedChunks, fontsLoaded, TILE_SIZE, CHUNK_SIZE]);
+    }, [loadedChunks, fontsLoaded, tileBitmapsLoading, tileBitmaps, TILE_SIZE, CHUNK_SIZE]);
 
     useEffect(() => {
         const gridImage = prepareGrid({
@@ -405,7 +408,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
                     isPlaceable={isPreviewPlaceable}
                 />
             </Stage>
-            {(chunksLoading || !fontsLoaded) && <div className={styles.overlay}>Loading map...</div>}
+            {(chunksLoading || !fontsLoaded || tileBitmapsLoading) && <div className={styles.overlay}>Loading map...</div>}
             {chunkError && <div className={styles.overlay}>Error while loading map: {chunkError}</div>}
         </div>
     );

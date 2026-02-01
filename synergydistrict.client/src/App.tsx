@@ -15,6 +15,7 @@ import { GameControlProvider } from "./provider/GameControlProvider";
 import { GameMapDataProvider } from "./provider/GameMapDataProvider";
 import { GameResourcesProvider } from "./provider/GameResourcesProvider";
 import { GameTimeProvider } from "./provider/GameTimeProvider";
+import { TileBitmapProvider } from "./provider/TileBitmapProvider";
 import TutorialMenu from "./pages/Menu/TutorialMenu";
 import CRTEffect from "./components/CRTEffect/CRTEffect";
 import { useSettings } from "./hooks/providers/useSettings";
@@ -35,34 +36,36 @@ function AppContent() {
             <div className="container">
                 <GameOptionsProvider>
                     <GamePropertiesProvider>
-                        <BrowserRouter>
-                            <Routes>
-                                <Route path="/" element={<Splash />} />
-                                <Route path="/menu" element={<Menu />}>
-                                    <Route path="" element={<MainMenu />} />
-                                    <Route path="play" element={<PlayMenu />} />
-                                    <Route path="tutorial" element={<TutorialMenu />} />
-                                    <Route path="statistics" element={<StatisticsMenu />} />
-                                    <Route path="settings" element={<SettingsMenu />} />
-                                </Route>
-                                <Route
-                                    path="/game"
-                                    element={
-                                        <GameControlProvider>
-                                            <GameMapDataProvider>
-                                                <GameTimeProvider>
-                                                    <GameResourcesProvider>
-                                                        <GameDataProvider>
-                                                            <Game />
-                                                        </GameDataProvider>
-                                                    </GameResourcesProvider>
-                                                </GameTimeProvider>
-                                            </GameMapDataProvider>
-                                        </GameControlProvider>
-                                    }
-                                />
-                            </Routes>
-                        </BrowserRouter>
+                        <TileBitmapProvider>
+                            <BrowserRouter>
+                                <Routes>
+                                    <Route path="/" element={<Splash />} />
+                                    <Route path="/menu" element={<Menu />}>
+                                        <Route path="" element={<MainMenu />} />
+                                        <Route path="play" element={<PlayMenu />} />
+                                        <Route path="tutorial" element={<TutorialMenu />} />
+                                        <Route path="statistics" element={<StatisticsMenu />} />
+                                        <Route path="settings" element={<SettingsMenu />} />
+                                    </Route>
+                                    <Route
+                                        path="/game"
+                                        element={
+                                            <GameControlProvider>
+                                                <GameMapDataProvider>
+                                                    <GameTimeProvider>
+                                                        <GameResourcesProvider>
+                                                            <GameDataProvider>
+                                                                <Game />
+                                                            </GameDataProvider>
+                                                        </GameResourcesProvider>
+                                                    </GameTimeProvider>
+                                                </GameMapDataProvider>
+                                            </GameControlProvider>
+                                        }
+                                    />
+                                </Routes>
+                            </BrowserRouter>
+                        </TileBitmapProvider>
                     </GamePropertiesProvider>
                 </GameOptionsProvider>
             </div>
