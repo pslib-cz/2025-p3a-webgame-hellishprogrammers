@@ -9,6 +9,7 @@ import useFont from "../../../hooks/useFont";
 type BuildingsLayerProps = {
     buildings: MapBuilding[];
     highlightedEdges?: ActiveSynergies[];
+    onBuildingClick?: (building: MapBuilding) => void;
 };
 
 const SELECTION_OUTLINE_COLOR = "#191919";
@@ -17,12 +18,32 @@ const BUILDING_LEVEL_NUMBER = "#FEFAE0";
 const HIGHLIGHT_EDGE_COLOR = "#FEFAE0";
 const OUTLINE_WIDTH = 4;
 
-const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges = [] }) => {
+const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges = [], onBuildingClick }) => {
     const { TILE_SIZE } = useGameProperties();
     const { buildingsBitmap } = useBuildingsBitmap();
     useFont("700 16px Space Mono");
 
     const { bitmap: err, loading } = useImageBitmap("/images/err.jpg");
+
+    const handleBuildingMouseEnter = (e: any) => {
+        const stage = e.target.getStage();
+        if (stage) {
+            const container = stage.container();
+            if (container) {
+                container.style.cursor = 'pointer';
+            }
+        }
+    };
+
+    const handleBuildingMouseLeave = (e: any) => {
+        const stage = e.target.getStage();
+        if (stage) {
+            const container = stage.container();
+            if (container) {
+                container.style.cursor = '';
+            }
+        }
+    };
 
     const getBuilding = (building: MapBuilding) => {
         const bitmap = buildingsBitmap[building.buildingType.buildingId]?.[building.rotation] || err;
@@ -40,8 +61,33 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges =
         const iconPosX = baseX + iconColIndex * TILE_SIZE + TILE_SIZE / 2 + (15 / 64) * TILE_SIZE;
         const iconPosY = baseY + iconRowIndex * TILE_SIZE + (20 / 64) * TILE_SIZE;
         return (
-            <Group key={building.MapBuildingId}>
-                <Image x={baseX} y={baseY} width={width} height={height} image={bitmap!} />
+            <Group 
+                key={building.MapBuildingId}
+            >
+                <Image 
+                    x={baseX} 
+                    y={baseY} 
+                    width={width} 
+                    height={height} 
+                    image={bitmap!}
+                    listening={true}
+                    onMouseEnter={handleBuildingMouseEnter}
+                    onMouseLeave={handleBuildingMouseLeave}
+                    onClick={() => onBuildingClick?.(building)}
+                    hitFunc={(context, shape) => {
+                        context.beginPath();
+                        for (let y = 0; y < tiles.length; y++) {
+                            for (let x = 0; x < tiles[y].length; x++) {
+                                const tile = tiles[y][x];
+                                if (tile && tile !== "Empty") {
+                                    context.rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                                }
+                            }
+                        }
+                        context.closePath();
+                        context.fillStrokeShape(shape);
+                    }}
+                />
                 {building.level > 1 ? (
                     <Group>
                         <Circle
@@ -186,7 +232,7 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges =
     };
 
     return (
-        <Layer listening={false}>
+        <Layer>
             {loading ? (
                 <></>
             ) : (
