@@ -22,7 +22,7 @@ Hráč musí balancovat následující metriky:
 | **💰 Money** (Peníze) | Generují se v čase. Potřeba pro nákup nových budov. |
 | **😊 Happiness** (Štěstí) | Ovlivňuje produktivitu. Nízké štěstí = pomalejší práce. |
 | **⚡ Electricity** (Elektřina)| Vyžadována pro pokročilé budovy. |
-| **🏭 Industry** (Průmysl) | Zrychluje nabídku nových budov v obchodě. |
+| **🏭 Industry** (Průmysl) | Využíváno pro pokročilé budovy |
 
 ## 🏗️ Budovy a Synergie
 
