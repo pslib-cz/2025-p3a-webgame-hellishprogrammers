@@ -532,41 +532,8 @@ export const GetPreviewSynergies = (
     loadedMapTiles: Record<string, MapTile>,
     variables: GameResources,
 ): SynergyProjection[] => {
-    const found = new Map<string, SynergyProjection>();
-
-    const computeProjection = (s: BuildingSynergy, amount: number): SynergyProjection => {
-        const productionProjection: ProductionProjection[] = (s.synergyProductions || []).map((p) => {
-            const resourceKey = p.type.toLowerCase() as keyof GameResources;
-            const currentValue = (variables as any)[resourceKey];
-            let detlaValue = 0;
-            const totalValue = p.value * amount;
-
-            if (typeof currentValue === "number") {
-                if (resourceKey === "energy" && totalValue < 0) {
-                    const usedAfter = variables.energyUsed - totalValue;
-                    detlaValue = Math.max(0, usedAfter - variables.energy);
-                } else if (resourceKey === "people" && totalValue < 0) {
-                    const usedAfter = variables.peopleUsed - totalValue;
-                    detlaValue = Math.max(0, usedAfter - variables.people);
-                } else {
-                    const after = currentValue + totalValue;
-                    detlaValue = after < 0 ? -after : 0;
-                }
-            }
-
-            return {
-                production: { ...p, value: totalValue },
-                detlaValue,
-            } as ProductionProjection;
-        });
-
-        return {
-            sourceBuildingId: s.sourceBuildingId,
-            targetBuildingId: s.targetBuildingId,
-            productionProjection,
-            amount,
-        } as SynergyProjection;
-    };
+    // First pass: count synergies
+    const synergyCounts = new Map<string, { synergy: BuildingSynergy; amount: number }>();
 
     const possibleSynergies = synergies.filter(
         (s) => s.sourceBuildingId === buildingType.buildingId || s.targetBuildingId === buildingType.buildingId,
@@ -606,12 +573,11 @@ export const GetPreviewSynergies = (
                 for (const s of possibleSynergies) {
                     if (s.sourceBuildingId === id || s.targetBuildingId === id) {
                             const key = `${s.sourceBuildingId}-${s.targetBuildingId}`;
-                            if (!found.has(key)) {
-                                found.set(key, computeProjection(s, 1));
+                            if (!synergyCounts.has(key)) {
+                                synergyCounts.set(key, { synergy: s, amount: 1 });
                             } else {
-                                const existing = found.get(key)!;
-                                const newAmount = existing.amount + 1;
-                                found.set(key, computeProjection(s, newAmount));
+                                const existing = synergyCounts.get(key)!;
+                                existing.amount += 1;
                             }
                     }
                 }
@@ -624,16 +590,78 @@ export const GetPreviewSynergies = (
             const nId = neighbor.buildingType.buildingId;
             if ((s.sourceBuildingId === bId && s.targetBuildingId === nId) || (s.sourceBuildingId === nId && s.targetBuildingId === bId)) {
                 const key = `${s.sourceBuildingId}-${s.targetBuildingId}`;
-                if (!found.has(key)) {
-                    found.set(key, computeProjection(s, 1));
+                if (!synergyCounts.has(key)) {
+                    synergyCounts.set(key, { synergy: s, amount: 1 });
                 } else {
-                    const existing = found.get(key)!;
-                    const newAmount = existing.amount + 1;
-                    found.set(key, computeProjection(s, newAmount));
+                    const existing = synergyCounts.get(key)!;
+                    existing.amount += 1;
                 }
             }
         }
     }
 
-    return Array.from(found.values());
+    // Second pass: compute projections with accumulated resources
+    const accumulatedResources: GameResources = { ...variables };
+
+    // Add base production to accumulated resources first
+    for (const product of buildingType.baseProduction || []) {
+        const resourceKey = product.type.toLowerCase() as keyof GameResources;
+        const currentValue = accumulatedResources[resourceKey];
+
+        if (typeof currentValue === "number") {
+            if (resourceKey === "energy" && product.value < 0) {
+                accumulatedResources.energyUsed -= product.value;
+            } else if (resourceKey === "people" && product.value < 0) {
+                accumulatedResources.peopleUsed -= product.value;
+            } else {
+                (accumulatedResources as any)[resourceKey] = currentValue + product.value;
+            }
+        }
+    }
+
+    const result: SynergyProjection[] = [];
+
+    for (const { synergy: s, amount } of synergyCounts.values()) {
+        const productionProjection: ProductionProjection[] = (s.synergyProductions || []).map((p) => {
+            const resourceKey = p.type.toLowerCase() as keyof GameResources;
+            const currentValue = (accumulatedResources as any)[resourceKey];
+            let detlaValue = 0;
+            const totalValue = p.value * amount;
+
+            if (typeof currentValue === "number") {
+                if (resourceKey === "energy" && totalValue < 0) {
+                    const usedAfter = accumulatedResources.energyUsed - totalValue;
+                    detlaValue = Math.max(0, usedAfter - accumulatedResources.energy);
+                } else if (resourceKey === "people" && totalValue < 0) {
+                    const usedAfter = accumulatedResources.peopleUsed - totalValue;
+                    detlaValue = Math.max(0, usedAfter - accumulatedResources.people);
+                } else {
+                    const after = currentValue + totalValue;
+                    detlaValue = after < 0 ? -after : 0;
+                }
+                
+                if (resourceKey === "energy" && totalValue < 0) {
+                    accumulatedResources.energyUsed -= totalValue;
+                } else if (resourceKey === "people" && totalValue < 0) {
+                    accumulatedResources.peopleUsed -= totalValue;
+                } else {
+                    (accumulatedResources as any)[resourceKey] = currentValue + totalValue;
+                }
+            }
+
+            return {
+                production: { ...p, value: totalValue },
+                detlaValue,
+            } as ProductionProjection;
+        });
+
+        result.push({
+            sourceBuildingId: s.sourceBuildingId,
+            targetBuildingId: s.targetBuildingId,
+            productionProjection,
+            amount,
+        } as SynergyProjection);
+    }
+
+    return result;
 };
