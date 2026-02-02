@@ -1,10 +1,33 @@
+import { useEffect, useRef } from "react";
 import ValuesBox from "../../components/Game/ValuesBox/ValuesBox";
+import useTileBitmaps from "../../hooks/providers/useTileBitmaps";
 import styles from "../../styles/Menu.module.css";
 
 
 
 
 const TutorialMenu = () => {
+    const { tileBitmaps, tileSize, loading } = useTileBitmaps()
+    const canvasRef = useRef<HTMLCanvasElement | null>(null)
+    useEffect(() => {
+        const canvas = canvasRef.current!;
+        const context = canvas?.getContext("2d");
+        const numberOfTiles = Object.entries(tileBitmaps).length
+        const totalWidth = tileSize * numberOfTiles;
+        const scale = totalWidth > canvas.width ? canvas.width / totalWidth : 1;
+        const scaledTileSize = tileSize * scale;
+        let gap = Math.abs((canvas.width - scaledTileSize * numberOfTiles) / (numberOfTiles + 1))
+        const minGapPx = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        gap = Math.max(gap, minGapPx);
+        context?.clearRect(0, 0, canvas?.width, canvas?.height);
+        for (let i = 0; i < numberOfTiles; i++) {
+            const element = tileBitmaps[Object.keys(tileBitmaps)[i]];
+            const x = (i + 1) * gap + i * scaledTileSize;
+            const y = canvas.height / 2 - scaledTileSize / 2;
+            context?.drawImage(element.bitmap, x, y, scaledTileSize, scaledTileSize);
+        }
+        
+    }, [canvasRef, loading]);
     return (
     <>
     <div>
@@ -13,11 +36,11 @@ const TutorialMenu = () => {
          interact with each other and the map via synergies.
          The map is made of 4 tile types</p>
     </div>
-    <div>sem canvas</div>
+    <canvas ref={canvasRef}/>
     <p>Water and mountain tiles cannot support buildings. The extractional type of buildings have synergies with the nature tiles so watch out for them as they can help you out.
         You can find the synergies of buildings on the left bar. It shows up when a building is selected to build. Here you can see interactions with other buildins.
         Example of Synergies for House</p>
-    <div>sem seznam</div>
+    <>sem seznam</>
     <p>The synergy hub shows you what synergies does the bulding get from other buildings and what
          buildings it gives to other buildings and what synergies will be made after building the building.
          It also shows the stats.
