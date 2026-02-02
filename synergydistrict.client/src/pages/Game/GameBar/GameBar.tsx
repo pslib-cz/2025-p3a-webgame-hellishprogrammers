@@ -103,6 +103,7 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
                                 }}
                                 isActive={activeBuilding?.buildingId === building.buildingId}
                                 iconKey={building.iconKey}
+                                sound={buildingAffordability[building.buildingId] ? "CLICK" : "ERROR"}
                             />
                         </div>
                     ))}

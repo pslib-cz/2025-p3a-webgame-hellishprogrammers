@@ -209,9 +209,6 @@ const Game = () => {
         setActiveBuildingType(building);
 
         if (building === null || !CanAfford(building, GameResources, GameMapData.placedBuildings)) {
-            if (building && !CanAfford(building, GameResources, GameMapData.placedBuildings)) {
-                playError();
-            }
             setBuildingPreview(null);
             return;
         }
