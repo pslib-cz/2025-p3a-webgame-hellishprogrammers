@@ -42,10 +42,17 @@ const PlayMenu = () => {
         clearStoredState(SESSION_RESET_KEYS);
     }, [setGameProperties, options]);
 
-    useEffect(() => {
-        const seed = Math.floor(Math.random() * 1000000);
+    const getNewSeed = () => {
+        const string = SEED_STRINGS_LIST[Math.floor(Math.random() * SEED_STRINGS_LIST.length)];
+        setSeedString(string);
+        const seed = stringToSeed(string)
         setOptions({ ...options, seed: seed });
+    }
+    
+    useEffect(() => {
+        getNewSeed()
     }, [])
+
 
     return (
         <>
@@ -69,10 +76,7 @@ const PlayMenu = () => {
                         <TextButton
                             text={"Generate"}
                             onClick={() => {
-                                const string = SEED_STRINGS_LIST[Math.floor(Math.random() * SEED_STRINGS_LIST.length)];
-                                setSeedString(string);
-                                const seed = stringToSeed(string)
-                                setOptions({ ...options, seed: seed });
+                                getNewSeed()
                             }}
                         />
                     </div>
