@@ -1,6 +1,6 @@
 import Construction from "../../components/Construction";
-import ValuesBox from "../../components/Game/ValuesBox/ValuesBox";
-import styles from "../../styles/Menu.module.css";
+//import ValuesBox from "../../components/Game/ValuesBox/ValuesBox";
+//import styles from "../../styles/Menu.module.css";
 
 
 
