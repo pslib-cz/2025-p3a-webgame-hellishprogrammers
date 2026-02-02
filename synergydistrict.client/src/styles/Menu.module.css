@@ -98,6 +98,15 @@
 .flex {
     display: flex;
 }
+.gap{
+    gap:1rem
+}
+.justify{
+    justify-content: center;
+}
+.wrap{
+    flex-wrap: wrap;
+}
 
 .right {
     display: flex;
