@@ -12,5 +12,6 @@ export const defaultGameOptions: GameOptions = {
   gameMode: "timePresure",
   gameDuration: 10,
   infiniteMap: false,
-  seed: Math.floor(Math.random() * 1000000)
+  seed: Math.floor(Math.random() * 1000000),
+  mapSize: 16,
 };
