@@ -46,7 +46,7 @@ const Game = () => {
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
     const { synergies, naturalFeatures } = useGameData();
-    const { gameControl } = useGameControl();
+    const { gameControl, setGameControl } = useGameControl();
     const { gameSettings } = useSettings();
     const playClick = useSound("CLICK");
     const playSelect = useSound("SELECT");
@@ -59,6 +59,10 @@ const Game = () => {
         isEnabled: gameSettings.isMusic,
         mode: "random",
     });
+        const handlePause = (setTo:boolean) => {
+        setIsPaused(setTo);
+        setGameControl(prev => ({...prev, timerSpeed: setTo ? "pause" : "play"}))
+    }
 
     const previewSynergies = useMemo(() => {
         if (!activeBuildingType || !buildingPreview || !buildingPreviewPosition)
@@ -126,14 +130,14 @@ const Game = () => {
             if (e.key === "Escape") {
                 e.preventDefault();
                 if (!gameControl.isEnd) {
-                    setIsPaused((prev) => !prev);
+                   handlePause(!isPaused)
                 }
             }
         };
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [gameControl.isEnd]);
+    }, [gameControl.isEnd, isPaused, handlePause]);
 
     const OnMapClick = (position: Position) => {
         if (activeBuildingType === null || buildingPreview === null || gameControl.isEnd) return;
@@ -304,7 +308,7 @@ const Game = () => {
             )}
             {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}
             {gameControl.isEnd && <EndScreen />}
-            {isPaused && !gameControl.isEnd && <PauseMenu onResume={() => setIsPaused(false)} />}
+            {isPaused && !gameControl.isEnd && <PauseMenu onResume={() => handlePause(false)} />}
         </div>
     );
 };
