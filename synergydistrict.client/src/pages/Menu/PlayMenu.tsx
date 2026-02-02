@@ -40,8 +40,6 @@ const PlayMenu = () => {
         setOptions({ ...options, seed: seed });
     }, [])
 
-    // Each time user goes to menu there is new seed
-
     return (
         <>
             <div className={styles.menuContent}>
@@ -112,7 +110,14 @@ const PlayMenu = () => {
                     options={["ON", "OFF"]}
                     selectedIndex={options.infiniteMap ? 0 : 1}
                     onChange={(index) => {
-                        setOptions({ ...options, infiniteMap: index === 0 });
+                        const defaultMapSize = defaultGameProperties.CHUNK_SIZE;
+                        if (index === 0) {
+                            setOptions({ ...options, infiniteMap: true, mapSize: defaultMapSize });
+                            setMapSizeString(defaultMapSize.toString());
+                        } else {
+                            setOptions({ ...options, infiniteMap: false, mapSize: defaultMapSize });
+                            setMapSizeString(defaultMapSize.toString());
+                        }
                         setHasInfMapChanged(true);
                     }}
                 />
