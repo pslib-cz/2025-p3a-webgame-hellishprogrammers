@@ -20,6 +20,13 @@ const SESSION_RESET_KEYS = [
     "synergies",
 ];
 
+const SEED_STRINGS_LIST = [
+    "skibidi",
+    "sigma",
+    "67",
+    "kayda"
+]
+
 const PlayMenu = () => {
     const { options, setOptions } = useGameOptions();
     const { setGameProperties } = useGameProperties();
@@ -52,21 +59,20 @@ const PlayMenu = () => {
                         onBlur={() => {
                             const seed = stringToSeed(seedString);
                             setOptions({ ...options, seed });
-                            setSeedString(seed.toString());
                         }}
                         onEnter={() => {
                             const seed = stringToSeed(seedString);
                             setOptions({ ...options, seed });
-                            setSeedString(seed.toString());
                         }}
                     />
                     <div className={`${styles.flex} border`}>
                         <TextButton
                             text={"Generate"}
                             onClick={() => {
-                                const seed = Math.floor(Math.random() * 1000000);
+                                const string = SEED_STRINGS_LIST[Math.floor(Math.random() * SEED_STRINGS_LIST.length)];
+                                setSeedString(string);
+                                const seed = stringToSeed(string)
                                 setOptions({ ...options, seed: seed });
-                                setSeedString(seed.toString());
                             }}
                         />
                     </div>
