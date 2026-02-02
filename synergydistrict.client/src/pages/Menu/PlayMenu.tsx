@@ -24,6 +24,8 @@ const PlayMenu = () => {
     const { options, setOptions } = useGameOptions();
     const { setGameProperties } = useGameProperties();
     const [seedString, setSeedString] = useState<string>(options.seed.toString());
+    const [durationString, setDurationString] = useState<string>(options.gameDuration?.toString() || "");
+    const [mapSizeString, setMapSizeString] = useState<string>(options.mapSize?.toString() || "");
     const [hasInfMapChanged, setHasInfMapChanged] = useState(false);
     const handleStart = useCallback(() => {
         setGameProperties(() => ({
@@ -48,9 +50,16 @@ const PlayMenu = () => {
                         text="Seed"
                         inputType="text"
                         value={seedString}
-                        onChange={(val) => {
-                            setOptions({ ...options, seed: stringToSeed(val) });
-                            setSeedString(val);
+                        onChange={(val) => setSeedString(val)}
+                        onBlur={() => {
+                            const seed = stringToSeed(seedString);
+                            setOptions({ ...options, seed });
+                            setSeedString(seed.toString());
+                        }}
+                        onEnter={() => {
+                            const seed = stringToSeed(seedString);
+                            setOptions({ ...options, seed });
+                            setSeedString(seed.toString());
                         }}
                     />
                     <div className={`${styles.flex} border`}>
@@ -75,8 +84,28 @@ const PlayMenu = () => {
                 <InputValue
                     text="Duration"
                     inputType="number"
-                    value={options.gameDuration || ""}
-                    onChange={(val) => setOptions({ ...options, gameDuration: Number(val) })}
+                    value={durationString}
+                    onChange={(val) => setDurationString(val)}
+                    onBlur={() => {
+                        let numericValue = Number(durationString);
+                        if (!Number.isFinite(numericValue)) {
+                            setDurationString(options.gameDuration?.toString() || "");
+                            return;
+                        }
+                        numericValue = Math.max(0.1, Math.min(999, numericValue));
+                        setOptions({ ...options, gameDuration: numericValue });
+                        setDurationString(numericValue.toString());
+                    }}
+                    onEnter={() => {
+                        let numericValue = Number(durationString);
+                        if (!Number.isFinite(numericValue)) {
+                            setDurationString(options.gameDuration?.toString() || "");
+                            return;
+                        }
+                        numericValue = Math.max(0.1, Math.min(999, numericValue));
+                        setOptions({ ...options, gameDuration: numericValue });
+                        setDurationString(numericValue.toString());
+                    }}
                 />
                 <InputToggle
                     text="Infinite map"
@@ -91,13 +120,27 @@ const PlayMenu = () => {
                     <InputValue
                         text="Map size"
                         inputType="number"
-                        value={options.mapSize || ""}
-                        onChange={(val) => {
-                            const numericValue = Number(val);
-                            if (!Number.isFinite(numericValue)) return;
-                            if (numericValue < 128) {
-                                setOptions({ ...options, mapSize: numericValue });
+                        value={mapSizeString}
+                        onChange={(val) => setMapSizeString(val)}
+                        onBlur={() => {
+                            let numericValue = Number(mapSizeString);
+                            if (!Number.isFinite(numericValue)) {
+                                setMapSizeString(options.mapSize?.toString() || "");
+                                return;
                             }
+                            numericValue = Math.max(1, Math.min(127, Math.floor(numericValue)));
+                            setOptions({ ...options, mapSize: numericValue });
+                            setMapSizeString(numericValue.toString());
+                        }}
+                        onEnter={() => {
+                            let numericValue = Number(mapSizeString);
+                            if (!Number.isFinite(numericValue)) {
+                                setMapSizeString(options.mapSize?.toString() || "");
+                                return;
+                            }
+                            numericValue = Math.max(1, Math.min(127, Math.floor(numericValue)));
+                            setOptions({ ...options, mapSize: numericValue });
+                            setMapSizeString(numericValue.toString());
                         }}
                         animationDelay={!hasInfMapChanged}
                     />
