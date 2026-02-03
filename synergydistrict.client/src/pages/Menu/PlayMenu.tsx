@@ -24,8 +24,65 @@ const SEED_STRINGS_LIST = [
     "skibidi",
     "sigma",
     "67",
-    "kayda"
-]
+    "kayda",
+    "Babis",
+    "Prd",
+    "infinite",
+    "GAY",
+    "TRANS",
+    "They/Them",
+    "Makvin",
+    "Mario",
+    "Mykhailo",
+    "Dan",
+    "Matej",
+    "VsichniNaSimona",
+    "Dollar",
+    "Ropa",
+    "Olomouc",
+    "Cizinec",
+    "Ukrajinec",
+    "NepracujiciSpoluobcan",
+    "Turky",
+    "Kebab",
+    "Gyros",
+    "Borshch",
+    "Svickova",
+    "Mamka",
+    "Tatinek",
+    "MamRadKozy",
+    "BigBlackMan",
+    "Random",
+    "MyBallSmall",
+    "Dickenson",
+    "Butterfly",
+    "GreyGooner",
+    "Trading",
+    "Centre",
+    "Island",
+    "Church",
+    "Blue",
+    "White",
+    "Chocolate",
+    "People",
+    "GreatSeed",
+    "MySeed",
+    "Someone",
+    "Joker",
+    "Batman",
+    "Braindamage",
+    "Lolipop",
+    "Starman",
+    "Candy",
+    "Mandy",
+    "Vajco",
+    "Koci",
+    "Parek",
+    "Rohlik",
+    "Brambora",
+    "Braza",
+    "TheEND",
+];
 
 const PlayMenu = () => {
     const { options, setOptions } = useGameOptions();
@@ -45,14 +102,13 @@ const PlayMenu = () => {
     const getNewSeed = () => {
         const string = SEED_STRINGS_LIST[Math.floor(Math.random() * SEED_STRINGS_LIST.length)];
         setSeedString(string);
-        const seed = stringToSeed(string)
+        const seed = stringToSeed(string);
         setOptions({ ...options, seed: seed });
-    }
-    
-    useEffect(() => {
-        getNewSeed()
-    }, [])
+    };
 
+    useEffect(() => {
+        getNewSeed();
+    }, []);
 
     return (
         <>
@@ -76,7 +132,7 @@ const PlayMenu = () => {
                         <TextButton
                             text={"Generate"}
                             onClick={() => {
-                                getNewSeed()
+                                getNewSeed();
                             }}
                         />
                     </div>
