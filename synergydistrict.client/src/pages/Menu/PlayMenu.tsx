@@ -21,19 +21,13 @@ const SESSION_RESET_KEYS = [
 ];
 
 const SEED_STRINGS_LIST = [
-    "skibidi",
-    "sigma",
-    "67",
     "infinite",
     "Makvin",
     "Mario",
-    "Mykhailo",
     "Dollar",
     "Ropa",
     "Olomouc",
     "Cizinec",
-    "Ukrajinec",
-    "NepracujiciSpoluobcan",
     "Turky",
     "Kebab",
     "Gyros",
@@ -61,8 +55,6 @@ const SEED_STRINGS_LIST = [
     "Starman",
     "Candy",
     "Mandy",
-    "Vajco",
-    "Parek",
     "Rohlik",
     "Brambora",
 ];
