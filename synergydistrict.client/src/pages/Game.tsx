@@ -64,6 +64,12 @@ const Game = () => {
         setGameControl((prev) => ({ ...prev, timerSpeed: setTo ? "pause" : "play" }));
     };
 
+    useEffect(() => {
+        if (activeBuildingType !== null && !CanAfford(activeBuildingType, GameResources, GameMapData.placedBuildings)) {
+            setBuildingPreview(null);
+        }
+    }, [GameResources]);
+
     const previewSynergies = useMemo(() => {
         if (!activeBuildingType || !buildingPreview || !buildingPreviewPosition)
             return [] as import("../types/Game/Buildings").SynergyProjection[];
