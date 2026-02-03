@@ -30,7 +30,7 @@ const TutorialMenu = () => {
     }, [canvasRef, loading]);
     return (
     <>
-    <div>
+     <div>
     <h2>HOW TO PLAY SYNERGY DISTRICT</h2>
     <p>Synergy District is a grid based city building game where buildings
          interact with each other and the map via synergies.
@@ -53,12 +53,10 @@ const TutorialMenu = () => {
         <ValuesBox iconKey="happiness" text="Is a multiplayer 50% = ×1" style={{ border: '0.25rem solid var(--text, #fefae0)', padding:'0.5rem' }}/>
 
         </div>
-        
-
     
     </>
     );
     
-};
+}
 
 export default TutorialMenu;

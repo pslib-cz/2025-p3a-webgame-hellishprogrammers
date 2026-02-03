@@ -27,6 +27,8 @@ export type AudioData = {
 
 const useMusic = (musicOptions: MusicOptions) => {
     const [currentTrack, setCurrentTrack] = useState<string>("");
+    const [canPlayAudio, setCanPlayAudio] = useState<boolean>(false);
+    const canPlayAudioRef = useRef<boolean>(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const playedTracksRef = useRef<number[]>([]);
     const timeoutRef = useRef<number | null>(null);
@@ -39,6 +41,38 @@ const useMusic = (musicOptions: MusicOptions) => {
 
     const { songsPath, volume, timeBetweenSongs, isEnabled, mode } = musicOptions;
     const songsPathKey = JSON.stringify(songsPath);
+
+    useEffect(() => {
+        const enableAudio = () => {
+            canPlayAudioRef.current = true;
+            setCanPlayAudio(true);
+        };
+
+        const testAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+        testAudio.volume = 0;
+        const playPromise = testAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    testAudio.pause();
+                    canPlayAudioRef.current = true;
+                    setCanPlayAudio(true);
+                })
+                .catch(() => {
+                    const events = ['click', 'keydown', 'touchstart'];
+                    events.forEach(event => document.addEventListener(event, enableAudio, { once: true }));
+                });
+        } else {
+            const events = ['click', 'keydown', 'touchstart'];
+            events.forEach(event => document.addEventListener(event, enableAudio, { once: true }));
+        }
+
+        return () => {
+            const events = ['click', 'keydown', 'touchstart'];
+            events.forEach(event => document.removeEventListener(event, enableAudio));
+        };
+    }, []);
 
     useEffect(() => {
         if (!audioRef.current) {
@@ -63,8 +97,11 @@ const useMusic = (musicOptions: MusicOptions) => {
 
             if (audioRef.current) {
                 audioRef.current.src = trackPath;
-                if (isEnabled) {
-                    audioRef.current.play().catch(() => {});
+                if (isEnabled && canPlayAudioRef.current) {
+                    audioRef.current.play().catch((err) => {
+                        console.error('Failed to play audio:', err);
+                    });
+                } else {
                 }
             }
         };
@@ -128,15 +165,20 @@ const useMusic = (musicOptions: MusicOptions) => {
         };
     }, [songsPathKey, volume, timeBetweenSongs, mode, isEnabled]);
 
+    // Handle when audio becomes playable or isEnabled changes
     useEffect(() => {
-        if (audioRef.current) {
-            if (isEnabled) {
-                audioRef.current.play().catch(() => {});
-            } else {
+       
+        if (audioRef.current && audioRef.current.src) {
+            if (isEnabled && canPlayAudio) {
+
+                audioRef.current.play().catch((err) => {
+                    console.error('Failed to play from effect:', err);
+                });
+            } else if (!isEnabled) {
                 audioRef.current.pause();
             }
         }
-    }, [isEnabled]);
+    }, [isEnabled, canPlayAudio]);
 
     return { currentTrack };
 };

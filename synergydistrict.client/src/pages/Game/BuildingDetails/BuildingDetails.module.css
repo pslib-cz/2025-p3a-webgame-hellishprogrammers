@@ -44,7 +44,6 @@
     align-items: center;
 }
 .row h2 {
-    margin: 0;
     text-transform: uppercase;
 }
 .close [class^="icon-"] {

@@ -18,7 +18,7 @@ const useFont = (font:string) => {
         return () => {
             cancelled = true;
         };
-    }, [])
+    }, [font])
 
     return fontsLoaded;
 }

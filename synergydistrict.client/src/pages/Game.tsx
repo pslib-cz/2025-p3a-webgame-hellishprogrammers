@@ -46,7 +46,7 @@ const Game = () => {
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
     const { synergies, naturalFeatures } = useGameData();
-    const { gameControl } = useGameControl();
+    const { gameControl, setGameControl } = useGameControl();
     const { gameSettings } = useSettings();
     const playClick = useSound("CLICK");
     const playSelect = useSound("SELECT");
@@ -54,11 +54,21 @@ const Game = () => {
 
     const { currentTrack } = useMusic({
         songsPath: ["/audio/game-music"],
-        volume: 0.2,
+        volume: 0.15,
         timeBetweenSongs: 10000,
         isEnabled: gameSettings.isMusic,
         mode: "random",
     });
+    const handlePause = (setTo: boolean) => {
+        setIsPaused(setTo);
+        setGameControl((prev) => ({ ...prev, timerSpeed: setTo ? "pause" : "play" }));
+    };
+
+    useEffect(() => {
+        if (activeBuildingType !== null && !CanAfford(activeBuildingType, GameResources, GameMapData.placedBuildings)) {
+            setBuildingPreview(null);
+        }
+    }, [GameResources]);
 
     const previewSynergies = useMemo(() => {
         if (!activeBuildingType || !buildingPreview || !buildingPreviewPosition)
@@ -126,14 +136,14 @@ const Game = () => {
             if (e.key === "Escape") {
                 e.preventDefault();
                 if (!gameControl.isEnd) {
-                    setIsPaused((prev) => !prev);
+                    handlePause(!isPaused);
                 }
             }
         };
 
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [gameControl.isEnd]);
+    }, [gameControl.isEnd, isPaused, handlePause]);
 
     const OnMapClick = (position: Position) => {
         if (activeBuildingType === null || buildingPreview === null || gameControl.isEnd) return;
@@ -146,7 +156,6 @@ const Game = () => {
                 GameMapData.loadedMapTiles,
             )
         ) {
-            playClick();
             const newBuilding: MapBuilding = {
                 buildingType: buildingPreview.buildingType,
                 MapBuildingId: crypto.randomUUID(),
@@ -165,7 +174,11 @@ const Game = () => {
                 GameMapData.loadedMapTiles,
                 GameMapData.ActiveNaturalFeatures,
             );
-            if (!newData) return;
+            if (!newData) {
+                playError();
+                return;
+            }
+            playClick();
 
             const newBuildings = [...GameMapData.placedBuildings, newBuilding];
 
@@ -205,9 +218,6 @@ const Game = () => {
         setActiveBuildingType(building);
 
         if (building === null || !CanAfford(building, GameResources, GameMapData.placedBuildings)) {
-            if (building && !CanAfford(building, GameResources, GameMapData.placedBuildings)) {
-                playError();
-            }
             setBuildingPreview(null);
             return;
         }
@@ -284,9 +294,9 @@ const Game = () => {
                     highlightedEdges={highlightedEdges}
                 />
                 {shouldRenderDocs && lastActiveBuildingType && (
-                    <BuildingDocs 
-                        building={lastActiveBuildingType} 
-                        activeSynergies={previewSynergies} 
+                    <BuildingDocs
+                        building={lastActiveBuildingType}
+                        activeSynergies={previewSynergies}
                         isExiting={isDocsExiting}
                     />
                 )}
@@ -295,16 +305,16 @@ const Game = () => {
                 <div className={styles.nowPlaying}>Now Playing: {currentTrack}</div>
             )}
             {shouldRenderDetails && lastSelectedBuilding && (
-                <BuildingDetails 
-                    building={lastSelectedBuilding} 
-                    CloseBar={() => OnBuildingClick(null)} 
+                <BuildingDetails
+                    building={lastSelectedBuilding}
+                    CloseBar={() => OnBuildingClick(null)}
                     onHighlightEdges={setHighlightedEdges}
                     isExiting={isDetailsExiting}
                 />
             )}
             {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}
             {gameControl.isEnd && <EndScreen />}
-            {isPaused && !gameControl.isEnd && <PauseMenu onResume={() => setIsPaused(false)} />}
+            {isPaused && !gameControl.isEnd && <PauseMenu onResume={() => handlePause(false)} />}
         </div>
     );
 };

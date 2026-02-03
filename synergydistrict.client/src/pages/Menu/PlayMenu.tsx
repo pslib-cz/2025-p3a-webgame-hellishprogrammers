@@ -20,10 +20,76 @@ const SESSION_RESET_KEYS = [
     "synergies",
 ];
 
+const SEED_STRINGS_LIST = [
+    "skibidi",
+    "sigma",
+    "67",
+    "kayda",
+    "Babis",
+    "Prd",
+    "infinite",
+    "GAY",
+    "TRANS",
+    "They/Them",
+    "Makvin",
+    "Mario",
+    "Mykhailo",
+    "Dan",
+    "Matej",
+    "VsichniNaSimona",
+    "Dollar",
+    "Ropa",
+    "Olomouc",
+    "Cizinec",
+    "Ukrajinec",
+    "NepracujiciSpoluobcan",
+    "Turky",
+    "Kebab",
+    "Gyros",
+    "Borshch",
+    "Svickova",
+    "Mamka",
+    "Tatinek",
+    "MamRadKozy",
+    "BigBlackMan",
+    "Random",
+    "MyBallSmall",
+    "Dickenson",
+    "Butterfly",
+    "GreyGooner",
+    "Trading",
+    "Centre",
+    "Island",
+    "Church",
+    "Blue",
+    "White",
+    "Chocolate",
+    "People",
+    "GreatSeed",
+    "MySeed",
+    "Someone",
+    "Joker",
+    "Batman",
+    "Braindamage",
+    "Lolipop",
+    "Starman",
+    "Candy",
+    "Mandy",
+    "Vajco",
+    "Koci",
+    "Parek",
+    "Rohlik",
+    "Brambora",
+    "Braza",
+    "TheEND",
+];
+
 const PlayMenu = () => {
     const { options, setOptions } = useGameOptions();
     const { setGameProperties } = useGameProperties();
     const [seedString, setSeedString] = useState<string>(options.seed.toString());
+    const [durationString, setDurationString] = useState<string>(options.gameDuration?.toString() || "");
+    const [mapSizeString, setMapSizeString] = useState<string>(options.mapSize?.toString() || "");
     const [hasInfMapChanged, setHasInfMapChanged] = useState(false);
     const handleStart = useCallback(() => {
         setGameProperties(() => ({
@@ -33,12 +99,16 @@ const PlayMenu = () => {
         clearStoredState(SESSION_RESET_KEYS);
     }, [setGameProperties, options]);
 
-    useEffect(() => {
-        const seed = Math.floor(Math.random() * 1000000);
+    const getNewSeed = () => {
+        const string = SEED_STRINGS_LIST[Math.floor(Math.random() * SEED_STRINGS_LIST.length)];
+        setSeedString(string);
+        const seed = stringToSeed(string);
         setOptions({ ...options, seed: seed });
-    }, [])
+    };
 
-    // Each time user goes to menu there is new seed
+    useEffect(() => {
+        getNewSeed();
+    }, []);
 
     return (
         <>
@@ -48,18 +118,21 @@ const PlayMenu = () => {
                         text="Seed"
                         inputType="text"
                         value={seedString}
-                        onChange={(val) => {
-                            setOptions({ ...options, seed: stringToSeed(val) });
-                            setSeedString(val);
+                        onChange={(val) => setSeedString(val)}
+                        onBlur={() => {
+                            const seed = stringToSeed(seedString);
+                            setOptions({ ...options, seed });
+                        }}
+                        onEnter={() => {
+                            const seed = stringToSeed(seedString);
+                            setOptions({ ...options, seed });
                         }}
                     />
                     <div className={`${styles.flex} border`}>
                         <TextButton
                             text={"Generate"}
                             onClick={() => {
-                                const seed = Math.floor(Math.random() * 1000000);
-                                setOptions({ ...options, seed: seed });
-                                setSeedString(seed.toString());
+                                getNewSeed();
                             }}
                         />
                     </div>
@@ -75,15 +148,42 @@ const PlayMenu = () => {
                 <InputValue
                     text="Duration"
                     inputType="number"
-                    value={options.gameDuration || ""}
-                    onChange={(val) => setOptions({ ...options, gameDuration: Number(val) })}
+                    value={durationString}
+                    onChange={(val) => setDurationString(val)}
+                    onBlur={() => {
+                        let numericValue = Number(durationString);
+                        if (!Number.isFinite(numericValue)) {
+                            setDurationString(options.gameDuration?.toString() || "");
+                            return;
+                        }
+                        numericValue = Math.max(0.1, Math.min(999, numericValue));
+                        setOptions({ ...options, gameDuration: numericValue });
+                        setDurationString(numericValue.toString());
+                    }}
+                    onEnter={() => {
+                        let numericValue = Number(durationString);
+                        if (!Number.isFinite(numericValue)) {
+                            setDurationString(options.gameDuration?.toString() || "");
+                            return;
+                        }
+                        numericValue = Math.max(0.1, Math.min(999, numericValue));
+                        setOptions({ ...options, gameDuration: numericValue });
+                        setDurationString(numericValue.toString());
+                    }}
                 />
                 <InputToggle
                     text="Infinite map"
                     options={["ON", "OFF"]}
                     selectedIndex={options.infiniteMap ? 0 : 1}
                     onChange={(index) => {
-                        setOptions({ ...options, infiniteMap: index === 0 });
+                        const defaultMapSize = defaultGameProperties.CHUNK_SIZE;
+                        if (index === 0) {
+                            setOptions({ ...options, infiniteMap: true, mapSize: defaultMapSize });
+                            setMapSizeString(defaultMapSize.toString());
+                        } else {
+                            setOptions({ ...options, infiniteMap: false, mapSize: defaultMapSize });
+                            setMapSizeString(defaultMapSize.toString());
+                        }
                         setHasInfMapChanged(true);
                     }}
                 />
@@ -91,13 +191,27 @@ const PlayMenu = () => {
                     <InputValue
                         text="Map size"
                         inputType="number"
-                        value={options.mapSize || ""}
-                        onChange={(val) => {
-                            const numericValue = Number(val);
-                            if (!Number.isFinite(numericValue)) return;
-                            if (numericValue < 128) {
-                                setOptions({ ...options, mapSize: numericValue });
+                        value={mapSizeString}
+                        onChange={(val) => setMapSizeString(val)}
+                        onBlur={() => {
+                            let numericValue = Number(mapSizeString);
+                            if (!Number.isFinite(numericValue)) {
+                                setMapSizeString(options.mapSize?.toString() || "");
+                                return;
                             }
+                            numericValue = Math.max(1, Math.min(127, Math.floor(numericValue)));
+                            setOptions({ ...options, mapSize: numericValue });
+                            setMapSizeString(numericValue.toString());
+                        }}
+                        onEnter={() => {
+                            let numericValue = Number(mapSizeString);
+                            if (!Number.isFinite(numericValue)) {
+                                setMapSizeString(options.mapSize?.toString() || "");
+                                return;
+                            }
+                            numericValue = Math.max(1, Math.min(127, Math.floor(numericValue)));
+                            setOptions({ ...options, mapSize: numericValue });
+                            setMapSizeString(numericValue.toString());
                         }}
                         animationDelay={!hasInfMapChanged}
                     />

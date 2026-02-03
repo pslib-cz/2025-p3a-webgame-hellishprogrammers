@@ -53,7 +53,7 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges =
         const baseY = building.position.y * TILE_SIZE;
         const width = building.buildingType.shape[0].length * TILE_SIZE;
         const height = building.buildingType.shape.length * TILE_SIZE;
-        const outlineStrokeWidth = Math.max(2, TILE_SIZE / 12);
+        //const outlineStrokeWidth = Math.max(2, TILE_SIZE / 12);
         const tiles = building.buildingType.shape;
 
         const iconRowIndex = tiles.findIndex((row) => row.includes("Icon"));
