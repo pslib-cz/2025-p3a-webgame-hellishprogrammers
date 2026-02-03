@@ -40,8 +40,9 @@ const TutorialMenu = () => {
     <p>Water and mountain tiles cannot support buildings. The extractional type of buildings have synergies with the nature tiles so watch out for them as they can help you out.
         You can find the synergies of buildings on the left bar. It shows up when a building is selected to build. Here you can see interactions with other buildins.
         Example of Synergies for House</p>
-    <>sem seznam</>
-    <p>The synergy hub shows you what synergies does the bulding get from other buildings and what
+    <img alt="Synergy display" src="../../../images/synergydisplay.png"/>
+    <p> 
+         The synergy hub shows you what synergies does the bulding get from other buildings and what
          buildings it gives to other buildings and what synergies will be made after building the building.
          It also shows the stats.
          Stats are values that will give you your score at the end of the game.</p>
