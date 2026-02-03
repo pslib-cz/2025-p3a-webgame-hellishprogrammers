@@ -28,9 +28,23 @@ const ToggleButton: FC<ToggleButtonProps> = ({ options, selectedIndex = 0, onCha
         <div className={`${styles.toggleButtons} border`}>
             {options.map((option, index) => {
                 const isDisabled = disabledIndices?.includes(index) ?? false;
-                return isIcons
-                    ? <IconButton key={index} iconKey={option} OnClick={() => handleClick(index)} isActive={index == active} disabled={isDisabled} />
-                    : <TextButton key={index} text={option} onClick={() => handleClick(index)} isActive={index === active} disabled={isDisabled} />
+                return isIcons ? (
+                    <IconButton
+                        key={index}
+                        iconKey={option}
+                        OnClick={() => handleClick(index)}
+                        isActive={index == active}
+                        disabled={isDisabled}
+                    />
+                ) : (
+                    <TextButton
+                        key={index}
+                        text={option}
+                        onClick={() => handleClick(index)}
+                        isActive={index === active}
+                        disabled={isDisabled}
+                    />
+                );
             })}
         </div>
     );

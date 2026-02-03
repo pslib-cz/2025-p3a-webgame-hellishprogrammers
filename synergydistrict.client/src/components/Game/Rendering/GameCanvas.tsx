@@ -397,8 +397,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
                     chunkBitmaps={chunkBitmaps}
                 />
                 <GridLayer gridImage={gridBitmapRef.current} />
-                <BuildingsLayer 
-                    buildings={GameMapData.placedBuildings} 
+                <BuildingsLayer
                     highlightedEdges={highlightedEdges}
                     onBuildingClick={onBuildingClick}
                 />

@@ -5,9 +5,9 @@ import useGameProperties from "../../../hooks/providers/useGameProperties";
 import { useBuildingsBitmap } from "../../../hooks/providers/useBuildingsBitmap";
 import { useImageBitmap } from "../../../hooks/useImage";
 import useFont from "../../../hooks/useFont";
+import useGameMapData from "../../../hooks/providers/useMapData";
 
 type BuildingsLayerProps = {
-    buildings: MapBuilding[];
     highlightedEdges?: ActiveSynergies[];
     onBuildingClick?: (building: MapBuilding) => void;
 };
@@ -18,9 +18,10 @@ const BUILDING_LEVEL_NUMBER = "#FEFAE0";
 const HIGHLIGHT_EDGE_COLOR = "#FEFAE0";
 const OUTLINE_WIDTH = 4;
 
-const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges = [], onBuildingClick }) => {
+const BuildingsLayer: FC<BuildingsLayerProps> = ({ highlightedEdges = [], onBuildingClick }) => {
     const { TILE_SIZE } = useGameProperties();
     const { buildingsBitmap } = useBuildingsBitmap();
+    const { GameMapData } = useGameMapData();
     useFont("700 16px Space Mono");
 
     const { bitmap: err, loading } = useImageBitmap("/images/err.jpg");
@@ -30,7 +31,7 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges =
         if (stage) {
             const container = stage.container();
             if (container) {
-                container.style.cursor = 'pointer';
+                container.style.cursor = "pointer";
             }
         }
     };
@@ -40,7 +41,7 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges =
         if (stage) {
             const container = stage.container();
             if (container) {
-                container.style.cursor = '';
+                container.style.cursor = "";
             }
         }
     };
@@ -61,14 +62,12 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges =
         const iconPosX = baseX + iconColIndex * TILE_SIZE + TILE_SIZE / 2 + (15 / 64) * TILE_SIZE;
         const iconPosY = baseY + iconRowIndex * TILE_SIZE + (20 / 64) * TILE_SIZE;
         return (
-            <Group 
-                key={building.MapBuildingId}
-            >
-                <Image 
-                    x={baseX} 
-                    y={baseY} 
-                    width={width} 
-                    height={height} 
+            <Group key={building.MapBuildingId}>
+                <Image
+                    x={baseX}
+                    y={baseY}
+                    width={width}
+                    height={height}
                     image={bitmap!}
                     listening={true}
                     onMouseEnter={handleBuildingMouseEnter}
@@ -171,28 +170,32 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges =
                 ) : null}
             </Group>
         );
-    }
+    };
 
     const renderHighlightedEdges = () => {
         if (highlightedEdges.length === 0) return null;
 
         return highlightedEdges.map((synergy, idx) => {
-            const sourceBuilding = buildings.find(b => b.MapBuildingId === synergy.sourceBuildingId);
-            
+            const sourceBuilding =
+                GameMapData.placedBuildings.find((b) => b.MapBuildingId === synergy.sourceBuildingId) ||
+                GameMapData.ActiveNaturalFeatures?.[synergy.sourceBuildingId];
+
             if (!sourceBuilding) return null;
 
+            const isNaturalFeature = !("buildingType" in sourceBuilding);
             const edge = synergy.edge;
             const baseX = sourceBuilding.position.x * TILE_SIZE;
             const baseY = sourceBuilding.position.y * TILE_SIZE;
-            
-            const relX = edge.position.x * TILE_SIZE;
-            const relY = edge.position.y * TILE_SIZE;
-            
+
+            // Natural features are always single tiles (1x1), so relative position is always 0,0
+            const relX = isNaturalFeature ? 0 : edge.position.x * TILE_SIZE;
+            const relY = isNaturalFeature ? 0 : edge.position.y * TILE_SIZE;
+
             let startX = baseX + relX;
             let startY = baseY + relY;
             let endX = startX;
             let endY = startY;
-            
+
             switch (edge.side) {
                 case "top":
                     startY = baseY + relY;
@@ -215,9 +218,9 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges =
                     endY = startY + TILE_SIZE;
                     break;
             }
-            
+
             const strokeWidth = OUTLINE_WIDTH;
-            
+
             return (
                 <Line
                     key={`highlight-${idx}-${synergy.sourceBuildingId}-${synergy.targetBuildingId}`}
@@ -236,17 +239,15 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ buildings, highlightedEdges =
             {loading ? (
                 <></>
             ) : (
-                buildings.map((building) => {
-                    return (
-                        building.isSelected ? null : getBuilding(building)
-                    );
+                GameMapData.placedBuildings.map((building) => {
+                    return building.isSelected ? null : getBuilding(building);
                 })
             )}
-            {
-                buildings.filter(b => b.isSelected).map(b => {
-                    return getBuilding(b)
-                })
-            }
+            {GameMapData.placedBuildings
+                .filter((b) => b.isSelected)
+                .map((b) => {
+                    return getBuilding(b);
+                })}
             {renderHighlightedEdges()}
         </Layer>
     );
