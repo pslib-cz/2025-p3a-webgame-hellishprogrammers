@@ -2,6 +2,7 @@ import { useState } from "react";
 import ToggleButton from "../../components/Buttons/ToggleButton/ToggleButton";
 import Statistics from "../../components/Menu/Statistics/Statistics";
 import History from "../../components/Menu/History/History";
+import styles from "../../styles/Menu.module.css";
 
 type StatisticsPage = "Statistics" | "History";
 
@@ -22,14 +23,14 @@ const StatisticsMenu = () => {
     };
 
     return (
-        <>
+        <div className={styles.menuContent}>
             <ToggleButton
                 options={toggleButtonOptions}
                 selectedIndex={toggleButtonOptions.indexOf(page)}
                 onChange={(index) => setPage(toggleButtonOptions[index])}
             />
             {renderPage()}
-        </>
+        </div>
     );
 };
 

@@ -1,12 +1,10 @@
-import type { BuildingType } from "../Game/Buildings";
-
 export type Statistics = {
     moneyMade: number;
     moneySpend: number;
     buildingsPlaced: number;
     buildingsDemolished: number;
     buildingsUpgraded: number;
-    buildingsPlacedByType: Map<BuildingType, number>;
+    buildingsPlacedByType: Record<string, number>;
 };
 
 export const defaultStatistics: Statistics = {
@@ -15,5 +13,5 @@ export const defaultStatistics: Statistics = {
     buildingsPlaced: 0,
     buildingsDemolished: 0,
     buildingsUpgraded: 0,
-    buildingsPlacedByType: new Map(),
+    buildingsPlacedByType: {},
 };
