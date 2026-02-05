@@ -13,6 +13,7 @@ import { defaultGameOptions } from "../../../types/Menu/GameOptions";
 import { defaultGameMapData } from "../../../types/Game/GameMapData";
 import { useSound } from "../../../hooks/useSound";
 import { useHistory } from "../../../hooks/providers/useHistory";
+import { useStatistics } from "../../../hooks/providers/useStatistics";
 
 const getRank = (score: number) => {
     if (score < 5000) return "F - INTERN";
@@ -22,7 +23,15 @@ const getRank = (score: number) => {
     else return "S - VISIONARY";
 };
 
-const SESSION_PA_RESET_KEYS = ["gameControl", "gameMapData", "gameResources", "gameTime", "buildings", "synergies", "gameProperties"];
+const SESSION_PA_RESET_KEYS = [
+    "gameControl",
+    "gameMapData",
+    "gameResources",
+    "gameTime",
+    "buildings",
+    "synergies",
+    "gameProperties",
+];
 
 const EndScreen: FC = () => {
     const navigate = useNavigate();
@@ -30,6 +39,7 @@ const EndScreen: FC = () => {
     const { options, setOptions } = useGameOptions();
     const { setGameMapData } = useGameMapData();
     const { setHistory } = useHistory();
+    const { setStatistics } = useStatistics();
 
     const playSuccess = useSound("SUCCESS");
 
@@ -56,6 +66,11 @@ const EndScreen: FC = () => {
             happiness: happiness,
         };
         setHistory((prev) => [...prev, newHistory]);
+        setStatistics((prev) => ({
+            ...prev,
+            bestScore: score > prev.bestScore ? score : prev.bestScore,
+            gamesPlayed: prev.gamesPlayed + 1,
+        }));
 
         playSuccess();
     }, []);
