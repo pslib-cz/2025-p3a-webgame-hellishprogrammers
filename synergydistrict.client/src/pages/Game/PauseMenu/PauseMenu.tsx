@@ -4,6 +4,9 @@ import InputToggle from "../../../components/Inputs/InputToggle";
 import InputValue from "../../../components/Inputs/InputValue/InputValue";
 import TextButton from "../../../components/Buttons/TextButton/TextButton";
 import styles from "./PauseMenu.module.css";
+import { clearStoredState } from "../../../utils/stateStorage";
+
+const SESSION_GAME_KEYS = ["gameControl", "gameMapData", "gameResources", "gameTime", "buildings", "synergies", "gameProperties"];
 
 interface PauseMenuProps {
     onResume: () => void;
@@ -20,6 +23,7 @@ const PauseMenu = ({ onResume }: PauseMenuProps) => {
     };
 
     const handleQuit = () => {
+        clearStoredState(SESSION_GAME_KEYS);
         navigate("/menu");
     };
 

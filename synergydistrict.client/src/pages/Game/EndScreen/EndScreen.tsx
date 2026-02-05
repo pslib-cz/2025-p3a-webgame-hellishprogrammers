@@ -1,4 +1,5 @@
 import { useEffect, useRef, type FC } from "react";
+import { useNavigate } from "react-router-dom";
 import TextButton from "../../../components/Buttons/TextButton/TextButton";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import ShowInfo from "../../../components/ShowInfo/ShowInfo";
@@ -21,9 +22,10 @@ const getRank = (score: number) => {
     else return "S - VISIONARY";
 };
 
-const SESSION_PA_RESET_KEYS = ["gameControl", "gameMapData", "gameResources", "gameTime", "buildings", "synergies"];
+const SESSION_PA_RESET_KEYS = ["gameControl", "gameMapData", "gameResources", "gameTime", "buildings", "synergies", "gameProperties"];
 
 const EndScreen: FC = () => {
+    const navigate = useNavigate();
     const { setGameControl } = useGameControl();
     const { options, setOptions } = useGameOptions();
     const { setGameMapData } = useGameMapData();
@@ -71,6 +73,11 @@ const EndScreen: FC = () => {
         window.location.reload();
     };
 
+    const handleExit = () => {
+        clearStoredState(SESSION_PA_RESET_KEYS);
+        navigate("/menu");
+    };
+
     return (
         <div className={styles.endScreen}>
             <h2 className={styles.title}>SESSION_TERMINATED</h2>
@@ -104,7 +111,7 @@ const EndScreen: FC = () => {
 
             <div className={`h2 ${styles.buttons}`}>
                 <TextButton text="play again" onClick={handlePlayAgain} textAlign="left" />
-                <TextButton text="exit" linkTo="/menu" />
+                <TextButton text="exit" onClick={handleExit} textAlign="left" />
             </div>
         </div>
     );
