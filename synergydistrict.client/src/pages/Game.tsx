@@ -334,7 +334,7 @@ const Game = () => {
                 )}
             </BuildingsBitmapProvider>
             {!gameControl.isEnd && currentTrack && gameSettings.isMusic && (
-                <div className={styles.nowPlaying}>Now Playing: {currentTrack}</div>
+                <div className={styles.nowPlaying} style={{zIndex: 40}}>Now Playing: {currentTrack}</div>
             )}
             {shouldRenderDetails && lastSelectedBuilding && (
                 <BuildingDetails
