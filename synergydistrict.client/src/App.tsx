@@ -22,6 +22,7 @@ import { useSettings } from "./hooks/providers/useSettings";
 import { useEffect } from "react";
 import { HistoryProvider } from "./provider/HistoryProvider";
 import { StatisticsProvider } from "./provider/StatisticsProvider";
+import CreditsMenu from "./pages/Menu/CreditsMenu";
 
 function AppContent() {
     const { gameSettings } = useSettings();
@@ -50,6 +51,7 @@ function AppContent() {
                                                 <Route path="tutorial" element={<TutorialMenu />} />
                                                 <Route path="statistics" element={<StatisticsMenu />} />
                                                 <Route path="settings" element={<SettingsMenu />} />
+                                                <Route path="credits" element={<CreditsMenu/>} />
                                             </Route>
                                             <Route
                                                 path="/game"

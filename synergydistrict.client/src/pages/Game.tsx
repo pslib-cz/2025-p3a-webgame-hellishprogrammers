@@ -27,6 +27,7 @@ import useMusic from "../hooks/useMusic";
 import PauseMenu from "./Game/PauseMenu/PauseMenu";
 import VersionDisplay from "../components/VersionDisplay/VersionDisplay";
 import { useSound } from "../hooks/useSound";
+import { type TimerSpeedType } from "../types";
 
 const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
@@ -42,6 +43,7 @@ const Game = () => {
     const [shouldRenderDetails, setShouldRenderDetails] = useState(false);
     const [lastActiveBuildingType, setLastActiveBuildingType] = useState<BuildingType | null>(null);
     const [lastSelectedBuilding, setLastSelectedBuilding] = useState<MapBuilding | null>(null);
+    const [lastSelectedTimeSpeed, setLastSelectedTimeSpeed] = useState<TimerSpeedType>("play")
     const { options } = useGameOptions();
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
@@ -61,7 +63,7 @@ const Game = () => {
     });
     const handlePause = (setTo: boolean) => {
         setIsPaused(setTo);
-        setGameControl((prev) => ({ ...prev, timerSpeed: setTo ? "pause" : "play" }));
+        setGameControl((prev) => ({ ...prev, timerSpeed: setTo ? "pause" : lastSelectedTimeSpeed }));
     };
 
     useEffect(() => {
@@ -312,7 +314,7 @@ const Game = () => {
                     isExiting={isDetailsExiting}
                 />
             )}
-            {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} />}
+            {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} onTimeSpeedChange={(timeSpeed: TimerSpeedType) => setLastSelectedTimeSpeed(timeSpeed)} />}
             {gameControl.isEnd && <EndScreen />}
             {isPaused && !gameControl.isEnd && <PauseMenu onResume={() => handlePause(false)} />}
         </div>

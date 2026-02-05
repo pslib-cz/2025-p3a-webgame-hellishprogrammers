@@ -7,7 +7,7 @@ export type GameControl = {
 };
 
 export const defaultGameControl: GameControl = {
-    timerSpeed: "pause",
+    timerSpeed: "play",
     isSound: true,
     isEnd: false,
 };
