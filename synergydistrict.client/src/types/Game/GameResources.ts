@@ -1,12 +1,12 @@
 export type GameResources = {
-        moneyBalance: number;
-        money: number;
-        peopleUsed: number;
-        people: number;
-        energyUsed: number;
-        energy: number;
-        industry: number;
-        happiness: number;
+    moneyBalance: number;
+    money: number;
+    peopleUsed: number;
+    people: number;
+    energyUsed: number;
+    energy: number;
+    industry: number;
+    happiness: number;
 };
 
 export const defaultGameResources: GameResources = {

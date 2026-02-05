@@ -187,7 +187,6 @@ const BuildingsLayer: FC<BuildingsLayerProps> = ({ highlightedEdges = [], onBuil
             const baseX = sourceBuilding.position.x * TILE_SIZE;
             const baseY = sourceBuilding.position.y * TILE_SIZE;
 
-            // Natural features are always single tiles (1x1), so relative position is always 0,0
             const relX = isNaturalFeature ? 0 : edge.position.x * TILE_SIZE;
             const relY = isNaturalFeature ? 0 : edge.position.y * TILE_SIZE;
 

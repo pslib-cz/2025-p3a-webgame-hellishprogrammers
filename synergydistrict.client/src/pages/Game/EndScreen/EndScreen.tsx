@@ -11,6 +11,7 @@ import { useGameOptions } from "../../../hooks/providers/useGameOptions";
 import { defaultGameOptions } from "../../../types/Menu/GameOptions";
 import { defaultGameMapData } from "../../../types/Game/GameMapData";
 import { useSound } from "../../../hooks/useSound";
+import { useHistory } from "../../../hooks/providers/useHistory";
 
 const getRank = (score: number) => {
     if (score < 5000) return "F - INTERN";
@@ -26,11 +27,25 @@ const EndScreen: FC = () => {
     const { setGameControl } = useGameControl();
     const { options, setOptions } = useGameOptions();
     const { setGameMapData } = useGameMapData();
+    const { setHistory } = useHistory();
 
     const playSuccess = useSound("SUCCESS");
 
     useEffect(() => {
         setGameControl((prev) => ({ ...prev, timerSpeed: "pause" }));
+        setHistory((prev) => [
+            ...prev,
+            {
+                score: score,
+                date: new Date().toLocaleDateString(),
+                money: moneyPt,
+                people: peoplePt,
+                industry: industryPt,
+                happiness: happiness,
+            },
+        ]);
+
+        playSuccess();
     }, []);
 
     const { GameResources } = useGameResources();
@@ -52,8 +67,6 @@ const EndScreen: FC = () => {
         clearStoredState(SESSION_PA_RESET_KEYS);
         window.location.reload();
     };
-
-    playSuccess()
 
     return (
         <div className={styles.endScreen}>
