@@ -1,4 +1,5 @@
 import useGameProperties from "../../../hooks/providers/useGameProperties";
+import { useHistory } from "../../../hooks/providers/useHistory";
 import { useStatistics } from "../../../hooks/providers/useStatistics";
 import { formatTime } from "../../../utils/timeUtils";
 import ProductionListing from "../../Game/ProductionListing/ProductionListing";
@@ -6,6 +7,7 @@ import styles from "./Statistics.module.css";
 
 const Statistics = () => {
     const { statistics } = useStatistics();
+    const { history } = useHistory();
     const { TPS } = useGameProperties();
 
     let favoriteBuildingNames = "None";
@@ -34,10 +36,10 @@ const Statistics = () => {
                     <p className={styles.number}>{formatTime(statistics.timeSpendPlaying / TPS)}</p>
                 </ProductionListing>
                 <ProductionListing title="Best score">
-                    <p className={styles.number}>{statistics.bestScore}</p>
+                    <p className={styles.number}>{Math.max(...history.map((h) => h.score))}</p>
                 </ProductionListing>
                 <ProductionListing title="Games played">
-                    <p className={styles.number}>{statistics.gamesPlayed}</p>
+                    <p className={styles.number}>{history.length}</p>
                 </ProductionListing>
             </div>
             <h3>Resources</h3>

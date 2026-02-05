@@ -6,8 +6,6 @@ export type Statistics = {
     buildingsUpgraded: number;
     buildingsPlacedByType: Record<string, number>;
     timeSpendPlaying: number;
-    bestScore: number;
-    gamesPlayed: number;
 };
 
 export const defaultStatistics: Statistics = {
@@ -18,6 +16,4 @@ export const defaultStatistics: Statistics = {
     buildingsUpgraded: 0,
     buildingsPlacedByType: {},
     timeSpendPlaying: 0,
-    bestScore: 0,
-    gamesPlayed: 0,
 };

@@ -89,23 +89,21 @@
 }
 
 .seed {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto;
     gap: 1rem;
-}
-.seed :first-child {
-  flex-grow: 1;
 }
 
 .flex {
     display: flex;
 }
-.gap{
-    gap:1rem
+.gap {
+    gap: 1rem;
 }
-.justify{
+.justify {
     justify-content: center;
 }
-.wrap{
+.wrap {
     flex-wrap: wrap;
 }
 

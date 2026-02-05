@@ -13,7 +13,6 @@ import { defaultGameOptions } from "../../../types/Menu/GameOptions";
 import { defaultGameMapData } from "../../../types/Game/GameMapData";
 import { useSound } from "../../../hooks/useSound";
 import { useHistory } from "../../../hooks/providers/useHistory";
-import { useStatistics } from "../../../hooks/providers/useStatistics";
 
 const getRank = (score: number) => {
     if (score < 5000) return "F - INTERN";
@@ -39,7 +38,6 @@ const EndScreen: FC = () => {
     const { options, setOptions } = useGameOptions();
     const { setGameMapData } = useGameMapData();
     const { setHistory } = useHistory();
-    const { setStatistics } = useStatistics();
 
     const playSuccess = useSound("SUCCESS");
 
@@ -50,27 +48,25 @@ const EndScreen: FC = () => {
         hasRun.current = true;
 
         setGameControl((prev) => ({ ...prev, timerSpeed: "pause" }));
-        const newHistory = {
-            score: score,
-            date: new Date().toLocaleString("en-US", {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-            }),
-            money: GameResources.moneyBalance,
-            people: GameResources.people,
-            industry: GameResources.industry,
-            happiness: happiness,
-        };
-        setHistory((prev) => [...prev, newHistory]);
-        setStatistics((prev) => ({
+
+        setHistory((prev) => [
             ...prev,
-            bestScore: score > prev.bestScore ? score : prev.bestScore,
-            gamesPlayed: prev.gamesPlayed + 1,
-        }));
+            {
+                score: score,
+                date: new Date().toLocaleString("en-US", {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                }),
+                money: GameResources.moneyBalance,
+                people: GameResources.people,
+                industry: GameResources.industry,
+                happiness: happiness,
+            },
+        ]);
 
         playSuccess();
     }, []);
