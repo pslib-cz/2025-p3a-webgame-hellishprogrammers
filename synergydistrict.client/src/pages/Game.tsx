@@ -28,6 +28,9 @@ import PauseMenu from "./Game/PauseMenu/PauseMenu";
 import VersionDisplay from "../components/VersionDisplay/VersionDisplay";
 import { useSound } from "../hooks/useSound";
 import { type TimerSpeedType } from "../types";
+import { clearStoredState } from "../utils/stateStorage";
+
+const SESSION_GAME_KEYS = ["gameControl", "gameMapData", "gameResources", "gameTime", "buildings", "synergies", "gameProperties"];
 
 const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
@@ -65,6 +68,12 @@ const Game = () => {
         setIsPaused(setTo);
         setGameControl((prev) => ({ ...prev, timerSpeed: setTo ? "pause" : lastSelectedTimeSpeed }));
     };
+
+    useEffect(() => {
+        return () => {
+            clearStoredState(SESSION_GAME_KEYS);
+        };
+    }, []);
 
     useEffect(() => {
         if (activeBuildingType !== null && !CanAfford(activeBuildingType, GameResources, GameMapData.placedBuildings)) {
