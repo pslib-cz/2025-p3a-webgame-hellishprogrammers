@@ -20,6 +20,7 @@ import type { GameResources } from "../../../types/Game/GameResources";
 import SynergyDisplay from "../../../components/Game/SynergyDisplay";
 import ToggleButton from "../../../components/Buttons/ToggleButton/ToggleButton";
 import { getGroupedSynergies, sumProduction } from "../../../utils/upgradeUtils";
+import { useStatistics } from "../../../hooks/providers/useStatistics";
 
 type BuildingDetailsProps = {
     building: MapBuilding;
@@ -31,9 +32,11 @@ type BuildingDetailsProps = {
 const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighlightEdges, isExiting }) => {
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
+    const { setStatistics } = useStatistics();
     const [IO, setIO] = useState<boolean>(false);
 
-    const currentBuilding = GameMapData.placedBuildings.find((b) => b.MapBuildingId === building.MapBuildingId) || building;
+    const currentBuilding =
+        GameMapData.placedBuildings.find((b) => b.MapBuildingId === building.MapBuildingId) || building;
     const currentLevel = currentBuilding.buildingType.upgrades[currentBuilding.level - 1];
     const isMaxLevel = currentBuilding.level >= currentBuilding.buildingType.upgrades.length;
 
@@ -129,6 +132,11 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
             placedBuildings: newBuilding,
             placedBuildingsMappped: buildPlacedBuildingsMap(newBuilding),
         }));
+        setStatistics((prev) => ({
+            ...prev,
+            moneySpend: prev.moneySpend + currentLevel.upgradeCost,
+            buildingsUpgraded: prev.buildingsUpgraded + 1,
+        }));
     };
 
     const deleteBuilding = () => {
@@ -155,10 +163,15 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
             placedBuildingsMappped: buildPlacedBuildingsMap(newBuildings),
             activeSynergies: newSynergies,
         }));
+        setStatistics((prev) => ({
+            ...prev,
+            moneySpend: prev.moneySpend + currentLevel.deleteCost,
+            buildingsDemolished: prev.buildingsDemolished + 1,
+        }));
     };
 
     return (
-        <div className={`${styles.buildingDetails} ${isExiting ? styles.exit : ''}`} style={{ userSelect: "none" }}>
+        <div className={`${styles.buildingDetails} ${isExiting ? styles.exit : ""}`} style={{ userSelect: "none" }}>
             <div className={styles.row}>
                 <h2 className={underscore.parent}>{building.buildingType.name}</h2>
                 <button onClick={() => CloseBar()} className={styles.close}>
@@ -175,7 +188,9 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
                         key={`${product.type}${product.value}`}
                         left={
                             <div className={styles.icon}>
-                                {GetIcon(product.type.toLowerCase() == "energy" ? "electricity" : product.type.toLowerCase())}
+                                {GetIcon(
+                                    product.type.toLowerCase() == "energy" ? "electricity" : product.type.toLowerCase(),
+                                )}
                             </div>
                         }
                         right={<>{product.value}</>}
@@ -244,9 +259,11 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
                             }
                             left={
                                 <div className={styles.icon}>
-                                    {GetIcon(product.type.toLowerCase() == "energy"
-                                        ? "electricity"
-                                        : product.type.toLowerCase())}
+                                    {GetIcon(
+                                        product.type.toLowerCase() == "energy"
+                                            ? "electricity"
+                                            : product.type.toLowerCase(),
+                                    )}
                                 </div>
                             }
                             right={<>{product.value}</>}

@@ -29,8 +29,17 @@ import VersionDisplay from "../components/VersionDisplay/VersionDisplay";
 import { useSound } from "../hooks/useSound";
 import { type TimerSpeedType } from "../types";
 import { clearStoredState } from "../utils/stateStorage";
+import { useStatistics } from "../hooks/providers/useStatistics";
 
-const SESSION_GAME_KEYS = ["gameControl", "gameMapData", "gameResources", "gameTime", "buildings", "synergies", "gameProperties"];
+const SESSION_GAME_KEYS = [
+    "gameControl",
+    "gameMapData",
+    "gameResources",
+    "gameTime",
+    "buildings",
+    "synergies",
+    "gameProperties",
+];
 
 const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);
@@ -46,13 +55,14 @@ const Game = () => {
     const [shouldRenderDetails, setShouldRenderDetails] = useState(false);
     const [lastActiveBuildingType, setLastActiveBuildingType] = useState<BuildingType | null>(null);
     const [lastSelectedBuilding, setLastSelectedBuilding] = useState<MapBuilding | null>(null);
-    const [lastSelectedTimeSpeed, setLastSelectedTimeSpeed] = useState<TimerSpeedType>("play")
+    const [lastSelectedTimeSpeed, setLastSelectedTimeSpeed] = useState<TimerSpeedType>("play");
     const { options } = useGameOptions();
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
     const { synergies, naturalFeatures } = useGameData();
     const { gameControl, setGameControl } = useGameControl();
     const { gameSettings } = useSettings();
+    const { setStatistics } = useStatistics();
     const playClick = useSound("CLICK");
     const playSelect = useSound("SELECT");
     const playError = useSound("ERROR");
@@ -219,6 +229,17 @@ const Game = () => {
                 ActiveNaturalFeatures: newNaturalFeaturesMap,
             }));
 
+            setStatistics((prev) => ({
+                ...prev,
+                moneySpend: prev.moneySpend + newBuilding.buildingType.cost,
+                buildingsPlaced: prev.buildingsPlaced + 1,
+                buildingsPlacedByType: {
+                    ...prev.buildingsPlacedByType,
+                    [newBuilding.buildingType.name]:
+                        (prev.buildingsPlacedByType[newBuilding.buildingType.name] || 0) + 1,
+                },
+            }));
+
             if (!CanAfford(buildingPreview!.buildingType, newData.newResources, newBuildings)) setBuildingPreview(null);
         } else playError();
     };
@@ -323,7 +344,12 @@ const Game = () => {
                     isExiting={isDetailsExiting}
                 />
             )}
-            {!gameControl.isEnd && <GameBar setBuilding={OnPlaceSelect} onTimeSpeedChange={(timeSpeed: TimerSpeedType) => setLastSelectedTimeSpeed(timeSpeed)} />}
+            {!gameControl.isEnd && (
+                <GameBar
+                    setBuilding={OnPlaceSelect}
+                    onTimeSpeedChange={(timeSpeed: TimerSpeedType) => setLastSelectedTimeSpeed(timeSpeed)}
+                />
+            )}
             {gameControl.isEnd && <EndScreen />}
             {isPaused && !gameControl.isEnd && <PauseMenu onResume={() => handlePause(false)} />}
         </div>
