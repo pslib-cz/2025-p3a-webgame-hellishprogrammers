@@ -91,7 +91,7 @@ export const TooltipContainer: FC<TooltipContainerProps> = ({ children, content,
 
     const containerStyle: CSSProperties = {
         position: "relative",
-        display: "block",
+        display: "flex",
         alignContent: "center"
     };
 

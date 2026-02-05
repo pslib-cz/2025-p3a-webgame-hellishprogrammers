@@ -2,6 +2,8 @@ import { type FC } from "react";
 import styles from "./SurvivalPaymentDisplay.module.css"
 import useGameTime from "../../../hooks/providers/useGameTime";
 import ValuesBox from "../ValuesBox/ValuesBox";
+import Tooltip from "../../Tooltip/Tooltip";
+import TooltipContainer from "../../Tooltip/TooltipContainer";
 
 const SurvivalPaymentDisplay: FC = () => {
     const { time } = useGameTime();
@@ -17,14 +19,19 @@ const SurvivalPaymentDisplay: FC = () => {
     };
 
     return (
-        <div className={styles.survivalDisplay + " border"}>
-            <div className={styles.time}>
-                <span className={styles.quarter}>Y{Math.floor(time.currentQuarter || 0 / 4)}</span>
-                <span className={styles.quarter}>Q{time.currentQuarter || 0 % 4}</span>
-            </div>
-            <div>
-                <ValuesBox iconKey="money" text={time.nextPayment?.toString() || "0"}/>
-            </div>
+        <div className={styles.survivalDisplay}>
+            <TooltipContainer content={<Tooltip title="Time display" description={`Diplays the current year and quater.`}/>} position="bottom">
+                <div className={styles.time + " border--narrow"}>
+                    <span className={styles.quarter}>Year: {Math.floor(time.currentQuarter || 0 / 4)}</span>
+                    <span className={styles.quarter}>Quater: {time.currentQuarter || 0 % 4}</span>
+                </div>
+            </TooltipContainer>
+            <TooltipContainer content={<Tooltip title="Taxes" description={"This is the tax you have to pay to at the end of the month"}/>} position="bottom">
+                <div className={styles.value + " border--narrow"}>
+                    <span>Tax:</span>
+                    <ValuesBox iconKey="money" text={time.nextPayment?.toString() || "0"} />
+                </div>
+            </TooltipContainer>
         </div>
     );
 };
