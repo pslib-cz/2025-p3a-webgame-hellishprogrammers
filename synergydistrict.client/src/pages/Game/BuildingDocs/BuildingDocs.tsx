@@ -12,6 +12,7 @@ import { useGameData } from "../../../hooks/providers/useGameData";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import { GetUnaffordableResources } from "../../../utils/PlacingUtils";
 import SynergyDisplay from "../../../components/Game/SynergyDisplay";
+import { GetIcon } from "../../../components/Icons";
 
 const buildingCategories: BuildingCategory[] = [
     "Residential",
@@ -193,7 +194,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies, isExit
         <div className={`${styles.buildingDocs} ${isExiting ? styles.exit : ''}`} style={{ userSelect: "none" }}>
             <div className={styles.title}>
                 <h2>{building.name.toUpperCase()}_</h2>
-                <span className={`${styles.icon} icon`}>{building.iconKey}</span>
+                <span className={styles.icon}>{GetIcon(building.iconKey)}</span>
             </div>
             <p>{building.description}</p>
             <ProductionListing title="Cost" style={{ opacity: unaffordableResources.has("moneyBalance") ? ".2" : "1" } as React.CSSProperties}>
@@ -209,8 +210,8 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies, isExit
                         key={`${product.type}${product.value}`}
                         style={{ opacity: unaffordableResources.has(product.type.toLowerCase()) ? ".2" : "1" } as React.CSSProperties}
                         left={
-                            <div className={`${styles.icon} icon`}>
-                                {product.type.toLowerCase() == "energy" ? "electricity" : product.type.toLowerCase()}
+                            <div className={styles.icon}>
+                                {GetIcon(product.type.toLowerCase() == "energy" ? "electricity" : product.type.toLowerCase())}
                             </div>
                         }
                         right={<>{product.value}</>}

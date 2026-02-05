@@ -2,7 +2,7 @@ import { useState, type FC } from "react";
 import styles from "./BuildingDetails.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
 import type { MapBuilding, ActiveSynergies } from "../../../types/Game/Grid";
-import { IconClose } from "../../../components/Icons";
+import { IconClose, GetIcon } from "../../../components/Icons";
 import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import useGameMapData from "../../../hooks/providers/useMapData";
@@ -174,8 +174,8 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
                         gameStyle={true}
                         key={`${product.type}${product.value}`}
                         left={
-                            <div className={`${styles.icon} icon`}>
-                                {product.type.toLowerCase() == "energy" ? "electricity" : product.type.toLowerCase()}
+                            <div className={styles.icon}>
+                                {GetIcon(product.type.toLowerCase() == "energy" ? "electricity" : product.type.toLowerCase())}
                             </div>
                         }
                         right={<>{product.value}</>}
@@ -243,10 +243,10 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
                                 } as React.CSSProperties
                             }
                             left={
-                                <div className={`${styles.icon} icon`}>
-                                    {product.type.toLowerCase() == "energy"
+                                <div className={styles.icon}>
+                                    {GetIcon(product.type.toLowerCase() == "energy"
                                         ? "electricity"
-                                        : product.type.toLowerCase()}
+                                        : product.type.toLowerCase())}
                                 </div>
                             }
                             right={<>{product.value}</>}
