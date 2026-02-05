@@ -1,4 +1,4 @@
-import { useEffect, type FC } from "react";
+import { useEffect, useRef, type FC } from "react";
 import TextButton from "../../../components/Buttons/TextButton/TextButton";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
 import ShowInfo from "../../../components/ShowInfo/ShowInfo";
@@ -31,19 +31,22 @@ const EndScreen: FC = () => {
 
     const playSuccess = useSound("SUCCESS");
 
+    const hasRun = useRef(false);
+
     useEffect(() => {
+        if (hasRun.current) return;
+        hasRun.current = true;
+
         setGameControl((prev) => ({ ...prev, timerSpeed: "pause" }));
-        setHistory((prev) => [
-            ...prev,
-            {
-                score: score,
-                date: new Date().toLocaleDateString(),
-                money: moneyPt,
-                people: peoplePt,
-                industry: industryPt,
-                happiness: happiness,
-            },
-        ]);
+        const newHistory = {
+            score: score,
+            date: new Date().toLocaleDateString(),
+            money: GameResources.moneyBalance,
+            people: GameResources.people,
+            industry: GameResources.industry,
+            happiness: happiness,
+        };
+        setHistory((prev) => [...prev, newHistory]);
 
         playSuccess();
     }, []);
