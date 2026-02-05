@@ -1,3 +1,7 @@
+.productionListing{
+    min-width: 15rem;
+}
+
 .title{
     background-color: var(--text);
     color: var(--background);
@@ -13,4 +17,6 @@
     justify-content: end;
     padding: .5rem 0.5rem;
     color: var(--text);
+    background-color: var(--background);
+    text-align: right;
 }
