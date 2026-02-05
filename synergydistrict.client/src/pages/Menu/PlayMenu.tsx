@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import useGameProperties from "../../hooks/providers/useGameProperties";
 import { defaultGameProperties } from "../../types/Game/GameProperties";
 import { clearStoredState } from "../../utils/stateStorage";
+import Tooltip from "../../components/Tooltip/Tooltip";
 
 const SESSION_RESET_KEYS = [
     "gameControl",
@@ -118,6 +119,10 @@ const PlayMenu = () => {
                     selectedIndex={0}
                     onChange={(index) => index === 0 && setOptions({ ...options, gameMode: "timePresure" })}
                     disabledIndices={[1]}
+                    tooltips={[
+                        <Tooltip title="Time Pressure" description="Make as much money, people and goods as possible in this time limited gamemode. Your work will be judged after the time limit runs out."/>,
+                        <Tooltip title="Survival" description="Survive as long as you can, but each quater the taxes on your town rise. If you cannot pay them, your out!"/>
+                    ]}
                 />
                 <h3>Options</h3>
                 <InputValue

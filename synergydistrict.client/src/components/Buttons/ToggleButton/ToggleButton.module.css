@@ -1,10 +1,17 @@
 .toggleButtons {
     display: flex;
 }
+.toggleButtons > * {
+    flex: 1;
+}
 .toggleButtons button {
-    flex-grow: 1;
+    width: 100%;
     border: none;
     padding: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 .toggleButtonsNarrow {
