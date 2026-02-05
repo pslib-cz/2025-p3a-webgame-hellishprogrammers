@@ -11,7 +11,7 @@ const History = () => {
             {history.length === 0 ? (
                 <p>No games where played yet...</p>
             ) : (
-                history.reverse().map((h) => (
+                [...history].reverse().map((h, index) => (
                     <ShowInfo
                         key={Math.random()}
                         left={
@@ -28,6 +28,9 @@ const History = () => {
                                 <ValuesBox iconKey={"happiness"} text={`${h.happiness}%`} />
                             </div>
                         }
+                        style={{
+                            animationDelay: `calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * ${index + 2})`,
+                        }}
                     />
                 ))
             )}
