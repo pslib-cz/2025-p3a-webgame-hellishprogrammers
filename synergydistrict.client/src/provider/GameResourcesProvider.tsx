@@ -3,6 +3,7 @@ import { defaultGameResources, type GameResources } from "../types/Game/GameReso
 import useGameTime from "../hooks/providers/useGameTime";
 import useGameProperties from "../hooks/providers/useGameProperties";
 import { loadStoredState, saveStoredState } from "../utils/stateStorage";
+import { useStatistics } from "../hooks/providers/useStatistics";
 
 type GameResourcesContextValue = {
     GameResources: GameResources;
@@ -13,10 +14,11 @@ export const GameResourcesContext = createContext<GameResourcesContextValue | nu
 
 export const GameResourcesProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [GameResources, setGameResources] = useState<GameResources>(() =>
-        loadStoredState<GameResources>("gameResources", defaultGameResources)
+        loadStoredState<GameResources>("gameResources", defaultGameResources),
     );
-    const {time} = useGameTime();
-    const {TPS} = useGameProperties();
+    const { time } = useGameTime();
+    const { TPS } = useGameProperties();
+    const { setStatistics } = useStatistics();
 
     useEffect(() => {
         saveStoredState("gameResources", GameResources);
@@ -27,15 +29,21 @@ export const GameResourcesProvider: React.FC<React.PropsWithChildren> = ({ child
         if (time.timer === 0) return;
         if (time.timer % TPS !== 0) return;
 
-        setGameResources(prev => ({
+        setGameResources((prev) => ({
             ...prev,
             moneyBalance: prev.moneyBalance + prev.money,
+        }));
+
+        setStatistics((prev) => ({
+            ...prev,
+            moneyMade: prev.moneyMade + GameResources.money,
+            timeSpendPlaying: prev.timeSpendPlaying + time.timer,
         }));
     }, [time.timer, TPS]);
 
     return (
-        <GameResourcesContext.Provider value={{ GameResources, setGameResources}}>
+        <GameResourcesContext.Provider value={{ GameResources, setGameResources }}>
             {children}
         </GameResourcesContext.Provider>
     );
-}
+};

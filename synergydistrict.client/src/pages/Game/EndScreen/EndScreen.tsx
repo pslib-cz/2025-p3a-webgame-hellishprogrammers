@@ -40,7 +40,14 @@ const EndScreen: FC = () => {
         setGameControl((prev) => ({ ...prev, timerSpeed: "pause" }));
         const newHistory = {
             score: score,
-            date: new Date().toLocaleDateString(),
+            date: new Date().toLocaleString("en-US", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+            }),
             money: GameResources.moneyBalance,
             people: GameResources.people,
             industry: GameResources.industry,

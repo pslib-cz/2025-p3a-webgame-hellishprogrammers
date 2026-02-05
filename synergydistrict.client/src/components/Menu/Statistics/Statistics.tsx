@@ -1,9 +1,12 @@
+import useGameProperties from "../../../hooks/providers/useGameProperties";
 import { useStatistics } from "../../../hooks/providers/useStatistics";
+import { formatTime } from "../../../utils/timeUtils";
 import ProductionListing from "../../Game/ProductionListing/ProductionListing";
 import styles from "./Statistics.module.css";
 
 const Statistics = () => {
     const { statistics } = useStatistics();
+    const { TPS } = useGameProperties();
 
     let favoriteBuildingNames = "None";
     let maxCount = 0;
@@ -25,6 +28,12 @@ const Statistics = () => {
 
     return (
         <>
+            <h3>Overall</h3>
+            <div className={styles.grid}>
+                <ProductionListing title="Time spend playing">
+                    <p className={styles.number}>{formatTime(statistics.timeSpendPlaying / TPS)}</p>
+                </ProductionListing>
+            </div>
             <h3>Resources</h3>
             <div className={styles.grid}>
                 <ProductionListing title="Money made">

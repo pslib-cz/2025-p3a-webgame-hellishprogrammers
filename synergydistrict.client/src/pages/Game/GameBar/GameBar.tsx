@@ -15,10 +15,11 @@ import useGameMapData from "../../../hooks/providers/useMapData";
 import type { TimerSpeedType } from "../../../types";
 import TooltipContainer from "../../../components/Tooltip/TooltipContainer";
 import Tooltip from "../../../components/Tooltip/Tooltip";
+import { formatTime } from "../../../utils/timeUtils";
 
 type GameBarProps = {
     setBuilding: (x: BuildingType | null) => void;
-    onTimeSpeedChange: (newSpeed: TimerSpeedType) => void
+    onTimeSpeedChange: (newSpeed: TimerSpeedType) => void;
 };
 
 const GameBar: FC<GameBarProps> = ({ setBuilding, onTimeSpeedChange }) => {
@@ -47,41 +48,30 @@ const GameBar: FC<GameBarProps> = ({ setBuilding, onTimeSpeedChange }) => {
         }
     }, [GameResources, buildings, GameMapData.placedBuildings]);
 
-    const formatTime = (totalSeconds: number) => {
-        const minutes = Math.floor(totalSeconds / 60)
-            .toString()
-            .padStart(2, "0");
-        const seconds = Math.floor(totalSeconds % 60)
-            .toString()
-            .padStart(2, "0");
-        return `${minutes}:${seconds}`;
-    };
-
     return (
         <div className={styles.gameBar}>
             <div className={styles.row}>
                 <div className={`${styles.timeControl} border--narrow`}>
                     <IconButton
                         OnClick={() => {
-                            setGameControl((v) => ({ ...v, timerSpeed: "pause" }))
-                            onTimeSpeedChange("pause")
-
+                            setGameControl((v) => ({ ...v, timerSpeed: "pause" }));
+                            onTimeSpeedChange("pause");
                         }}
                         isActive={gameControl.timerSpeed === "pause"}
                         iconKey="pause"
                     />
                     <IconButton
                         OnClick={() => {
-                            setGameControl((v) => ({ ...v, timerSpeed: "play" }))
-                            onTimeSpeedChange("play")
+                            setGameControl((v) => ({ ...v, timerSpeed: "play" }));
+                            onTimeSpeedChange("play");
                         }}
                         isActive={gameControl.timerSpeed === "play"}
                         iconKey="play"
                     />
                     <IconButton
                         OnClick={() => {
-                            setGameControl((v) => ({ ...v, timerSpeed: "fastforward" }))
-                            onTimeSpeedChange("fastforward")
+                            setGameControl((v) => ({ ...v, timerSpeed: "fastforward" }));
+                            onTimeSpeedChange("fastforward");
                         }}
                         isActive={gameControl.timerSpeed === "fastforward"}
                         iconKey="fastforward"
@@ -124,28 +114,42 @@ const GameBar: FC<GameBarProps> = ({ setBuilding, onTimeSpeedChange }) => {
             </div>
             <div className={styles.row}>
                 <div className={`${styles.values} border--narrow`}>
-                    <TooltipContainer content={<Tooltip title="Money" description="Used to buy new buildings"/>}>
+                    <TooltipContainer content={<Tooltip title="Money" description="Used to buy new buildings" />}>
                         <ValuesBox iconKey="money" text={`${GameResources.moneyBalance} (${GameResources.money}/t)`} />
                     </TooltipContainer>
-
                 </div>
                 <div className={`${styles.values} border--narrow`}>
-                    <TooltipContainer content={<Tooltip title="People" description="Needed for buildings to be operational"/>}>
+                    <TooltipContainer
+                        content={<Tooltip title="People" description="Needed for buildings to be operational" />}
+                    >
                         <ValuesBox
                             iconKey="people"
                             text={`${GameResources.people - GameResources.peopleUsed}/${GameResources.people}`}
                         />
                     </TooltipContainer>
-                    <TooltipContainer content={<Tooltip title="Electricity" description="Building are not upgradable witout electricity"/>}>
+                    <TooltipContainer
+                        content={
+                            <Tooltip title="Electricity" description="Building are not upgradable witout electricity" />
+                        }
+                    >
                         <ValuesBox
                             iconKey="electricity"
                             text={`${GameResources.energy - GameResources.energyUsed}/${GameResources.energy}`}
                         />
                     </TooltipContainer>
-                    <TooltipContainer content={<Tooltip title="Materials" description="Required for advanced procesing"/>}>
+                    <TooltipContainer
+                        content={<Tooltip title="Materials" description="Required for advanced procesing" />}
+                    >
                         <ValuesBox iconKey="industry" text={`${GameResources.industry}`} />
                     </TooltipContainer>
-                    <TooltipContainer content={<Tooltip title="Happiness" description="Greatly changes your score at the end of the game"/>}>
+                    <TooltipContainer
+                        content={
+                            <Tooltip
+                                title="Happiness"
+                                description="Greatly changes your score at the end of the game"
+                            />
+                        }
+                    >
                         <ValuesBox
                             iconKey="happiness"
                             text={`${GameResources.happiness > 100 ? 100 : GameResources.happiness}%`}
