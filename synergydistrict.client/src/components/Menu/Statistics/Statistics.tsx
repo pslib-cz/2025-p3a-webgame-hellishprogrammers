@@ -33,6 +33,12 @@ const Statistics = () => {
                 <ProductionListing title="Time spend playing">
                     <p className={styles.number}>{formatTime(statistics.timeSpendPlaying / TPS)}</p>
                 </ProductionListing>
+                <ProductionListing title="Best score">
+                    <p className={styles.number}>{statistics.bestScore}</p>
+                </ProductionListing>
+                <ProductionListing title="Games played">
+                    <p className={styles.number}>{statistics.gamesPlayed}</p>
+                </ProductionListing>
             </div>
             <h3>Resources</h3>
             <div className={styles.grid}>
