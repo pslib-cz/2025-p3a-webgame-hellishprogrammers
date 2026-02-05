@@ -37,7 +37,7 @@ export const GameResourcesProvider: React.FC<React.PropsWithChildren> = ({ child
         setStatistics((prev) => ({
             ...prev,
             moneyMade: prev.moneyMade + GameResources.money,
-            timeSpendPlaying: prev.timeSpendPlaying + time.timer,
+            timeSpendPlaying: prev.timeSpendPlaying + TPS,
         }));
     }, [time.timer, TPS]);
 
