@@ -59,6 +59,8 @@ export const TooltipContainer: FC<TooltipContainerProps> = ({ children, content,
             }
             
             setAdjustedPosition(adjustments);
+        } else if (!visible) {
+            setAdjustedPosition({});
         }
     }, [visible, position]);
 
