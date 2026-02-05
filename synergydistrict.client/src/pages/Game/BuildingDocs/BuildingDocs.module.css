@@ -31,7 +31,7 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    overflow: scroll;
+    overflow-y: auto;
     scrollbar-width: none;
     animation: slideInFromLeft 0.3s ease-out forwards;
 }

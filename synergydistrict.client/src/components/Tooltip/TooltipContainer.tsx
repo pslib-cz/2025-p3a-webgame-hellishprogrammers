@@ -1,5 +1,6 @@
 import type { FC, ReactNode, CSSProperties } from "react";
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 type TooltipContainerProps = {
     children: ReactNode; 
@@ -11,11 +12,18 @@ type TooltipContainerProps = {
 export const TooltipContainer: FC<TooltipContainerProps> = ({ children, content, position = "top",style }) => {
     const [visible, setVisible] = useState(false);
     const [adjustedPosition, setAdjustedPosition] = useState<CSSProperties>({});
+    const [containerRect, setContainerRect] = useState<DOMRect | null>(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (visible && tooltipRef.current && containerRef.current) {
+        if (visible && containerRef.current) {
+            setContainerRect(containerRef.current.getBoundingClientRect());
+        }
+    }, [visible]);
+
+    useEffect(() => {
+        if (visible && tooltipRef.current && containerRect) {
             const tooltip = tooltipRef.current;
             const rect = tooltip.getBoundingClientRect();
             
@@ -26,9 +34,11 @@ export const TooltipContainer: FC<TooltipContainerProps> = ({ children, content,
             
             if (rect.right > viewportWidth) {
                 const overflow = rect.right - viewportWidth;
-                adjustments.left = `calc(50% - ${overflow + 10}px)`;
+                adjustments.left = `${containerRect.left + containerRect.width / 2 - overflow - 10}px`;
+                adjustments.transform = "translateX(-50%)";
             } else if (rect.left < 0) {
-                adjustments.left = `calc(50% + ${Math.abs(rect.left) + 10}px)`;
+                adjustments.left = `${containerRect.left + containerRect.width / 2 + Math.abs(rect.left) + 10}px`;
+                adjustments.transform = "translateX(-50%)";
             }
 
             if (rect.bottom > viewportHeight) {
@@ -36,40 +46,45 @@ export const TooltipContainer: FC<TooltipContainerProps> = ({ children, content,
                     adjustments = {
                         ...adjustments,
                         top: "auto",
-                        bottom: "100%",
+                        bottom: `${window.innerHeight - containerRect.top}px`,
                         marginTop: "0",
                         marginBottom: ".5rem",
                     };
                 } else {
                     const overflow = rect.bottom - viewportHeight;
-                    adjustments.top = `calc(50% - ${overflow + 10}px)`;
+                    adjustments.bottom = `${window.innerHeight - containerRect.top - overflow - 10}px`;
+                    adjustments.top = "auto";
                 }
             } else if (rect.top < 0) {
                 if (position === "top") {
                     adjustments = {
                         ...adjustments,
                         bottom: "auto",
-                        top: "100%",
+                        top: `${containerRect.bottom}px`,
                         marginBottom: "0",
                         marginTop: ".5rem",
                     };
                 } else {
-                    adjustments.top = `calc(50% + ${Math.abs(rect.top) + 10}px)`;
+                    adjustments.top = `${containerRect.top + containerRect.height / 2 + Math.abs(rect.top) + 10}px`;
                 }
             }
             
             setAdjustedPosition(adjustments);
         } else if (!visible) {
             setAdjustedPosition({});
+            setContainerRect(null);
         }
-    }, [visible, position]);
+    }, [visible, position, containerRect]);
 
     const TooltipContainerStyle: CSSProperties = {
-        position: "absolute",
+        position: "fixed",
         visibility: visible ? "visible" : "hidden",
         zIndex: 1000,
         pointerEvents: "none",
-        ...getPositionStyles(position),
+        maxWidth: "20rem",
+        minWidth: "12rem",
+        width: "max-content",
+        ...getFixedPositionStyles(position, containerRect),
         ...adjustedPosition,
         ...style,
     };
@@ -88,40 +103,45 @@ export const TooltipContainer: FC<TooltipContainerProps> = ({ children, content,
             onMouseLeave={() => setVisible(false)}
         >
             {children}
-            <div ref={tooltipRef} style={TooltipContainerStyle}>
-                {content}
-            </div>
+            {visible && createPortal(
+                <div ref={tooltipRef} style={TooltipContainerStyle}>
+                    {content}
+                </div>,
+                document.body
+            )}
         </div>
     );
 };
 
-function getPositionStyles(position: "top" | "bottom" | "left" | "right"): CSSProperties {
+function getFixedPositionStyles(position: "top" | "bottom" | "left" | "right", containerRect: DOMRect | null): CSSProperties {
+    if (!containerRect) return {};
+    
     switch (position) {
         case "top":
             return {
-                bottom: "100%",
-                left: "50%",
+                bottom: `${window.innerHeight - containerRect.top}px`,
+                left: `${containerRect.left + containerRect.width / 2}px`,
                 transform: "translateX(-50%)",
                 marginBottom: ".5rem",
             };
         case "bottom":
             return {
-                top: "100%",
-                left: "50%",
+                top: `${containerRect.bottom}px`,
+                left: `${containerRect.left + containerRect.width / 2}px`,
                 transform: "translateX(-50%)",
                 marginTop: ".5rem",
             };
         case "left":
             return {
-                right: "100%",
-                top: "50%",
+                right: `${window.innerWidth - containerRect.left}px`,
+                top: `${containerRect.top + containerRect.height / 2}px`,
                 transform: "translateY(-50%)",
                 marginRight: ".5rem",
             };
         case "right":
             return {
-                left: "100%",
-                top: "50%",
+                left: `${containerRect.right}px`,
+                top: `${containerRect.top + containerRect.height / 2}px`,
                 transform: "translateY(-50%)",
                 marginLeft: ".5rem",
             };
