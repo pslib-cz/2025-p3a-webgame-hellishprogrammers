@@ -1,8 +1,13 @@
 .right {
     display: flex;
     height: 100%;
+    box-sizing: border-box;
     justify-content: flex-end;
     align-items: center;
     padding: 0 1rem;
     gap: 0.5rem;
+}
+
+.left h3 {
+    margin-bottom: .5rem;
 }
