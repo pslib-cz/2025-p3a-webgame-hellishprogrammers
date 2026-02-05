@@ -12,12 +12,14 @@ import useGameTime from "../../../hooks/providers/useGameTime";
 import { useGameOptions } from "../../../hooks/providers/useGameOptions";
 import { useSettings } from "../../../hooks/providers/useSettings";
 import useGameMapData from "../../../hooks/providers/useMapData";
+import type { TimerSpeedType } from "../../../types";
 
 type GameBarProps = {
     setBuilding: (x: BuildingType | null) => void;
+    onTimeSpeedChange: (newSpeed: TimerSpeedType) => void
 };
 
-const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
+const GameBar: FC<GameBarProps> = ({ setBuilding, onTimeSpeedChange }) => {
     const { gameControl, setGameControl } = useGameControl();
     const { gameSettings, setGameSettings } = useSettings();
     const { GameResources } = useGameResources();
@@ -58,17 +60,27 @@ const GameBar: FC<GameBarProps> = ({ setBuilding }) => {
             <div className={styles.row}>
                 <div className={`${styles.timeControl} border--narrow`}>
                     <IconButton
-                        OnClick={() => setGameControl((v) => ({ ...v, timerSpeed: "pause" }))}
+                        OnClick={() => {
+                            setGameControl((v) => ({ ...v, timerSpeed: "pause" }))
+                            onTimeSpeedChange("pause")
+                            
+                        }}
                         isActive={gameControl.timerSpeed === "pause"}
                         iconKey="pause"
                     />
                     <IconButton
-                        OnClick={() => setGameControl((v) => ({ ...v, timerSpeed: "play" }))}
+                        OnClick={() => {
+                            setGameControl((v) => ({ ...v, timerSpeed: "play" }))
+                            onTimeSpeedChange("play")
+                        }}
                         isActive={gameControl.timerSpeed === "play"}
                         iconKey="play"
                     />
                     <IconButton
-                        OnClick={() => setGameControl((v) => ({ ...v, timerSpeed: "fastforward" }))}
+                        OnClick={() => {
+                            setGameControl((v) => ({ ...v, timerSpeed: "fastforward" }))
+                            onTimeSpeedChange("fastforward")
+                        }}
                         isActive={gameControl.timerSpeed === "fastforward"}
                         iconKey="fastforward"
                     />

@@ -25,39 +25,42 @@ const Menu = () => {
             <VersionDisplay />
             <div className={styles.menu}>
                 <div className={styles.menuSide}>
-                <div className={`${styles.menuContainer} ${styles.menuNarrow}`}>
-                    <NavLink to="/menu" onClick={() => playClick()}>
-                        <h1 className={underscore.parent}>Synergy District</h1>
-                    </NavLink>
-                    <nav>
-                        <menu className={`h2`}>
-                            <li>
-                                <TextButton text="play" linkTo="play" />
-                            </li>
-                            <li>
-                                <TextButton text="tutorial" linkTo="tutorial" />
-                            </li>
-                            <li>
-                                <TextButton text="statistics" linkTo="statistics" />
-                            </li>
-                            <li>
-                                <TextButton text="settings" linkTo="settings" />
-                            </li>
-                        </menu>
-                    </nav>
+                    <div className={`${styles.menuContainer} ${styles.menuNarrow}`}>
+                        <NavLink to="/menu" onClick={() => playClick()}>
+                            <h1 className={underscore.parent}>Synergy District</h1>
+                        </NavLink>
+                        <nav>
+                            <menu className={`h2`}>
+                                <li>
+                                    <TextButton text="play" linkTo="play" />
+                                </li>
+                                <li>
+                                    <TextButton text="tutorial" linkTo="tutorial" />
+                                </li>
+                                <li>
+                                    <TextButton text="statistics" linkTo="statistics" />
+                                </li>
+                                <li>
+                                    <TextButton text="settings" linkTo="settings" />
+                                </li>
+                                <li>
+                                    <TextButton text="credits" linkTo="credits" />
+                                </li>
+                            </menu>
+                        </nav>
+                    </div>
+                </div>
+                <div className={styles.menuSide}>
+                    <div className={styles.closeButton}>
+                        <NavLink to="/menu" onClick={() => playClick()}>
+                            <IconClose />
+                        </NavLink>
+                    </div>
+                    <div className={styles.menuContainer}>
+                        <Outlet />
+                    </div>
                 </div>
             </div>
-            <div className={styles.menuSide}>
-                <div className={styles.closeButton}>
-                    <NavLink to="/menu" onClick={() => playClick()}>
-                        <IconClose />
-                    </NavLink>
-                </div>
-                <div className={styles.menuContainer}>
-                    <Outlet />
-                </div>
-            </div>
-        </div>
         </>
     );
 };

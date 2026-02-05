@@ -10,10 +10,10 @@ export type ValuesBoxProps = {
 
 const ValuesBox: FC<ValuesBoxProps> = ({ iconKey, text, style }) => {
     return (
-        <div className={styles.valuesBox} style={style}>
-            <div className={styles.icon}>{GetIcon(iconKey)}</div>
-            <div>{text}</div>
-        </div>
+            <div className={styles.valuesBox} style={style}>
+                <div className={styles.icon}>{GetIcon(iconKey)}</div>
+                <div>{text}</div>
+            </div>
     );
 };
 
