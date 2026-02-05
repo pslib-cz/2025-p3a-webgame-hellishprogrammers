@@ -34,6 +34,18 @@ const GameBar: FC<GameBarProps> = ({ setBuilding, onTimeSpeedChange }) => {
     const [activeBuilding, setActiveBuilding] = useState<BuildingType | null>(null);
     const [buildingAffordability, setBuildingAffordability] = useState<Record<string, boolean>>({});
 
+    const formatNumber = (num: number) => {
+        if(num > 1000000) {
+            return Math.floor(num / 1000000) + "M"
+        }
+        if(num > 1000) {
+            return Math.floor(num / 1000) + "k"
+        }
+        else{
+            return num.toString()
+        }
+    }
+
     useEffect(() => {
         if (buildings) {
             const affordability: Record<string, boolean> = {};
@@ -115,7 +127,7 @@ const GameBar: FC<GameBarProps> = ({ setBuilding, onTimeSpeedChange }) => {
             <div className={styles.row}>
                 <div className={`${styles.values} border--narrow`}>
                     <TooltipContainer content={<Tooltip title="Money" description="Used to buy new buildings" />}>
-                        <ValuesBox iconKey="money" text={`${GameResources.moneyBalance} (${GameResources.money}/t)`} />
+                        <ValuesBox iconKey="money" text={`${formatNumber(GameResources.moneyBalance)} (${GameResources.money}/t)`} />
                     </TooltipContainer>
                 </div>
                 <div className={`${styles.values} border--narrow`}>
