@@ -9,7 +9,7 @@ const CreditsMenu = () => {
                         Created by:
                     </h2>
                     <div>
-                        Daniel Brzezina, Matěj Kovář, Michajlo Odynec
+                        Daniel Brzezina, Matěj Kovář, Mykhailo Odynets
                     </div>
                     <h2>
                         Music by:
