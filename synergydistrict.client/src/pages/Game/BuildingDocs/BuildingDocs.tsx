@@ -13,6 +13,7 @@ import useGameResources from "../../../hooks/providers/useGameResources";
 import { GetUnaffordableResources } from "../../../utils/PlacingUtils";
 import SynergyDisplay from "../../../components/Game/SynergyDisplay";
 import { GetIcon } from "../../../components/Icons";
+import Tooltip from "../../../components/Tooltip/Tooltip";
 
 const buildingCategories: BuildingCategory[] = [
     "Residential",
@@ -234,6 +235,11 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies, isExit
                                 setUserSelectedFilter(sel);
                             }}
                             isIcons={true}
+                            tooltips={[
+                                <Tooltip title="Incoming synergies" description="Possible synergies this building can get from others."/>,
+                                <Tooltip title="Outgoing synergies" description="Possible synergies this building can give to others"/>,
+                                <Tooltip title="Current synergies" description="Synergies that would be created if you placed this building at this position"/>
+                            ]}
                         />
                     </div>
                 </div>
