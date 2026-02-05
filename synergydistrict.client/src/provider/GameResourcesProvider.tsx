@@ -1,9 +1,11 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useRef } from "react";
 import { defaultGameResources, type GameResources } from "../types/Game/GameResources";
 import useGameTime from "../hooks/providers/useGameTime";
 import useGameProperties from "../hooks/providers/useGameProperties";
 import { loadStoredState, saveStoredState } from "../utils/stateStorage";
 import { useStatistics } from "../hooks/providers/useStatistics";
+import useGameControl from "../hooks/providers/useGameControl";
+import { useGameOptions } from "../hooks/providers/useGameOptions";
 
 type GameResourcesContextValue = {
     GameResources: GameResources;
@@ -16,13 +18,40 @@ export const GameResourcesProvider: React.FC<React.PropsWithChildren> = ({ child
     const [GameResources, setGameResources] = useState<GameResources>(() =>
         loadStoredState<GameResources>("gameResources", defaultGameResources),
     );
-    const { time } = useGameTime();
+    const { time, registerPaymentCallback } = useGameTime();
     const { TPS } = useGameProperties();
     const { setStatistics } = useStatistics();
+    const { setGameControl } = useGameControl();
+    const { options } = useGameOptions();
+    const callbackRegistered = useRef(false);
 
     useEffect(() => {
         saveStoredState("gameResources", GameResources);
     }, [GameResources]);
+
+    useEffect(() => {
+        if (options.gameMode === "survival" && registerPaymentCallback && !callbackRegistered.current) {
+            callbackRegistered.current = true;
+            registerPaymentCallback((payment: number) => {
+                setGameResources((prev) => {
+                    const newBalance = prev.moneyBalance - payment;
+                    
+                    if (newBalance < 0) {
+                        setGameControl((control) => ({
+                            ...control,
+                            isEnd: true,
+                        }));
+                        return prev;
+                    }
+                    
+                    return {
+                        ...prev,
+                        moneyBalance: newBalance,
+                    };
+                });
+            });
+        }
+    }, [options.gameMode, registerPaymentCallback, setGameControl]);
 
     useEffect(() => {
         if (TPS === 0) return; // avoid division by zero

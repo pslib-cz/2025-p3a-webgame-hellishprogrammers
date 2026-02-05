@@ -97,7 +97,9 @@ const GameBar: FC<GameBarProps> = ({ setBuilding, onTimeSpeedChange }) => {
                     />
                 </div>
                 <div className={`${styles.timer} border--narrow`}>
-                    <h3>{formatTime(options.gameDuration * 60 - time.timer / TPS)}</h3>
+                    <h3>
+                        {formatTime(options.gameDuration * 60 - time.timer / TPS)}
+                    </h3>
                 </div>
             </div>
             <div className={styles.row}>

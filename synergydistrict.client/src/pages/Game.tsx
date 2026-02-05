@@ -30,6 +30,7 @@ import { useSound } from "../hooks/useSound";
 import { type TimerSpeedType } from "../types";
 import { clearStoredState } from "../utils/stateStorage";
 import { useStatistics } from "../hooks/providers/useStatistics";
+import SurvivalPaymentDisplay from "../components/Game/SurvivalPaymentDisplay/SurvivalPaymentDisplay";
 
 const SESSION_GAME_KEYS = [
     "gameControl",
@@ -312,6 +313,7 @@ const Game = () => {
     return (
         <div className={styles.game}>
             <VersionDisplay />
+            {options.gameMode === "survival" && !gameControl.isEnd && <SurvivalPaymentDisplay />}
             <BuildingsBitmapProvider>
                 <GameCanvas
                     disableDynamicLoading={!options.infiniteMap}

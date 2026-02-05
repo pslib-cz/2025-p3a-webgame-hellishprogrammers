@@ -1,0 +1,18 @@
+.survivalDisplay{
+    display: flex;
+    position: absolute;
+    top: 2rem;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    z-index: 1000;
+    font-size: 1.5rem;
+}
+
+.time{
+    background-color: var(--text);
+    color: var(--background);
+    padding: 1rem;
+    display: flex;
+    gap: .25rem;
+}

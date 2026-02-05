@@ -116,9 +116,8 @@ const PlayMenu = () => {
                 <h3>Gamemode</h3>
                 <ToggleButton
                     options={["Time presure", "Survival"]}
-                    selectedIndex={0}
-                    onChange={(index) => index === 0 && setOptions({ ...options, gameMode: "timePresure" })}
-                    disabledIndices={[1]}
+                    selectedIndex={options.gameMode === "timePresure" ? 0 : 1}
+                    onChange={(index) => setOptions({ ...options, gameMode: index === 0 ? "timePresure" : "survival" })}
                     tooltips={[
                         <Tooltip title="Time Pressure" description="Make as much money, people and goods as possible in this time limited gamemode. Your work will be judged after the time limit runs out."/>,
                         <Tooltip title="Survival" description="Survive as long as you can, but each quater the taxes on your town rise. If you cannot pay them, your out!"/>

@@ -8,6 +8,7 @@ import { loadStoredState, saveStoredState } from "../utils/stateStorage";
 type GameTimeContextValue = {
     time: GameTimeType;
     setTime: React.Dispatch<React.SetStateAction<GameTimeType>>;
+    registerPaymentCallback?: (callback: (payment: number) => void) => void;
 };
 
 export const GameTimeContext = createContext<GameTimeContextValue | null>(null);
@@ -20,6 +21,7 @@ export const GameTimeProvider: React.FC<PropsWithChildren> = ({ children }) => {
     );
     const { TPS } = useGameProperties();
     const elapsedGameTicksRef = useRef(0);
+    const [paymentCallback, setPaymentCallback] = useState<((payment: number) => void) | undefined>(undefined);
 
     useEffect(() => {
         elapsedGameTicksRef.current = time.timer;
@@ -29,14 +31,46 @@ export const GameTimeProvider: React.FC<PropsWithChildren> = ({ children }) => {
         saveStoredState("gameTime", time);
     }, [time]);
 
+    // Time Pressure mode end condition
     useEffect(() => {
-        if (!gameControl.isEnd && options.gameDuration * 60 - time.timer / TPS <= 0) {
+        if (options.gameMode === "timePresure" && !gameControl.isEnd && options.gameDuration * 60 - time.timer / TPS <= 0) {
             setGameControl((prev) => ({
                 ...prev,
                 isEnd: true,
             }));
         }
-    }, [time.timer]);
+    }, [time.timer, options.gameMode]);
+
+    useEffect(() => {
+        if (options.gameMode === "survival" && !gameControl.isEnd) {
+            const QUARTER_DURATION_SECONDS = options.gameDuration;
+            const quarterTime = Math.floor(time.timer / TPS) % QUARTER_DURATION_SECONDS;
+            const currentQuarter = Math.floor(time.timer / (TPS * QUARTER_DURATION_SECONDS)) + 1;
+            
+            if (quarterTime === 0 && time.timer > 0 && currentQuarter !== time.currentQuarter) {
+                setTime((prev) => ({
+                    ...prev,
+                    currentQuarter: currentQuarter,
+                }));
+                
+                if (paymentCallback) {
+                    const basePayment = 1000;
+                    const payment = Math.floor(basePayment * Math.pow(1.5, currentQuarter - 1));
+                    paymentCallback(payment);
+                }
+            }
+            
+            const basePayment = 1000;
+            const nextPayment = Math.floor(basePayment * Math.pow(1.5, currentQuarter - 1));
+            
+            if (nextPayment !== time.nextPayment) {
+                setTime((prev) => ({
+                    ...prev,
+                    nextPayment: nextPayment,
+                }));
+            }
+        }
+    }, [time.timer, TPS, options.gameMode, paymentCallback, gameControl.isEnd]);
 
     useEffect(() => {
         const speed = gameControl.timerSpeed;
@@ -59,5 +93,9 @@ export const GameTimeProvider: React.FC<PropsWithChildren> = ({ children }) => {
         return () => window.clearInterval(id);
     }, [gameControl.timerSpeed, TPS]);
 
-    return <GameTimeContext.Provider value={{ time, setTime }}>{children}</GameTimeContext.Provider>;
+    return <GameTimeContext.Provider value={{ 
+        time, 
+        setTime,
+        registerPaymentCallback: (callback: (payment: number) => void) => setPaymentCallback(() => callback)
+    }}>{children}</GameTimeContext.Provider>;
 };
