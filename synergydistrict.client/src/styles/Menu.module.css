@@ -170,6 +170,10 @@
     animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 6);
 }
 
+.menu menu li:nth-child(5) {
+    animation-delay: calc(var(--menu-animation-base-delay) + var(--menu-animation-step-delay) * 7.5);
+}
+
 .closeButton {
     opacity: 0;
     animation: fadeInUp var(--menu-animation-duration) ease-out forwards;
