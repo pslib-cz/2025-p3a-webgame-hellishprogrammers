@@ -179,8 +179,8 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
                     <IconClose />
                 </button>
             </div>
-            <p>
-                Level {currentBuilding.level} (Efficiency: {currentBuilding.level * 100}%)
+            <p className={styles.level}>
+                Level {currentBuilding.level}
             </p>
             <div className={styles.infoContainer}>
                 {buildingProduction.map((product) => (

@@ -46,14 +46,14 @@
 .row h2 {
     text-transform: uppercase;
 }
-.close [class^="icon-"] {
+.close [class^="icon"] {
     font-size: 1.5rem;
     padding: 0.5rem;
     margin: -0.5rem;
 }
 
-.icon {
-    font-size: 1.5rem;
+.level {
+    margin: 0;
 }
 
 .infoContainer {
