@@ -590,11 +590,12 @@ export const GetPreviewSynergies = (
             const nId = neighbor.buildingType.buildingId;
             if ((s.sourceBuildingId === bId && s.targetBuildingId === nId) || (s.sourceBuildingId === nId && s.targetBuildingId === bId)) {
                 const key = `${s.sourceBuildingId}-${s.targetBuildingId}`;
+                const incrementAmount = s.sourceBuildingId === s.targetBuildingId ? 2 : 1;
                 if (!synergyCounts.has(key)) {
-                    synergyCounts.set(key, { synergy: s, amount: 1 });
+                    synergyCounts.set(key, { synergy: s, amount: incrementAmount });
                 } else {
                     const existing = synergyCounts.get(key)!;
-                    existing.amount += 1;
+                    existing.amount += incrementAmount;
                 }
             }
         }
