@@ -1,6 +1,7 @@
 using SynergyDistrict.Server.Models.Buildings;
 using SynergyDistrict.Server.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace SynergyDistrict.Server.Data
 {
@@ -22,9 +23,9 @@ namespace SynergyDistrict.Server.Data
                 new SynergyItem { Name = "Mine" },
                 new SynergyItem { Name = "Farm" },
                 new SynergyItem { Name = "Factory" },
+                new SynergyItem { Name = "Hydro plant" },
                 new SynergyItem { Name = "House" },
                 new SynergyItem { Name = "Park" },
-                new SynergyItem { Name = "Town Hall" },
                 new SynergyItem { Name = "Market" },
 
                 new SynergyItem { Name = "Grass" },
@@ -37,7 +38,8 @@ namespace SynergyDistrict.Server.Data
             context.SaveChanges();
 
             var synergyItemMap = synergyItems.ToDictionary(s => s.Name, s => s);
-
+            
+            // BUILDINGS
             var buildings = new Building[]
             {
                 new Building
@@ -246,6 +248,45 @@ namespace SynergyDistrict.Server.Data
                 },
                 new Building
                 {
+                    SynergyItem = synergyItemMap["Hydro plant"],
+                    Type = BuildingType.Industrial,
+                    Description = "Hydroelectric power station. Converts flowing water into clean electricity. Must be constructed adjacent to water sources to function. Output scales with technological advancement.",
+                    IconKey = "hydroplant",
+                    Cost = 3000,
+                    Shape =
+                    [
+                        [BuildingTileType.Icon, BuildingTileType.Solid],
+                        [BuildingTileType.Solid, BuildingTileType.Solid]
+                    ],
+                    BaseProduction =
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Industry, Value = -25 },
+                    ],
+                    Upgrades =
+                    [
+                        new BuildingUpgrade {
+                            UpgradeCost = 1500,
+                            DeleteCost = 200,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = -15 },
+                                new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 }
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            UpgradeCost = 3000,
+                            DeleteCost = 400,
+                            UpgradeProductions = [
+                                new BuildingProduction { Type = BuildingProductionType.Industry, Value = -15 },
+                                new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 }
+                            ]
+                        },
+                        new BuildingUpgrade {
+                            DeleteCost = 1000
+                        },
+                    ]
+                },
+                new Building
+                {
                     SynergyItem = synergyItemMap["House"],
                     Type = BuildingType.Residential,
                     Description = "Standard living quarters for the workforce. Tax revenue scales dynamically with the satisfaction level of tenants.",
@@ -348,50 +389,6 @@ namespace SynergyDistrict.Server.Data
                 },
                 new Building
                 {
-                    SynergyItem = synergyItemMap["Town Hall"],
-                    Type = BuildingType.Commercial,
-                    Description = "Administrative center of Synergy District. Coordinates city-wide efficiency and provides the initial power grid setup.",
-                    IconKey = "townhall",
-                    Cost = 3000,
-                    Shape =
-                    [
-                        [BuildingTileType.Icon, BuildingTileType.Solid],
-                        [BuildingTileType.Solid, BuildingTileType.Solid]
-                    ],
-                    BaseProduction = 
-                    [
-                        new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },
-                    ],
-                    Upgrades =
-                    [
-                        new BuildingUpgrade {
-                            UpgradeCost = 1000,
-                            DeleteCost = 100,
-                            UpgradeProductions = [
-                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 },
-                            ]
-                        },
-                        new BuildingUpgrade {
-                            UpgradeCost = 2000,
-                            DeleteCost = 400,
-                            UpgradeProductions = [
-                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = 4 },
-                            ]
-                        },
-                        new BuildingUpgrade {
-                            UpgradeCost = 3000,
-                            DeleteCost = 750,
-                            UpgradeProductions = [
-                                new BuildingProduction { Type = BuildingProductionType.Energy, Value = 6 },
-                            ]
-                        },
-                        new BuildingUpgrade {
-                            DeleteCost = 1500,
-                        },
-                    ]
-                },
-                new Building
-                {
                     SynergyItem = synergyItemMap["Market"],
                     Type = BuildingType.Commercial,
                     Description = "Small-scale commercial outlet. Provides goods for local residents. Operational only when placed near populated areas.",
@@ -436,11 +433,106 @@ namespace SynergyDistrict.Server.Data
                 },
             };
 
-            context.Buildings.AddRange(buildings);
-            context.SaveChanges();
-
             var buildingMap = buildings.ToDictionary(b => b.SynergyItem.Name, b => b);
 
+            context.Buildings.AddRange(buildingMap.Values);
+
+            // UPGRADE SYNERGIES
+            AddUpgradeSynergy(buildingMap["Hydro plant"], synergyItemMap["Water"],
+                [
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Energy, Value = 2 }
+                    ],
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 }
+                    ]
+                ]);
+
+            AddUpgradeSynergy(buildingMap["Market"], synergyItemMap["House"],
+                [
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 },
+                        new BuildingProduction { Type = BuildingProductionType.People, Value = -1 }
+                    ],
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 },
+                        new BuildingProduction { Type = BuildingProductionType.People, Value = -1 }
+                    ],
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 },
+                        new BuildingProduction { Type = BuildingProductionType.People, Value = -1 }
+                    ]
+                ]);
+
+            context.SaveChanges();
+
+
+            //var hydroPlant = buildingMap["Hydro plant"];
+            //hydroPlant.Upgrades.ElementAt(0).UpgradeSynergies.Add(
+            //    new Synergy
+            //    {
+            //        SourceSynergyItem = synergyItemMap["Water"],
+            //        TargetSynergyItem = hydroPlant.SynergyItem,
+            //        SynergyProductions =
+            //        [
+            //            new BuildingProduction { Type = BuildingProductionType.Energy, Value = 2 }
+            //        ]
+            //    }
+            //);
+            //hydroPlant.Upgrades.ElementAt(1).UpgradeSynergies.Add(
+            //    new Synergy
+            //    {
+            //        SourceSynergyItem = synergyItemMap["Water"],
+            //        TargetSynergyItem = hydroPlant.SynergyItem,
+            //        SynergyProductions =
+            //        [
+            //            new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 }
+            //        ]
+            //    }
+            //);
+
+            //var market = buildingMap["Market"];
+            //market.Upgrades.ElementAt(0).UpgradeSynergies.Add(
+            //    new Synergy
+            //    {
+            //        SourceSynergyItem = buildingMap["House"].SynergyItem,
+            //        TargetSynergyItem = buildingMap["Market"].SynergyItem,
+            //        SynergyProductions =
+            //        [
+            //            new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 },
+            //            new BuildingProduction { Type = BuildingProductionType.People, Value = -1 }
+            //        ]
+            //    }
+            //);
+            //market.Upgrades.ElementAt(1).UpgradeSynergies.Add(
+            //    new Synergy
+            //    {
+            //        SourceSynergyItem = buildingMap["House"].SynergyItem,
+            //        TargetSynergyItem = buildingMap["Market"].SynergyItem,
+            //        SynergyProductions =
+            //        [
+            //            new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 },
+            //            new BuildingProduction { Type = BuildingProductionType.People, Value = -1 }
+            //        ]
+            //    }
+            //);
+            //market.Upgrades.ElementAt(2).UpgradeSynergies.Add(
+            //    new Synergy
+            //    {
+            //        SourceSynergyItem = buildingMap["House"].SynergyItem,
+            //        TargetSynergyItem = buildingMap["Market"].SynergyItem,
+            //        SynergyProductions =
+            //        [
+            //            new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 },
+            //            new BuildingProduction { Type = BuildingProductionType.People, Value = -1 }
+            //        ]
+            //    }
+            //);
+
+            //context.Buildings.UpdateRange(hydroPlant, market);
+            //context.SaveChanges();
+
+            // SYNERGIES
             var synergies = new List<Synergy>
             {
                 new Synergy
@@ -522,7 +614,7 @@ namespace SynergyDistrict.Server.Data
                 },
                 new Synergy
                 {
-                    SourceSynergyItem = synergyItemMap["Park"],
+                    SourceSynergyItem = buildingMap["Park"].SynergyItem,
                     TargetSynergyItem = buildingMap["House"].SynergyItem,
                     SynergyProductions =
                     [
@@ -531,12 +623,21 @@ namespace SynergyDistrict.Server.Data
                 },
                 new Synergy
                 {
-                    SourceSynergyItem = synergyItemMap["Market"],
+                    SourceSynergyItem = buildingMap["Market"].SynergyItem,
                     TargetSynergyItem = buildingMap["Park"].SynergyItem,
                     SynergyProductions =
                     [
-                        new BuildingProduction { Type = BuildingProductionType.Money, Value = -10 },
-                        new BuildingProduction { Type = BuildingProductionType.Happiness, Value = 10 },
+                        new BuildingProduction { Type = BuildingProductionType.Money, Value = -4 },
+                        new BuildingProduction { Type = BuildingProductionType.Happiness, Value = 8 },
+                    ]
+                },
+                new Synergy
+                {
+                    SourceSynergyItem = synergyItemMap["Water"],
+                    TargetSynergyItem = buildingMap["Hydro plant"].SynergyItem,
+                    SynergyProductions =
+                    [
+                        new BuildingProduction { Type = BuildingProductionType.Energy, Value = 1 }
                     ]
                 },
             };
@@ -562,6 +663,31 @@ namespace SynergyDistrict.Server.Data
 
             context.BuildingSynergies.AddRange(synergies);
             context.SaveChanges();
+        }
+        private static void AddUpgradeSynergy(Building building, SynergyItem source, SynergyItem target, BuildingProduction[][] productions)
+        {
+            var upgrades = building.Upgrades.ToList();
+            for (int i = 0; i < productions.Length; i++)
+            {
+                if (upgrades.Count - 1 < i) break;
+
+                upgrades[i].UpgradeSynergies.Add(
+                   new Synergy
+                   {
+                       SourceSynergyItem = source,
+                       TargetSynergyItem = target,
+                       SynergyProductions = productions[i]
+                   }
+               );
+            }
+        }
+        private static void AddUpgradeSynergy(Building building, SynergyItem source, BuildingProduction[][] productions)
+        {
+            AddUpgradeSynergy(building, source, building.SynergyItem, productions);
+        }
+        private static void AddUpgradeSynergy(Building building, Building source, BuildingProduction[][] productions)
+        {
+            AddUpgradeSynergy(building, source.SynergyItem, building.SynergyItem, productions);
         }
     }
 }

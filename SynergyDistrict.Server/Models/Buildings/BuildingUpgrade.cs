@@ -6,5 +6,6 @@
         public int? UpgradeCost { get; set; }
         public int DeleteCost { get; set; }
         public ICollection<BuildingProduction> UpgradeProductions { get; set; } = [];
+        public ICollection<Synergy> UpgradeSynergies { get; set; } = [];
     }
 }

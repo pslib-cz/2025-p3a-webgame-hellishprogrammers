@@ -47,6 +47,16 @@ namespace SynergyDistrict.Server.Controllers
                         {
                             Value = p.Value,
                             Type = p.Type,
+                        }),
+                        UpgradeSynergies = u.UpgradeSynergies.Select(s => new BuildingSynergyDTO
+                        {
+                            TargetBuildingId = s.TargetSynergyItemId,
+                            SourceBuildingId = s.SourceSynergyItemId,
+                            SynergyProductions = s.SynergyProductions.Select(p => new BuildingProductionDTO
+                            {
+                                Value = p.Value,
+                                Type = p.Type,
+                            })
                         })
                     })
                 })
@@ -56,7 +66,6 @@ namespace SynergyDistrict.Server.Controllers
                 .AsNoTracking()
                 .Select(s => new BuildingSynergyDTO
                 {
-                    BuildingSynergyId = s.SynergyId,
                     TargetBuildingId = s.TargetSynergyItemId,
                     SourceBuildingId = s.SourceSynergyItemId,
                     SynergyProductions = s.SynergyProductions.Select(p => new BuildingProductionDTO

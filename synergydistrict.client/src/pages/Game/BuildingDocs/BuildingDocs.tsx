@@ -197,7 +197,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies, isExit
                 <h2>{building.name.toUpperCase()}_</h2>
                 <span className={styles.buildingIcon}>{GetIcon(building.iconKey)}</span>
             </div>
-            <p style={{margin: 0}}>{building.description}</p>
+            <p style={{marginTop: 0}}>{building.description}</p>
             <ProductionListing title="Cost" style={{ opacity: unaffordableResources.has("moneyBalance") ? ".2" : "1" } as React.CSSProperties}>
                 <ValuesBox
                     iconKey="money"

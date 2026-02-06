@@ -13,16 +13,16 @@ export type Production = {
 };
 
 export type ProductionProjection = {
-    production: Production
-    detlaValue: number
-}
+    production: Production;
+    detlaValue: number;
+};
 
 export type SynergyProjection = {
     sourceBuildingId: number;
     targetBuildingId: number;
-    productionProjection: ProductionProjection[]
+    productionProjection: ProductionProjection[];
     amount: number;
-}
+};
 
 export type Edge = {
     position: Position;
@@ -33,6 +33,7 @@ export type BuildingUpgrades = {
     upgradeCost: number;
     deleteCost: number;
     upgradeProductions: Production[];
+    upgradeSynergies: BuildingSynergy[];
 };
 
 export type BuildingType = {
