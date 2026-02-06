@@ -36,7 +36,7 @@ const Statistics = () => {
                     <p className={styles.number}>{formatTime(statistics.timeSpendPlaying / TPS)}</p>
                 </ProductionListing>
                 <ProductionListing title="Best score">
-                    <p className={styles.number}>{Math.max(...history.map((h) => h.score))}</p>
+                    <p className={styles.number}>{history.length > 0 ? Math.max(...history.map((h) => h.score)) : 0}</p>
                 </ProductionListing>
                 <ProductionListing title="Games played">
                     <p className={styles.number}>{history.length}</p>

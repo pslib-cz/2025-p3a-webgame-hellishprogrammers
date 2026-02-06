@@ -4,6 +4,7 @@ import useGameTime from "../hooks/providers/useGameTime";
 import useGameProperties from "../hooks/providers/useGameProperties";
 import { loadStoredState, saveStoredState } from "../utils/stateStorage";
 import { useStatistics } from "../hooks/providers/useStatistics";
+import useGameControl from "../hooks/providers/useGameControl";
 
 type GameResourcesContextValue = {
     GameResources: GameResources;
@@ -19,6 +20,7 @@ export const GameResourcesProvider: React.FC<React.PropsWithChildren> = ({ child
     const { time } = useGameTime();
     const { TPS } = useGameProperties();
     const { setStatistics } = useStatistics();
+    const { gameControl } = useGameControl();
 
     useEffect(() => {
         saveStoredState("gameResources", GameResources);
@@ -34,10 +36,12 @@ export const GameResourcesProvider: React.FC<React.PropsWithChildren> = ({ child
             moneyBalance: prev.moneyBalance + prev.money,
         }));
 
+        const timeIncrease: number = gameControl.timerSpeed === "fastforward" ? TPS / 2 : TPS;
+
         setStatistics((prev) => ({
             ...prev,
             moneyMade: prev.moneyMade + GameResources.money,
-            timeSpendPlaying: prev.timeSpendPlaying + TPS,
+            timeSpendPlaying: prev.timeSpendPlaying + timeIncrease,
         }));
     }, [time.timer, TPS]);
 
