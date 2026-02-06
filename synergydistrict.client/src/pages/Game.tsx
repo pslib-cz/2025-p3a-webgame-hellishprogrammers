@@ -86,10 +86,22 @@ const Game = () => {
     }, []);
 
     useEffect(() => {
-        if (activeBuildingType !== null && !CanAfford(activeBuildingType, GameResources, GameMapData.placedBuildings)) {
-            setBuildingPreview(null);
+        if (activeBuildingType !== null) {
+            if (!CanAfford(activeBuildingType, GameResources, GameMapData.placedBuildings)) {
+                setBuildingPreview(null);
+            } else if (buildingPreview === null) {
+                const previewBuilding: MapBuilding = {
+                    buildingType: activeBuildingType,
+                    MapBuildingId: "preview",
+                    position: { x: 0, y: 0 },
+                    rotation: 0,
+                    level: 1,
+                    isSelected: false,
+                };
+                setBuildingPreview(previewBuilding);
+            }
         }
-    }, [GameResources]);
+    }, [GameResources, activeBuildingType, buildingPreview]);
 
     const previewSynergies = useMemo(() => {
         if (!activeBuildingType || !buildingPreview || !buildingPreviewPosition)
