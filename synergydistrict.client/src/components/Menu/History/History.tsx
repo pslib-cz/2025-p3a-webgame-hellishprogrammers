@@ -9,7 +9,7 @@ const History = () => {
     return (
         <>
             {history.length === 0 ? (
-                <p>No games where played yet...</p>
+                <p>No games were played yet...</p>
             ) : (
                 [...history].reverse().map((h, index) => (
                     <ShowInfo
