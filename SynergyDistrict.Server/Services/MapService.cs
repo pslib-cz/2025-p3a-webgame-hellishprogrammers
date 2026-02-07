@@ -56,7 +56,7 @@ namespace SynergyDistrict.Server.Services
 
             return chunk.ToArray();
         }
-
+        
         private FastNoiseLite Create(int seed)
         {
             var n = new FastNoiseLite(seed);

@@ -1,5 +1,12 @@
 import type { BuildingTileType, TileType } from "../types";
-import type { BuildingSynergy, BuildingType, Edge, Production, SynergyProjection, ProductionProjection } from "../types/Game/Buildings";
+import type {
+    BuildingSynergy,
+    BuildingType,
+    Edge,
+    Production,
+    SynergyProjection,
+    ProductionProjection,
+} from "../types/Game/Buildings";
 import type { GameResources } from "../types/Game/GameResources";
 import type { ActiveSynergies, EdgeSide, MapBuilding, MapTile, NaturalFeature, Position } from "../types/Game/Grid";
 
@@ -191,12 +198,18 @@ export const CalculateValues = (
             const neighborTileKey = `${neighborPosX};${neighborPosY}`;
             const neighborTile = loadedMapTiles[neighborTileKey];
 
-            if (neighborTile && neighborTile.hasIcon && naturalFeatures) {
+            if (
+                neighborTile &&
+                naturalFeatures &&
+                (neighborTile.hasIcon || neighborTile.tileType.toLowerCase() === "water")
+            ) {
                 const naturalFeatureData = {
                     type: neighborTile.tileType,
                     position: { x: neighborPosX, y: neighborPosY },
                 };
-                const id = naturalFeatures.find((n) => n.name === naturalFeatureData.type.toString())?.synergyItemId;
+                const id = naturalFeatures.find(
+                    (n) => n.name.toLowerCase() === naturalFeatureData.type.toString().toLowerCase(),
+                )?.synergyItemId;
                 const activeSynergies = possibleSynergies.filter(
                     (s) => s.targetBuildingId === id || s.sourceBuildingId === id,
                 );
@@ -566,19 +579,31 @@ export const GetPreviewSynergies = (
             const neighborTileKey = `${neighborPosX};${neighborPosY}`;
             const neighborTile = loadedMapTiles[neighborTileKey];
 
-                if (neighborTile && neighborTile.hasIcon && naturalFeatures) {
-                const id = naturalFeatures.find((n) => n.name === neighborTile.tileType.toString())?.synergyItemId;
+            if (
+                neighborTile &&
+                naturalFeatures &&
+                (neighborTile.hasIcon || neighborTile.tileType.toLowerCase() === "water")
+            ) {
+                const id = naturalFeatures.find(
+                    (n) => n.name.toLowerCase() === neighborTile.tileType.toString().toLowerCase(),
+                )?.synergyItemId;
                 if (id == null) continue;
+
+                const processedSynergyPairs = new Set<string>();
 
                 for (const s of possibleSynergies) {
                     if (s.sourceBuildingId === id || s.targetBuildingId === id) {
-                            const key = `${s.sourceBuildingId}-${s.targetBuildingId}`;
-                            if (!synergyCounts.has(key)) {
-                                synergyCounts.set(key, { synergy: s, amount: 1 });
-                            } else {
-                                const existing = synergyCounts.get(key)!;
-                                existing.amount += 1;
-                            }
+                        const key = `${s.sourceBuildingId}-${s.targetBuildingId}`;
+
+                        if (processedSynergyPairs.has(key)) continue;
+                        processedSynergyPairs.add(key);
+
+                        if (!synergyCounts.has(key)) {
+                            synergyCounts.set(key, { synergy: s, amount: 1 });
+                        } else {
+                            const existing = synergyCounts.get(key)!;
+                            existing.amount += 1;
+                        }
                     }
                 }
             }
@@ -588,8 +613,12 @@ export const GetPreviewSynergies = (
         for (const s of possibleSynergies) {
             const bId = buildingType.buildingId;
             const nId = neighbor.buildingType.buildingId;
-            if ((s.sourceBuildingId === bId && s.targetBuildingId === nId) || (s.sourceBuildingId === nId && s.targetBuildingId === bId)) {
+            if (
+                (s.sourceBuildingId === bId && s.targetBuildingId === nId) ||
+                (s.sourceBuildingId === nId && s.targetBuildingId === bId)
+            ) {
                 const key = `${s.sourceBuildingId}-${s.targetBuildingId}`;
+
                 const incrementAmount = s.sourceBuildingId === s.targetBuildingId ? 2 : 1;
                 if (!synergyCounts.has(key)) {
                     synergyCounts.set(key, { synergy: s, amount: incrementAmount });
@@ -640,7 +669,7 @@ export const GetPreviewSynergies = (
                     const after = currentValue + totalValue;
                     detlaValue = after < 0 ? -after : 0;
                 }
-                
+
                 if (resourceKey === "energy" && totalValue < 0) {
                     accumulatedResources.energyUsed -= totalValue;
                 } else if (resourceKey === "people" && totalValue < 0) {

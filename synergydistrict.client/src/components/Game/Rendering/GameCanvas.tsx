@@ -273,7 +273,7 @@ const GameCanvas: FC<GameCanvasProps> = ({
 
     const handleStageDragStart = useCallback(() => {
         setGrabbing(true);
-    },[])
+    }, []);
 
     const handleStageDragMove = useCallback(() => {
         if (!isPointerOverStage) return;
@@ -397,17 +397,16 @@ const GameCanvas: FC<GameCanvasProps> = ({
                     chunkBitmaps={chunkBitmaps}
                 />
                 <GridLayer gridImage={gridBitmapRef.current} />
-                <BuildingsLayer
-                    highlightedEdges={highlightedEdges}
-                    onBuildingClick={onBuildingClick}
-                />
+                <BuildingsLayer highlightedEdges={highlightedEdges} onBuildingClick={onBuildingClick} />
                 <PreviewLayer
                     previewBuilding={previewBuilding}
                     position={previewTile}
                     isPlaceable={isPreviewPlaceable}
                 />
             </Stage>
-            {(chunksLoading || !fontsLoaded || tileBitmapsLoading) && <div className={styles.overlay}>Loading map...</div>}
+            {(chunksLoading || !fontsLoaded || tileBitmapsLoading) && (
+                <div className={styles.overlay}>Loading map...</div>
+            )}
             {chunkError && <div className={styles.overlay}>Error while loading map: {chunkError}</div>}
         </div>
     );
