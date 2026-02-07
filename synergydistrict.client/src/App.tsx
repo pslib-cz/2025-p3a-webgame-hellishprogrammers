@@ -49,7 +49,7 @@ function AppContent() {
         document.documentElement.style.fontSize = `${scaledFontSize}px`;
     }, [gameSettings.uiScale]);
 
-    const minRequiredWidth = Math.round(1000 * (gameSettings.uiScale / 100));
+    const minRequiredWidth = Math.round(1200 * (gameSettings.uiScale / 100));
 
     const handleUiScaleInputChange = (value: string) => {
         setUiScaleInput(value);
