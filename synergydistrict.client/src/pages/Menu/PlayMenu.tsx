@@ -104,7 +104,7 @@ const PlayMenu = () => {
                             setOptions({ ...options, seed });
                         }}
                     />
-                    <div className={`${styles.flex} border`}>
+                    <div className={`${styles.flex} border`} style={{textWrap: "nowrap"}}>
                         <TextButton
                             text={"Generate"}
                             onClick={() => {

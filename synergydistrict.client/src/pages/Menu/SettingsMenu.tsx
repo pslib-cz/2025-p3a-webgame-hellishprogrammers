@@ -2,11 +2,15 @@ import InputToggle from "../../components/Inputs/InputToggle";
 import InputValue from "../../components/Inputs/InputValue/InputValue";
 import { useSettings } from "../../hooks/providers/useSettings";
 import styles from "../../styles/Menu.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const SettingsMenu = () => {
     const { gameSettings, setGameSettings } = useSettings();
     const [uiScaleInput, setUiScaleInput] = useState(gameSettings.uiScale.toString());
+
+    useEffect(() => {
+        setUiScaleInput(gameSettings.uiScale.toString());
+    }, [gameSettings.uiScale]);
 
     const handleCrtIntensityChange = (value: string) => {
         const numValue = parseInt(value) || 0;
