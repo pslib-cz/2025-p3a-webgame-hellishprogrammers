@@ -64,6 +64,7 @@ namespace SynergyDistrict.Server.Controllers
 
             var synergies = _context.BuildingSynergies
                 .AsNoTracking()
+                .Where(s => s.BuildingUpgradeId == null)
                 .Select(s => new BuildingSynergyDTO
                 {
                     TargetBuildingId = s.TargetSynergyItemId,

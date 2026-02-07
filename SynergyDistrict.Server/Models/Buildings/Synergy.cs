@@ -1,8 +1,12 @@
-﻿namespace SynergyDistrict.Server.Models.Buildings
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SynergyDistrict.Server.Models.Buildings
 {
     public class Synergy
     {
         public int SynergyId { get; set; }
+
+        public int? BuildingUpgradeId { get; set; }
 
         public int TargetSynergyItemId { get; set; }
         public SynergyItem TargetSynergyItem { get; set; } = null!;
