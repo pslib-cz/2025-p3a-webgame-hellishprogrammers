@@ -35,10 +35,10 @@ const GameBar: FC<GameBarProps> = ({ setBuilding, onTimeSpeedChange }) => {
     const [buildingAffordability, setBuildingAffordability] = useState<Record<string, boolean>>({});
 
     const formatNumber = (num: number) => {
-        if(num > 1000000) {
+        if(num >= 1000000) {
             return Math.round(num / 10000) / 100 + "M"
         }
-        if(num > 1000) {
+        if(num >= 10000) {
             return Math.round(num / 10) / 100 + "k"
         }
         else{
