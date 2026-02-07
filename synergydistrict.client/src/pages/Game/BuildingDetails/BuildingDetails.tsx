@@ -99,10 +99,10 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
         const newResources = { ...GameResources } as GameResources;
         return (
             newResources.moneyBalance - currentLevel.deleteCost >= 0 &&
-            CanDeleteProdution(building.buildingType.baseProduction, newResources) &&
-            CanDeleteProdution(totalLevelProduction, newResources) &&
-            CanDeleteProdution(totalIncomingProduction, newResources) &&
-            CanDeleteProdution(totalOutgoingProduction, newResources)
+            DeleteProductionSum(building.buildingType.baseProduction, newResources) &&
+            DeleteProductionSum(totalLevelProduction, newResources) &&
+            DeleteProductionSum(totalIncomingProduction, newResources) &&
+            DeleteProductionSum(totalOutgoingProduction, newResources)
         );
     };
 
@@ -179,9 +179,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
                     <IconClose />
                 </button>
             </div>
-            <p className={styles.level}>
-                Level {currentBuilding.level}
-            </p>
+            <p className={styles.level}>Level {currentBuilding.level}</p>
             <div className={styles.infoContainer}>
                 {buildingProduction.map((product) => (
                     <ShowInfo
@@ -206,8 +204,14 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
                         onChange={(x) => setIO([false, true][x])}
                         isIcons={true}
                         tooltips={[
-                            <Tooltip title="Incoming synergies" description="Possible synergies this building can get from others" />,
-                            <Tooltip title="Outgoing synergies" description="Possible synergies this building can give to others" />,
+                            <Tooltip
+                                title="Incoming synergies"
+                                description="Possible synergies this building can get from others"
+                            />,
+                            <Tooltip
+                                title="Outgoing synergies"
+                                description="Possible synergies this building can give to others"
+                            />,
                         ]}
                     />
                 </div>
@@ -216,31 +220,31 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
                 {synergies.length === 0
                     ? "No synergies found"
                     : synergies.map((synergyGroup) => {
-                        const name = synergyGroup.otherBuilding
-                            ? synergyGroup.otherBuilding.buildingType.name
-                            : synergyGroup.naturalFeature?.type || "Unknown";
-                        const id = synergyGroup.otherBuilding
-                            ? synergyGroup.otherBuilding.MapBuildingId
-                            : synergyGroup.naturalFeature?.id || "unknown";
+                          const name = synergyGroup.otherBuilding
+                              ? synergyGroup.otherBuilding.buildingType.name
+                              : synergyGroup.naturalFeature?.type || "Unknown";
+                          const id = synergyGroup.otherBuilding
+                              ? synergyGroup.otherBuilding.MapBuildingId
+                              : synergyGroup.naturalFeature?.id || "unknown";
 
-                        return (
-                            <SynergyDisplay
-                                key={id}
-                                id={id}
-                                name={name}
-                                productions={synergyGroup.productions.map((p) => {
-                                    let detlaValue = 0;
-                                    return {
-                                        production: p,
-                                        detlaValue,
-                                    };
-                                })}
-                                amount={synergyGroup.count > 1 ? synergyGroup.count : null}
-                                onMouseEnter={handleSynergyHover}
-                                onMouseLeave={handleSynergyLeave}
-                            />
-                        );
-                    })}
+                          return (
+                              <SynergyDisplay
+                                  key={id}
+                                  id={id}
+                                  name={name}
+                                  productions={synergyGroup.productions.map((p) => {
+                                      let detlaValue = 0;
+                                      return {
+                                          production: p,
+                                          detlaValue,
+                                      };
+                                  })}
+                                  amount={synergyGroup.count > 1 ? synergyGroup.count : null}
+                                  onMouseEnter={handleSynergyHover}
+                                  onMouseLeave={handleSynergyLeave}
+                              />
+                          );
+                      })}
             </div>
             <div className={styles.row}>
                 {isMaxLevel && <h3>Max level</h3>}
