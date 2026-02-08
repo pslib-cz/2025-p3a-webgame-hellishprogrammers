@@ -31,15 +31,7 @@ import { type TimerSpeedType } from "../types";
 import { clearStoredState } from "../utils/stateStorage";
 import { useStatistics } from "../hooks/providers/useStatistics";
 
-const SESSION_GAME_KEYS = [
-    "gameControl",
-    "gameMapData",
-    "gameResources",
-    "gameTime",
-    "buildings",
-    "synergies",
-    "gameProperties",
-];
+const SESSION_GAME_KEYS = ["gameControl", "gameMapData", "gameResources", "gameTime", "buildings", "synergies"];
 
 const Game = () => {
     const [activeBuildingType, setActiveBuildingType] = useState<BuildingType | null>(null);

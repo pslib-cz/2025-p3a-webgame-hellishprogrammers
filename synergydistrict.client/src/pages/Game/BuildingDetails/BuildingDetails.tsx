@@ -11,7 +11,6 @@ import TextButton from "../../../components/Buttons/TextButton/TextButton";
 import {
     AddProductionSum,
     buildPlacedBuildingsMap,
-    CanAddProdution,
     DeleteProductionSum,
     GetUnaffordableProduction,
     MaterializeNaturalFeatures,
