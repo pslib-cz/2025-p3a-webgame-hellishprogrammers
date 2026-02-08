@@ -31,33 +31,48 @@ const TutorialMenu = () => {
         
     // }, [canvasRef, loading]);
     return (
-    // <>
-    //  <div>
-    // <h2>HOW TO PLAY SYNERGY DISTRICT</h2>
-    // <p>Synergy District is a grid based city building game where buildings
-    //      interact with each other and the map via synergies.
-    //      The map is made of 4 tile types</p>
-    // </div>
-    // <canvas ref={canvasRef}/>
-    // <p>Water and mountain tiles cannot support buildings. The extractional type of buildings have synergies with the nature tiles so watch out for them as they can help you out.
-    //     You can find the synergies of buildings on the left bar. It shows up when a building is selected to build. Here you can see interactions with other buildins.
-    //     Example of Synergies for House</p>
-    // <img alt="Synergy display" src="../../../images/synergydisplay.png"/>
-    // <p> 
-    //      The synergy hub shows you what synergies does the bulding get from other buildings and what
-    //      buildings it gives to other buildings and what synergies will be made after building the building.
-    //      It also shows the stats.
-    //      Stats are values that will give you your score at the end of the game.</p>
-    //      <div className={`${styles.flex} ${styles.wrap} ${styles.gap} ${styles.justify}`}>
-    //     <ValuesBox iconKey="money" text="1 pt per 1$" style={{ border: '0.25rem solid var(--text, #fefae0)', padding:'0.5rem'}} />
-    //     <ValuesBox iconKey="people" text="50 pts per head" style={{ border: '0.25rem solid var(--text, #fefae0)', padding:'0.5rem'}}/>
-    //     <ValuesBox iconKey="industry" text="10 pts per unit" style={{ border: '0.25rem solid var(--text, #fefae0)', padding:'0.5rem' }}/>
-    //     <ValuesBox iconKey="happiness" text="Is a multiplayer 50% = ×1" style={{ border: '0.25rem solid var(--text, #fefae0)', padding:'0.5rem' }}/>
-
-    //     </div>
+    <div>
+     <div>
+    <h2>Basic Controls</h2>
+    <p>To move around the map, left-click and drag.
+         You can zoom in and out using the scroll wheel.
+         To place a building, select one from the menu at the bottom of your screen.
+         Once selected, right-click to rotate the building and left-click to place it.
+        Press escape to pause the game.</p>
+    </div>
+    <div>
+    <h2>Game Loop</h2>
+    <p>Buildings cost money but produce statistics.
+        You can view the statistics a building generates in the sidebar on the left.
+        Key metrics/statistics like money and population determine your final score,
+        while happiness acts as a score multiplier.
+        To achieve the highest score possible,
+        you must find the ideal balance between the different types of buildings.</p>
+    </div>
+    <div>
+        <h2>Synergies</h2>
+        <p>Buildings have synergies with each other and the map.
+            When a building is selected, you can view these synergies in the sidebar on the left.
+            Synergies are applied through shared edges, the number of edges a building shares determines the number of synergies it receives.
+            Filtering Synergies
+            At the bottom of the left sidebar, you will see three icons:
+            <ul>
+                <li>Incoming Synergies: Shows the benefits the building is currently receiving.</li>
+                <li>Outgoing Synergies: Shows the benefits the building is providing to others.</li>
+                <li>Preview Synergies: Shows the potential synergies you would gain by placing the building in the hovered location.</li>
+            </ul>
+            
+           
+            </p>
+    </div>
+    <div>
+        <h2>Upgrades</h2>
+        <p>When left clicked on a building on the map on the right a bar will show up.
+             You can delete or upgrade buildings there.
+             You see what the next upgrade gives you.</p>
+    </div>
     
-    // </>
-    <Construction />
+    </div>
     );
     
 }
