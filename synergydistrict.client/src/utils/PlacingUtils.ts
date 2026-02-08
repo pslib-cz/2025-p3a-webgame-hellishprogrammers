@@ -126,6 +126,7 @@ export const CalculateValues = (
     loadedMapTiles: Record<string, MapTile>,
     existingNaturalFeatures?: Record<string, NaturalFeature>,
     activeSynergyUpgrades: Record<string, BuildingSynergy[]> = {},
+    activeSynergies: ActiveSynergies[] = [],
 ): CalculateValuesResult | null => {
     const result: CalculateValuesResult = {
         newResources: { ...variables },
@@ -153,6 +154,14 @@ export const CalculateValues = (
                 if (existingFeature) {
                     result.removedNaturalFeatureIds.push(existingFeature.id);
                     naturalFeaturesMap.delete(key);
+
+                    const connectedSynergies = activeSynergies.filter(
+                        (s) => s.sourceBuildingId === existingFeature.id || s.targetBuildingId === existingFeature.id,
+                    );
+
+                    for (const synergy of connectedSynergies) {
+                        DeleteProductionSum(synergy.synergyProductions, result.newResources);
+                    }
                 }
             }
         }

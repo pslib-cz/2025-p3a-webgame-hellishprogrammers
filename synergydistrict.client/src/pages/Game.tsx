@@ -208,6 +208,7 @@ const Game = () => {
                 GameMapData.loadedMapTiles,
                 GameMapData.ActiveNaturalFeatures,
                 GameMapData.activeSynergyUpgrades,
+                GameMapData.activeSynergies,
             );
             if (!newData) {
                 playError();
