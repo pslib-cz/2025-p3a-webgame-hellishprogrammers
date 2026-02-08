@@ -5,4 +5,5 @@ export type History = {
     people: number;
     industry: number;
     happiness: number;
+    duration?: number;
 };
