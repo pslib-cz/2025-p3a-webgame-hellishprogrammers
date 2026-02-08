@@ -181,12 +181,19 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
             return existing;
         });
 
+        const newSynergyUpgrades = { ...(GameMapData.activeSynergyUpgrades || {}) };
+        if (currentLevel.upgradeSynergies) {
+            const currentUpgrades = newSynergyUpgrades[building.MapBuildingId] || [];
+            newSynergyUpgrades[building.MapBuildingId] = [...currentUpgrades, ...currentLevel.upgradeSynergies];
+        }
+
         setGameResources(newResources);
         setGameMapData((prev) => ({
             ...prev,
             placedBuildings: newBuilding,
             placedBuildingsMappped: buildPlacedBuildingsMap(newBuilding),
             activeSynergies: newSynergies,
+            activeSynergyUpgrades: newSynergyUpgrades,
         }));
         setStatistics((prev) => ({
             ...prev,

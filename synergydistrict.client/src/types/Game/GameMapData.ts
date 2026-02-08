@@ -1,3 +1,4 @@
+import type { BuildingSynergy } from "./Buildings";
 import type { ActiveSynergies, MapBuilding, MapTile, NaturalFeature } from "./Grid";
 
 export type GameMapData = {
@@ -7,6 +8,7 @@ export type GameMapData = {
     placedBuildings: MapBuilding[];
     placedBuildingsMappped: Record<string, MapBuilding>;
     ActiveNaturalFeatures?: Record<string, NaturalFeature>;
+    activeSynergyUpgrades?: Record<string, BuildingSynergy[]>;
 };
 
 export const defaultGameMapData: GameMapData = {
@@ -15,4 +17,5 @@ export const defaultGameMapData: GameMapData = {
     activeSynergies: [],
     placedBuildings: [],
     placedBuildingsMappped: {},
+    activeSynergyUpgrades: {},
 };

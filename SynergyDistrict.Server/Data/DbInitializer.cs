@@ -464,73 +464,23 @@ namespace SynergyDistrict.Server.Data
                     ]
                 ]);
 
+            //AddUpgradeSynergy(buildingMap["Market"], synergyItemMap["House"],
+            //    [
+            //        [
+            //            new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 },
+            //            new BuildingProduction { Type = BuildingProductionType.People, Value = -1 }
+            //        ],
+            //        [
+            //            new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 },
+            //            new BuildingProduction { Type = BuildingProductionType.People, Value = -1 }
+            //        ],
+            //        [
+            //            new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 },
+            //            new BuildingProduction { Type = BuildingProductionType.People, Value = -1 }
+            //        ]
+            //    ]);
+
             context.SaveChanges();
-
-
-            //var hydroPlant = buildingMap["Hydro plant"];
-            //hydroPlant.Upgrades.ElementAt(0).UpgradeSynergies.Add(
-            //    new Synergy
-            //    {
-            //        SourceSynergyItem = synergyItemMap["Water"],
-            //        TargetSynergyItem = hydroPlant.SynergyItem,
-            //        SynergyProductions =
-            //        [
-            //            new BuildingProduction { Type = BuildingProductionType.Energy, Value = 2 }
-            //        ]
-            //    }
-            //);
-            //hydroPlant.Upgrades.ElementAt(1).UpgradeSynergies.Add(
-            //    new Synergy
-            //    {
-            //        SourceSynergyItem = synergyItemMap["Water"],
-            //        TargetSynergyItem = hydroPlant.SynergyItem,
-            //        SynergyProductions =
-            //        [
-            //            new BuildingProduction { Type = BuildingProductionType.Energy, Value = 3 }
-            //        ]
-            //    }
-            //);
-
-            //var market = buildingMap["Market"];
-            //market.Upgrades.ElementAt(0).UpgradeSynergies.Add(
-            //    new Synergy
-            //    {
-            //        SourceSynergyItem = buildingMap["House"].SynergyItem,
-            //        TargetSynergyItem = buildingMap["Market"].SynergyItem,
-            //        SynergyProductions =
-            //        [
-            //            new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 },
-            //            new BuildingProduction { Type = BuildingProductionType.People, Value = -1 }
-            //        ]
-            //    }
-            //);
-            //market.Upgrades.ElementAt(1).UpgradeSynergies.Add(
-            //    new Synergy
-            //    {
-            //        SourceSynergyItem = buildingMap["House"].SynergyItem,
-            //        TargetSynergyItem = buildingMap["Market"].SynergyItem,
-            //        SynergyProductions =
-            //        [
-            //            new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 },
-            //            new BuildingProduction { Type = BuildingProductionType.People, Value = -1 }
-            //        ]
-            //    }
-            //);
-            //market.Upgrades.ElementAt(2).UpgradeSynergies.Add(
-            //    new Synergy
-            //    {
-            //        SourceSynergyItem = buildingMap["House"].SynergyItem,
-            //        TargetSynergyItem = buildingMap["Market"].SynergyItem,
-            //        SynergyProductions =
-            //        [
-            //            new BuildingProduction { Type = BuildingProductionType.Money, Value = 2 },
-            //            new BuildingProduction { Type = BuildingProductionType.People, Value = -1 }
-            //        ]
-            //    }
-            //);
-
-            //context.Buildings.UpdateRange(hydroPlant, market);
-            //context.SaveChanges();
 
             // SYNERGIES
             var synergies = new List<Synergy>

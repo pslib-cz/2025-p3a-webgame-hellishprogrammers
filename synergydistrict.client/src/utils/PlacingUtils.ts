@@ -1,14 +1,15 @@
 import type { BuildingTileType, TileType } from "../types";
 import type {
-    BuildingSynergy,
     BuildingType,
-    Edge,
+    BuildingSynergy,
     Production,
+    Edge,
     SynergyProjection,
     ProductionProjection,
 } from "../types/Game/Buildings";
 import type { GameResources } from "../types/Game/GameResources";
-import type { ActiveSynergies, EdgeSide, MapBuilding, MapTile, NaturalFeature, Position } from "../types/Game/Grid";
+import type { MapBuilding, MapTile, Position, NaturalFeature, ActiveSynergies, EdgeSide } from "../types/Game/Grid";
+import { sumProduction } from "./upgradeUtils";
 
 export const CanPlaceBuilding = (
     shape: BuildingTileType[][],
@@ -124,6 +125,7 @@ export const CalculateValues = (
     variables: GameResources,
     loadedMapTiles: Record<string, MapTile>,
     existingNaturalFeatures?: Record<string, NaturalFeature>,
+    activeSynergyUpgrades: Record<string, BuildingSynergy[]> = {},
 ): CalculateValuesResult | null => {
     const result: CalculateValuesResult = {
         newResources: { ...variables },
@@ -210,6 +212,9 @@ export const CalculateValues = (
                 const id = naturalFeatures.find(
                     (n) => n.name.toLowerCase() === naturalFeatureData.type.toString().toLowerCase(),
                 )?.synergyItemId;
+
+                if (id == null) continue;
+
                 const activeSynergies = possibleSynergies.filter(
                     (s) => s.targetBuildingId === id || s.sourceBuildingId === id,
                 );
@@ -217,7 +222,17 @@ export const CalculateValues = (
                 if (activeSynergies.length === 0) continue;
 
                 for (const synergy of activeSynergies) {
-                    if (!AddProductionSum(synergy.synergyProductions || [], result.newResources)) return null;
+                    // Check for upgrades
+                    const neighborUpgrades = activeSynergyUpgrades[id.toString()] || [];
+                    const relevantUpgrades = neighborUpgrades.filter(
+                        (us) =>
+                            us.sourceBuildingId === synergy.sourceBuildingId &&
+                            us.targetBuildingId === synergy.targetBuildingId,
+                    );
+                    const bonusProductions = relevantUpgrades.flatMap((us) => us.synergyProductions);
+                    const totalProduction = sumProduction([...synergy.synergyProductions, ...bonusProductions]);
+
+                    if (!AddProductionSum(totalProduction || [], result.newResources)) return null;
 
                     const positionKey = `${neighborPosX};${neighborPosY}`;
                     let naturalFeature = naturalFeaturesMap.get(positionKey);
@@ -241,7 +256,7 @@ export const CalculateValues = (
                     result.newSynergies.push({
                         sourceBuildingId: naturalFeature.id,
                         targetBuildingId: target.MapBuildingId,
-                        synergyProductions: synergy.synergyProductions,
+                        synergyProductions: totalProduction,
                         edge: { position: edgePosition, side: edgeSide },
                     });
                 }
@@ -261,7 +276,17 @@ export const CalculateValues = (
         if (activeSynergies.length === 0) continue;
 
         for (const synergy of activeSynergies) {
-            if (!AddProductionSum(synergy.synergyProductions || [], result.newResources)) return null;
+            // Check for upgrades
+            const neighborUpgrades = activeSynergyUpgrades[neighbor.MapBuildingId] || [];
+            const relevantUpgrades = neighborUpgrades.filter(
+                (us) =>
+                    us.sourceBuildingId === synergy.sourceBuildingId &&
+                    us.targetBuildingId === synergy.targetBuildingId,
+            );
+            const bonusProductions = relevantUpgrades.flatMap((us) => us.synergyProductions);
+            const totalProduction = sumProduction([...synergy.synergyProductions, ...bonusProductions]);
+
+            if (!AddProductionSum(totalProduction || [], result.newResources)) return null;
 
             let target: MapBuilding;
             let source: MapBuilding;
@@ -286,12 +311,12 @@ export const CalculateValues = (
             result.newSynergies.push({
                 sourceBuildingId: source.MapBuildingId,
                 targetBuildingId: target.MapBuildingId,
-                synergyProductions: synergy.synergyProductions,
+                synergyProductions: totalProduction,
                 edge: { position: edgePosition, side: edgeSide },
             });
 
             if (synergy.sourceBuildingId === synergy.targetBuildingId) {
-                if (!AddProductionSum(synergy.synergyProductions || [], result.newResources)) return null;
+                if (!AddProductionSum(totalProduction || [], result.newResources)) return null;
 
                 target = neighbor;
                 source = building;
@@ -301,7 +326,7 @@ export const CalculateValues = (
                 result.newSynergies.push({
                     sourceBuildingId: source.MapBuildingId,
                     targetBuildingId: target.MapBuildingId,
-                    synergyProductions: synergy.synergyProductions,
+                    synergyProductions: totalProduction,
                     edge: { position: edgePosition, side: edgeSide },
                 });
             }
@@ -545,9 +570,13 @@ export const GetPreviewSynergies = (
     synergies: BuildingSynergy[],
     loadedMapTiles: Record<string, MapTile>,
     variables: GameResources,
+    activeSynergyUpgrades: Record<string, BuildingSynergy[]> = {},
 ): SynergyProjection[] => {
     // First pass: count synergies
-    const synergyCounts = new Map<string, { synergy: BuildingSynergy; amount: number }>();
+    const synergyCounts = new Map<
+        string,
+        { synergy: BuildingSynergy; amount: number; totalProduction: Production[] }
+    >();
 
     const possibleSynergies = synergies.filter(
         (s) => s.sourceBuildingId === buildingType.buildingId || s.targetBuildingId === buildingType.buildingId,
@@ -599,11 +628,21 @@ export const GetPreviewSynergies = (
                         if (processedSynergyPairs.has(key)) continue;
                         processedSynergyPairs.add(key);
 
+                        // Use helper to get potential upgrades (preview is always level 1 building)
+                        // But need to know neighbor's potential upgrades. Natural features don't upgrade.
+                        // New building (level 1) + Natural Feature (no level) -> No Upgrade bonus from them to us, unless we start > lvl 1? (we don't)
+                        // Wait, if WE are placing a building, it starts at level 1.
+                        // Does level 1 have upgrade bonuses? No, only lvl 2+.
+                        // So only neighbor upgrades matter. Natural feature has no upgrades.
+
+                        const finalProduction = s.synergyProductions;
+
                         if (!synergyCounts.has(key)) {
-                            synergyCounts.set(key, { synergy: s, amount: 1 });
+                            synergyCounts.set(key, { synergy: s, amount: 1, totalProduction: finalProduction });
                         } else {
                             const existing = synergyCounts.get(key)!;
                             existing.amount += 1;
+                            existing.totalProduction = sumProduction([...existing.totalProduction, ...finalProduction]);
                         }
                     }
                 }
@@ -618,14 +657,27 @@ export const GetPreviewSynergies = (
                 (s.sourceBuildingId === bId && s.targetBuildingId === nId) ||
                 (s.sourceBuildingId === nId && s.targetBuildingId === bId)
             ) {
+                // Determine upgrades
+                // Neighbor might have upgrades affecting this synergy
+                const neighborUpgrades = activeSynergyUpgrades[neighbor.MapBuildingId] || [];
+                const relevantUpgrades = neighborUpgrades.filter(
+                    (us) => us.sourceBuildingId === s.sourceBuildingId && us.targetBuildingId === s.targetBuildingId,
+                );
+                const bonusProductions = relevantUpgrades.flatMap((us) => us.synergyProductions);
+                const finalProduction = sumProduction([...s.synergyProductions, ...bonusProductions]);
+
                 const key = `${s.sourceBuildingId}-${s.targetBuildingId}`;
 
                 const incrementAmount = s.sourceBuildingId === s.targetBuildingId ? 2 : 1;
+                const productionToAdd =
+                    incrementAmount === 2 ? sumProduction([...finalProduction, ...finalProduction]) : finalProduction;
+
                 if (!synergyCounts.has(key)) {
-                    synergyCounts.set(key, { synergy: s, amount: incrementAmount });
+                    synergyCounts.set(key, { synergy: s, amount: incrementAmount, totalProduction: productionToAdd });
                 } else {
                     const existing = synergyCounts.get(key)!;
                     existing.amount += incrementAmount;
+                    existing.totalProduction = sumProduction([...existing.totalProduction, ...productionToAdd]);
                 }
             }
         }
@@ -652,12 +704,12 @@ export const GetPreviewSynergies = (
 
     const result: SynergyProjection[] = [];
 
-    for (const { synergy: s, amount } of synergyCounts.values()) {
-        const productionProjection: ProductionProjection[] = (s.synergyProductions || []).map((p) => {
+    for (const { synergy: s, amount, totalProduction } of synergyCounts.values()) {
+        const productionProjection: ProductionProjection[] = (totalProduction || []).map((p) => {
             const resourceKey = p.type.toLowerCase() as keyof GameResources;
             const currentValue = (accumulatedResources as any)[resourceKey];
             let detlaValue = 0;
-            const totalValue = p.value * amount;
+            const totalValue = p.value; // totalProduction is already summed up for ALL edges of this type
 
             if (typeof currentValue === "number") {
                 if (resourceKey === "energy" && totalValue < 0) {

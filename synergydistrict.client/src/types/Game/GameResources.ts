@@ -10,12 +10,12 @@ export type GameResources = {
 };
 
 export const defaultGameResources: GameResources = {
-    moneyBalance: 10000,
+    moneyBalance: 100000,
     money: 0,
     peopleUsed: 0,
     people: 0,
     energyUsed: 0,
     energy: 0,
-    industry: 0,
+    industry: 100,
     happiness: 100,
 };

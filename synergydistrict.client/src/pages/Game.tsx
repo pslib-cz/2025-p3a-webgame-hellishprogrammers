@@ -115,6 +115,7 @@ const Game = () => {
             synergies,
             GameMapData.loadedMapTiles,
             GameResources,
+            GameMapData.activeSynergyUpgrades,
         );
     }, [
         activeBuildingType,
@@ -206,6 +207,7 @@ const Game = () => {
                 GameResources,
                 GameMapData.loadedMapTiles,
                 GameMapData.ActiveNaturalFeatures,
+                GameMapData.activeSynergyUpgrades,
             );
             if (!newData) {
                 playError();
@@ -346,7 +348,9 @@ const Game = () => {
                 )}
             </BuildingsBitmapProvider>
             {!gameControl.isEnd && currentTrack && gameSettings.isMusic && (
-                <div className={styles.nowPlaying} style={{zIndex: 40}}>Now Playing: {currentTrack}</div>
+                <div className={styles.nowPlaying} style={{ zIndex: 40 }}>
+                    Now Playing: {currentTrack}
+                </div>
             )}
             {shouldRenderDetails && lastSelectedBuilding && (
                 <BuildingDetails
