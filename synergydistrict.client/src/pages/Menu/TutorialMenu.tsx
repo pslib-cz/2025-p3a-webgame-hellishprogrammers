@@ -14,8 +14,8 @@ const TutorialMenu = () => {
             <div>
                 <h2>Game Loop</h2>
                 <p>
-                    Buildings cost money but produce statistics. You can view the statistics a building generates in the
-                    sidebar on the left. Key metrics/statistics like money and population determine your final score,
+                    Buildings cost money but produce resources. You can view the resources a building generates in the
+                    sidebar on the left. Key metrics/resources like money and population determine your final score,
                     while happiness acts as a score multiplier. To achieve the highest score possible, you must find the
                     ideal balance between the different types of buildings.
                 </p>
