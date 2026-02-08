@@ -40,7 +40,7 @@ const BuildingDocs: FC<BuildingDocsProps> = ({ building, activeSynergies, isExit
     const { synergies, buildings, naturalFeatures } = useGameData();
     const { GameResources } = useGameResources();
     const unaffordableResources = GetUnaffordableResources(building, GameResources);
-    const [filter, setFilter] = useState<SynergyFilter>("outgoing")
+    const [filter, setFilter] = useState<SynergyFilter>("incoming")
     const [userSelectedFilter, setUserSelectedFilter] = useState<SynergyFilter | null>(null);
 
     const possibleSynergies = synergies.filter((s) => {

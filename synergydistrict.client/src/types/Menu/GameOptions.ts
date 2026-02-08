@@ -10,8 +10,8 @@ export type GameOptions = {
 
 export const defaultGameOptions: GameOptions = {
   gameMode: "timePresure",
-  gameDuration: 10,
+  gameDuration: 20,
   infiniteMap: false,
   seed: 0,
-  mapSize: 16,
+  mapSize: 32,
 };
