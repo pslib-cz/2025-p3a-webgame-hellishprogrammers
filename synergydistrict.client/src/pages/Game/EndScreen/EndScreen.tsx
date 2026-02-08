@@ -13,6 +13,8 @@ import { defaultGameOptions } from "../../../types/Menu/GameOptions";
 import { defaultGameMapData } from "../../../types/Game/GameMapData";
 import { useSound } from "../../../hooks/useSound";
 import { useHistory } from "../../../hooks/providers/useHistory";
+import useGameTime from "../../../hooks/providers/useGameTime";
+import useGameProperties from "../../../hooks/providers/useGameProperties";
 
 const getRank = (score: number) => {
     if (score < 5000) return "F - INTERN";
@@ -40,6 +42,8 @@ const EndScreen: FC = () => {
     const { setHistory } = useHistory();
 
     const playSuccess = useSound("SUCCESS");
+    const { time } = useGameTime();
+    const { TPS } = useGameProperties();
 
     const hasRun = useRef(false);
 
@@ -65,6 +69,7 @@ const EndScreen: FC = () => {
                 people: GameResources.people,
                 industry: GameResources.industry,
                 happiness: happiness,
+                duration: Math.round(durationInMinutes * 10) / 10,
             },
         ]);
 
@@ -79,10 +84,13 @@ const EndScreen: FC = () => {
 
     const happiness = GameResources.happiness > 100 ? 100 : GameResources.happiness;
 
-    const subtotal = moneyPt + peoplePt + industryPt;
-    const multiplier = Math.round((happiness / 50) * 100) / 100;
+    const durationInMinutes = time.timer / TPS / 60;
+    const durationMultiplier = Math.round((10 / options.gameDuration) * 100) / 100;
 
-    const score = Math.round(subtotal * multiplier);
+    const subtotal = moneyPt + peoplePt + industryPt;
+    const happinessMultiplier = Math.round((happiness / 50) * 100) / 100;
+
+    const score = Math.round(subtotal * happinessMultiplier * durationMultiplier);
 
     const handlePlayAgain = () => {
         setOptions({ ...options, seed: defaultGameOptions.seed });
@@ -117,10 +125,14 @@ const EndScreen: FC = () => {
 
             <div className={styles.box}>
                 <ValuesBox iconKey="happiness" text={`${happiness}%`} />
+                <p>{happinessMultiplier}x</p>
+                <p>(Happiness multiplier)</p>
 
-                <p>{multiplier}x</p>
-
-                <p>(Multiplier applied)</p>
+                <div className={`${styles.right}`}>
+                    <p>{options.gameDuration} min</p>
+                </div>
+                <p>{durationMultiplier}x</p>
+                <p>(Duration multiplier)</p>
             </div>
 
             <ShowInfo left={<p>Final score</p>} right={<div className={`${styles.right} border`}>{score}</div>} />
