@@ -19,13 +19,29 @@ import { TileBitmapProvider } from "./provider/TileBitmapProvider";
 import TutorialMenu from "./pages/Menu/TutorialMenu";
 import CRTEffect from "./components/CRTEffect/CRTEffect";
 import { useSettings } from "./hooks/providers/useSettings";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { HistoryProvider } from "./provider/HistoryProvider";
 import { StatisticsProvider } from "./provider/StatisticsProvider";
 import CreditsMenu from "./pages/Menu/CreditsMenu";
+import InputValue from "./components/Inputs/InputValue/InputValue";
 
 function AppContent() {
-    const { gameSettings } = useSettings();
+    const { gameSettings, setGameSettings } = useSettings();
+    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+    const [uiScaleInput, setUiScaleInput] = useState(gameSettings.uiScale.toString());
+
+    useEffect(() => {
+        setUiScaleInput(gameSettings.uiScale.toString());
+    }, [gameSettings.uiScale]);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setScreenWidth(window.innerWidth);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         const baseFontSize = window.innerWidth <= 1600 ? 12 : 16;
@@ -33,9 +49,44 @@ function AppContent() {
         document.documentElement.style.fontSize = `${scaledFontSize}px`;
     }, [gameSettings.uiScale]);
 
+    const minRequiredWidth = Math.round(1200 * (gameSettings.uiScale / 100));
+
+    const handleUiScaleInputChange = (value: string) => {
+        setUiScaleInput(value);
+    };
+
+    const commitUiScaleChange = () => {
+        const numValue = parseInt(uiScaleInput) || 100;
+        const clampedValue = Math.max(50, Math.min(200, numValue));
+        setUiScaleInput(clampedValue.toString());
+        setGameSettings({ ...gameSettings, uiScale: clampedValue });
+    };
+
     return (
         <>
             <CRTEffect intensity={gameSettings.crtIntensity} />
+            {screenWidth < minRequiredWidth && (
+                <div className="screen-size-warning">
+                    <div className="screen-size-warning__content">
+                        <h2>Screen Size Not Supported</h2>
+                        <p>This application requires a minimum screen width of {minRequiredWidth}px.</p>
+                        <p>Current width: {screenWidth}px</p>
+                        <p>Please use a larger screen or increase your browser window size.</p>
+                        
+                        <div className="screen-size-warning__ui-scale">
+                            <h3>Or Adjust UI Scale:</h3>
+                            <InputValue
+                                text="UI Scale (%)"
+                                inputType="number"
+                                value={uiScaleInput}
+                                onChange={handleUiScaleInputChange}
+                                onBlur={commitUiScaleChange}
+                                onEnter={commitUiScaleChange}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
             <div className="container">
                 <HistoryProvider>
                     <StatisticsProvider>
