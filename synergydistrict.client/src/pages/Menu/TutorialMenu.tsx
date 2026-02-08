@@ -1,6 +1,8 @@
+import styles from "../../styles/Menu.module.css";
+
 const TutorialMenu = () => {
     return (
-        <div>
+        <div className={styles.menuContent}>
             <div>
                 <h2>Basic Controls</h2>
                 <p>
