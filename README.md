@@ -20,7 +20,7 @@ Hráč musí balancovat následující metriky:
 | :--- | :--- |
 | **👥 People** (Lidé) | Nutní pro fungování budov. Získávají se z Domů. |
 | **💰 Money** (Peníze) | Generují se v čase. Potřeba pro nákup nových budov. |
-| **😊 Happiness** (Štěstí) | Ovlivňuje produktivitu. Nízké štěstí = pomalejší práce. |
+| **😊 Happiness** (Štěstí) | Násobič výsledného skóre.  |
 | **⚡ Electricity** (Elektřina)| Vyžadována pro pokročilé budovy. |
 | **🏭 Industry** (Průmysl) | Využíváno pro pokročilé budovy |
 
@@ -28,11 +28,11 @@ Hráč musí balancovat následující metriky:
 
 Příklady interakcí ve hře:
 
-* **Domy (Domy):** Získávají bonus +2 lidi za každý sousední Park.
+* **Domy (Domy):** Získávají bonus štěstí za každý sousední Park.
 * **Kanceláře:** +20 % peněz, bonus se násobí "Blue" synergií.
-* **Obchod:** Zdvojnásobuje výnos, pokud sousedí s jinou komerční budovou.
-* **Továrna:** Generuje průmysl, ale snižuje štěstí (-1) a peníze (-1).
-* **Park:** Zvyšuje štěstí (+2), ale více parků vedle sebe může mít klesající efekt.
+* **Obchod:** Vydělává jenom pokud sousedí s Domem.
+* **Továrna:** Generuje peníze, ale snižuje štěstí v okolí a spotřebovává industry.
+* **Park:** Zvyšuje štěstí, ale více parků vedle sebe může mít klesající efekt.
 
 ## Rozdělení práce
 
