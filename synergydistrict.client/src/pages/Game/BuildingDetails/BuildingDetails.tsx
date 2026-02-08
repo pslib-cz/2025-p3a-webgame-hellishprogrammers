@@ -154,7 +154,8 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
         return (
             !isMaxLevel &&
             GameResources.moneyBalance - currentLevel.upgradeCost >= 0 &&
-            CanAddProdution([...currentLevel.upgradeProductions, ...allSynergyProductions], newResources)
+            AddProductionSum(currentLevel.upgradeProductions, newResources) &&
+            AddProductionSum(sumProduction(allSynergyProductions), newResources)
         );
     };
 
