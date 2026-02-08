@@ -368,12 +368,12 @@ export const CanDeleteProdution = (products: Production[], variables: GameResour
             if (resultProduction < 0) return false;
 
             if (resourceKey === "energy" && product.value > 0) {
-                if (variables.energy - product.value <= variables.energyUsed) return false;
+                if (variables.energy - product.value < variables.energyUsed) return false;
                 continue;
             }
 
             if (resourceKey === "people" && product.value > 0) {
-                if (variables.people - product.value <= variables.peopleUsed) return false;
+                if (variables.people - product.value < variables.peopleUsed) return false;
                 continue;
             }
         }
@@ -383,6 +383,7 @@ export const CanDeleteProdution = (products: Production[], variables: GameResour
 
 export const DeleteProductionSum = (products: Production[], variables: GameResources): boolean => {
     if (!CanDeleteProdution(products, variables)) return false;
+
     for (const product of products) {
         const resourceKey = product.type.toLowerCase() as keyof GameResources;
         const currentValue = variables[resourceKey];

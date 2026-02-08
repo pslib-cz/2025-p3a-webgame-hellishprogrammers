@@ -2,6 +2,7 @@ import { useState, type FC } from "react";
 import styles from "./BuildingDetails.module.css";
 import underscore from "/src/styles/FlashingUnderscore.module.css";
 import type { MapBuilding, ActiveSynergies } from "../../../types/Game/Grid";
+import type { Production } from "../../../types/Game/Buildings";
 import { IconClose, GetIcon } from "../../../components/Icons";
 import ShowInfo from "../../../components/ShowInfo/ShowInfo";
 import ValuesBox from "../../../components/Game/ValuesBox/ValuesBox";
@@ -11,7 +12,6 @@ import {
     AddProductionSum,
     buildPlacedBuildingsMap,
     CanAddProdution,
-    CanDeleteProdution,
     DeleteProductionSum,
     GetUnaffordableProduction,
 } from "../../../utils/PlacingUtils";
@@ -22,6 +22,7 @@ import ToggleButton from "../../../components/Buttons/ToggleButton/ToggleButton"
 import { getGroupedSynergies, sumProduction } from "../../../utils/upgradeUtils";
 import { useStatistics } from "../../../hooks/providers/useStatistics";
 import Tooltip from "../../../components/Tooltip/Tooltip";
+import { useGameData } from "../../../hooks/providers/useGameData";
 
 type BuildingDetailsProps = {
     building: MapBuilding;
@@ -34,6 +35,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
     const { setStatistics } = useStatistics();
+    const { buildings, naturalFeatures } = useGameData();
     const [IO, setIO] = useState<boolean>(false);
 
     const currentBuilding =
@@ -95,8 +97,49 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
         ...totalLevelProduction,
     ]);
 
+    const SynergyUpgrades = () => {
+        if (!currentLevel?.upgradeSynergies) return [];
+        const results: { activeSynergy: ActiveSynergies; additionalStats: Production[] }[] = [];
+
+        currentLevel.upgradeSynergies.forEach((upSyn) => {
+            const myTypeId = building.buildingType.buildingId;
+            const otherTypeId = upSyn.sourceBuildingId === myTypeId ? upSyn.targetBuildingId : upSyn.sourceBuildingId;
+
+            GameMapData.activeSynergies.forEach((activeSyn) => {
+                let otherInstanceId: string | null = null;
+                if (activeSyn.sourceBuildingId === building.MapBuildingId) otherInstanceId = activeSyn.targetBuildingId;
+                else if (activeSyn.targetBuildingId === building.MapBuildingId)
+                    otherInstanceId = activeSyn.sourceBuildingId;
+
+                if (!otherInstanceId) return;
+
+                const otherBuilding = GameMapData.placedBuildings.find((b) => b.MapBuildingId === otherInstanceId);
+                if (otherBuilding) {
+                    if (otherBuilding.buildingType.buildingId === otherTypeId) {
+                        results.push({ activeSynergy: activeSyn, additionalStats: upSyn.synergyProductions });
+                    }
+                } else {
+                    const natFeature = GameMapData.ActiveNaturalFeatures?.[otherInstanceId];
+                    if (natFeature) {
+                        const def = naturalFeatures.find(
+                            (n) => n.name.toLowerCase() === natFeature.type.toString().toLowerCase(),
+                        );
+                        if (def && def.synergyItemId === otherTypeId) {
+                            results.push({ activeSynergy: activeSyn, additionalStats: upSyn.synergyProductions });
+                        }
+                    }
+                }
+            });
+        });
+        return results;
+    };
+
+    const synergyUpgradesList = SynergyUpgrades();
+    const allSynergyProductions = synergyUpgradesList.flatMap((s) => s.additionalStats);
+
     const isDeletable = () => {
         const newResources = { ...GameResources } as GameResources;
+
         return (
             newResources.moneyBalance - currentLevel.deleteCost >= 0 &&
             DeleteProductionSum(building.buildingType.baseProduction, newResources) &&
@@ -111,7 +154,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
         return (
             !isMaxLevel &&
             GameResources.moneyBalance - currentLevel.upgradeCost >= 0 &&
-            CanAddProdution(currentLevel.upgradeProductions, newResources)
+            CanAddProdution([...currentLevel.upgradeProductions, ...allSynergyProductions], newResources)
         );
     };
 
@@ -121,17 +164,29 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
         const newResources = { ...GameResources } as GameResources;
         newResources.moneyBalance -= currentLevel.upgradeCost;
 
-        AddProductionSum(currentLevel.upgradeProductions, newResources);
+        AddProductionSum([...currentLevel.upgradeProductions, ...allSynergyProductions], newResources);
 
         const newBuilding = GameMapData.placedBuildings.map((b) =>
             b.MapBuildingId === building.MapBuildingId ? { ...b, level: b.level + 1 } : b,
         );
+
+        const newSynergies = GameMapData.activeSynergies.map((existing) => {
+            const upgrade = synergyUpgradesList.find((u) => u.activeSynergy === existing);
+            if (upgrade) {
+                return {
+                    ...existing,
+                    synergyProductions: sumProduction([...existing.synergyProductions, ...upgrade.additionalStats]),
+                };
+            }
+            return existing;
+        });
 
         setGameResources(newResources);
         setGameMapData((prev) => ({
             ...prev,
             placedBuildings: newBuilding,
             placedBuildingsMappped: buildPlacedBuildingsMap(newBuilding),
+            activeSynergies: newSynergies,
         }));
         setStatistics((prev) => ({
             ...prev,
@@ -280,6 +335,62 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
                     ))}
                 </div>
             )}
+            {!isMaxLevel &&
+                currentLevel.upgradeSynergies?.map((synergy) => {
+                    const myTypeId = building.buildingType.buildingId;
+                    const otherTypeId =
+                        synergy.sourceBuildingId === myTypeId ? synergy.targetBuildingId : synergy.sourceBuildingId;
+
+                    const otherBuildingDef = buildings.find((b) => b.buildingId === otherTypeId);
+                    const otherNatDef = naturalFeatures.find((n) => n.synergyItemId === otherTypeId);
+                    const name = otherBuildingDef?.name || otherNatDef?.name || "Unknown";
+
+                    const matchingActive = synergyUpgradesList.filter(
+                        (l) => l.additionalStats === synergy.synergyProductions,
+                    );
+                    const count = matchingActive.length;
+
+                    const totalSynergyProductions = sumProduction(
+                        synergy.synergyProductions.map((p) => ({ ...p, value: p.value * count })),
+                    );
+
+                    const projectedProductions = totalSynergyProductions.map((p) => {
+                        const resourceKey = p.type.toLowerCase() as keyof GameResources;
+                        const currentValue = (GameResources as any)[resourceKey];
+                        const totalCostForThisType = p.value;
+
+                        let detlaValue = 0;
+                        if (typeof currentValue === "number") {
+                            if (resourceKey === "energy" && totalCostForThisType < 0) {
+                                const after = GameResources.energyUsed - totalCostForThisType;
+                                if (after > GameResources.energy) detlaValue = after - GameResources.energy;
+                            } else if (resourceKey === "people" && totalCostForThisType < 0) {
+                                const after = GameResources.peopleUsed - totalCostForThisType;
+                                if (after > GameResources.people) detlaValue = after - GameResources.people;
+                            } else if (totalCostForThisType < 0) {
+                                if (currentValue + totalCostForThisType < 0)
+                                    detlaValue = -(currentValue + totalCostForThisType);
+                            }
+                        }
+
+                        return {
+                            production: p,
+                            detlaValue,
+                        };
+                    });
+
+                    return (
+                        <SynergyDisplay
+                            key={`${otherTypeId}-${name}`}
+                            id={otherTypeId.toString()}
+                            name={name}
+                            productions={projectedProductions}
+                            amount={count > 0 ? count : null}
+                            onMouseEnter={() => onHighlightEdges?.(matchingActive.map((m) => m.activeSynergy))}
+                            onMouseLeave={handleSynergyLeave}
+                        />
+                    );
+                })}
             <div className={styles.buttons}>
                 {!isMaxLevel && (
                     <div className={styles.button} style={{ opacity: isUpgradable() ? 1 : 0.2 }}>
