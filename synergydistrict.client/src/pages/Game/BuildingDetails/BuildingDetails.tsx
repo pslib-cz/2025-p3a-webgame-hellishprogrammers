@@ -14,6 +14,7 @@ import {
     CanAddProdution,
     DeleteProductionSum,
     GetUnaffordableProduction,
+    MaterializeNaturalFeatures,
 } from "../../../utils/PlacingUtils";
 import useGameResources from "../../../hooks/providers/useGameResources";
 import type { GameResources } from "../../../types/Game/GameResources";
@@ -35,7 +36,7 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
     const { GameMapData, setGameMapData } = useGameMapData();
     const { GameResources, setGameResources } = useGameResources();
     const { setStatistics } = useStatistics();
-    const { buildings, naturalFeatures } = useGameData();
+    const { buildings, naturalFeatures, synergies: gameSynergies } = useGameData();
     const [IO, setIO] = useState<boolean>(false);
 
     const currentBuilding =
@@ -215,17 +216,117 @@ const BuildingDetails: FC<BuildingDetailsProps> = ({ building, CloseBar, onHighl
         DeleteProductionSum(totalOutgoingProduction, newResources);
 
         const newBuildings = GameMapData.placedBuildings.filter((b) => b.MapBuildingId !== building.MapBuildingId);
+        const newPlacedBuildingsMap = buildPlacedBuildingsMap(newBuildings);
+
         const newSynergies = GameMapData.activeSynergies.filter(
             (s) => s.sourceBuildingId !== building.MapBuildingId && s.targetBuildingId !== building.MapBuildingId,
         );
+
+        const restoredNaturalFeaturesMap = { ...GameMapData.ActiveNaturalFeatures };
+
+        for (let y = 0; y < building.buildingType.shape.length; y++) {
+            for (let x = 0; x < building.buildingType.shape[y].length; x++) {
+                if (building.buildingType.shape[y][x] !== "Empty") {
+                    const tileX = building.position.x + x;
+                    const tileY = building.position.y + y;
+                    const tileKey = `${tileX};${tileY}`;
+                    const tile = GameMapData.loadedMapTiles[tileKey];
+
+                    if (tile && (tile.hasIcon || tile.tileType.toLowerCase() === "water")) {
+                        const nfDef = naturalFeatures.find((n) => n.name.toLowerCase() === tile.tileType.toLowerCase());
+                        if (!nfDef) continue;
+
+                        const nfId = nfDef.synergyItemId;
+
+                        const [restoredNF] = MaterializeNaturalFeatures([
+                            { type: tile.tileType, position: { x: tileX, y: tileY } },
+                        ]);
+                        restoredNaturalFeaturesMap[restoredNF.id] = restoredNF;
+
+                        const offsets = [
+                            { dx: 0, dy: -1, side: "top" as const, opposite: "bottom" as const },
+                            { dx: 1, dy: 0, side: "right" as const, opposite: "left" as const },
+                            { dx: 0, dy: 1, side: "bottom" as const, opposite: "top" as const },
+                            { dx: -1, dy: 0, side: "left" as const, opposite: "right" as const },
+                        ];
+
+                        for (const { dx, dy, side, opposite } of offsets) {
+                            const nx = tileX + dx;
+                            const ny = tileY + dy;
+                            const neighborKey = `${nx};${ny}`;
+                            const neighborBuilding = newPlacedBuildingsMap[neighborKey];
+
+                            if (neighborBuilding) {
+                                const nbLocalX = nx - neighborBuilding.position.x;
+                                const nbLocalY = ny - neighborBuilding.position.y;
+
+                                const connectingEdge = neighborBuilding.buildingType.edges.find(
+                                    (e) =>
+                                        e.position.x === nbLocalX && e.position.y === nbLocalY && e.side === opposite,
+                                );
+
+                                if (connectingEdge) {
+                                    const possibleSynergies = gameSynergies.filter(
+                                        (s) =>
+                                            (s.sourceBuildingId === neighborBuilding.buildingType.buildingId &&
+                                                s.targetBuildingId === nfId) ||
+                                            (s.sourceBuildingId === nfId &&
+                                                s.targetBuildingId === neighborBuilding.buildingType.buildingId),
+                                    );
+
+                                    for (const s of possibleSynergies) {
+                                        const neighborUpgrades =
+                                            GameMapData.activeSynergyUpgrades?.[neighborBuilding.MapBuildingId] || [];
+                                        const relevantUpgrades = neighborUpgrades.filter(
+                                            (us) =>
+                                                us.sourceBuildingId === s.sourceBuildingId &&
+                                                us.targetBuildingId === s.targetBuildingId,
+                                        );
+                                        const bonusProductions = relevantUpgrades.flatMap(
+                                            (us) => us.synergyProductions,
+                                        );
+                                        const finalProduction = sumProduction([
+                                            ...s.synergyProductions,
+                                            ...bonusProductions,
+                                        ]);
+
+                                        AddProductionSum(finalProduction, newResources);
+
+                                        newSynergies.push({
+                                            sourceBuildingId:
+                                                s.sourceBuildingId === nfId
+                                                    ? restoredNF.id
+                                                    : neighborBuilding.MapBuildingId,
+                                            targetBuildingId:
+                                                s.targetBuildingId === nfId
+                                                    ? restoredNF.id
+                                                    : neighborBuilding.MapBuildingId,
+                                            synergyProductions: finalProduction,
+                                            edge: {
+                                                position: {
+                                                    x: tileX - neighborBuilding.position.x,
+                                                    y: tileY - neighborBuilding.position.y,
+                                                },
+                                                side: side,
+                                            },
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         CloseBar();
         setGameResources(newResources);
         setGameMapData((prev) => ({
             ...prev,
             placedBuildings: newBuildings,
-            placedBuildingsMappped: buildPlacedBuildingsMap(newBuildings),
+            placedBuildingsMappped: newPlacedBuildingsMap,
             activeSynergies: newSynergies,
+            ActiveNaturalFeatures: restoredNaturalFeaturesMap,
         }));
         setStatistics((prev) => ({
             ...prev,
